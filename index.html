@@ -292,7 +292,7 @@
         function sampledColor() {
           try {
             if (document.getElementById('yuvaGate') && !document.getElementById('yuvaGate').classList.contains('yg-out')) return '#0b0f19';
-            if (window.__andosSplashActive) return '#0b0f19';
+            if (window.__andosSplashActive) return '#000000';
             var overlays = ['#soSheet', '.ios-wallet-alert-backdrop', '.newbie-offer-backdrop'];
             for (var o = 0; o < overlays.length; o++) { if (document.querySelector(overlays[o])) return null; }
             var xs = [Math.round(window.innerWidth * 0.5), Math.round(window.innerWidth * 0.12), Math.round(window.innerWidth * 0.88)];
@@ -327,7 +327,8 @@
         }
         function onScroll() {
           var gate = document.getElementById('yuvaGate');
-          if ((gate && !gate.classList.contains('yg-out')) || window.__andosSplashActive) { writeMetaTheme('#0b0f19'); return; }
+          if (window.__andosSplashActive) { writeMetaTheme('#000000'); return; }
+          if (gate && !gate.classList.contains('yg-out')) { writeMetaTheme('#0b0f19'); return; }
           var shell = document.querySelector('.andos-shell');
           var pg = shell ? shell.getAttribute('data-page') : '';
           var isHome = (pg === 'home' || !pg);
@@ -11948,7 +11949,7 @@ if (window.ResizeObserver) new ResizeObserver(fitScreen).observe(document.getEle
 
 
 <!-- ==================== SMART VIDEO SPLASH (cold-start only, screen-fit) ==================== -->
-<div id="appSplashOverlay" style="position:fixed;inset:0;z-index:9999;background:#0b0f19;transition:opacity .5s ease;">
+<div id="appSplashOverlay" style="position:fixed;inset:0;z-index:9999;background:#000;transition:opacity .5s ease;">
     <video id="appSplashVideo" autoplay muted playsinline style="width:100%;height:100%;object-fit:contain;"></video>
 </div>
 <script>
@@ -11965,7 +11966,7 @@ if (window.ResizeObserver) new ResizeObserver(fitScreen).observe(document.getEle
     var v = document.getElementById('appSplashVideo'), done = false;
     // STATUS BAR SYNC: black splash video ke dauran upar ka system-bar bhi BLACK
     window.__andosSplashActive = true;
-    try { if (typeof window.__andosWriteMetaTheme === 'function') window.__andosWriteMetaTheme('#0b0f19'); else { var _mts = document.querySelectorAll('meta[name="theme-color"]'); for (var _i = 0; _i < _mts.length; _i++) _mts[_i].setAttribute('content', '#0b0f19'); } } catch (e) {}
+    try { if (typeof window.__andosWriteMetaTheme === 'function') window.__andosWriteMetaTheme('#000000'); else { var _mts = document.querySelectorAll('meta[name="theme-color"]'); for (var _i = 0; _i < _mts.length; _i++) _mts[_i].setAttribute('content', '#000000'); } } catch (e) {}
     function finish() { if (done) return; done = true; try { sessionStorage.setItem('andos_splash_done', '1'); } catch (e) {}
         window.__andosSplashActive = false; setTimeout(function () { window.__andosSplashDone = true; try { document.dispatchEvent(new CustomEvent('andos:splash:done')); } catch (e) {} }, 450);
         // ab screen ke header ke hisab se color wapas lagao
