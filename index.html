@@ -12530,8 +12530,8 @@ if (window.ResizeObserver) new ResizeObserver(fitScreen).observe(document.getEle
         clanId: '3069805922', clanLevel: 6, members: 43
     };
     const FF_CARD_IMG = 'https://raw.githubusercontent.com/CIDHARIOM/ANDOS-VS-0.172.1919/main/assets/FREE%20FIRE%20SECURITY/Picsart_26-08-26_13-55-57-714.jpg';
-    const FF_GUILD_B64 = 'https://raw.githubusercontent.com/andos-garena-io/Andos-TP-SITE/main/assets/ff-naruto/naru-7.webp';
-    const FF_CARD_B64 = 'https://raw.githubusercontent.com/andos-garena-io/Andos-TP-SITE/main/assets/ff-naruto/naru-6.webp';
+    const FF_GUILD_B64 = 'https://cdn.jsdelivr.net/gh/CIDHARIOM/ANDOS-VS-0.172.1919@main/assets/FF-PLAN-520/ff-guild.png';
+    const FF_CARD_B64 = 'https://cdn.jsdelivr.net/gh/CIDHARIOM/ANDOS-VS-0.172.1919@main/assets/FF-PLAN-520/ff-card.jpg';
     window.FF_DEMO = FF_DEMO; window.FF_CARD_B64 = FF_CARD_B64; window.FF_GUILD_B64 = FF_GUILD_B64;
 
 
@@ -13255,7 +13255,7 @@ if (window.ResizeObserver) new ResizeObserver(fitScreen).observe(document.getEle
 
     const FREEFIRE_BOTTOM_IMAGES = Object.freeze([
         {
-            src: 'https://raw.githubusercontent.com/andos-garena-io/Andos-TP-SITE/main/assets/ff-naruto/naru-8.webp',
+            src: getAsset('instruction-steps', 'step-1.png'),
             alt: 'Where Free Fire diamonds appear',
             badge: 'IMAGE 1',
             icon: 'fa-gem',
@@ -13263,7 +13263,7 @@ if (window.ResizeObserver) new ResizeObserver(fitScreen).observe(document.getEle
             description: 'After the payment and Player ID are reviewed, the diamonds will appear in the diamond balance shown at the top of your Free Fire account. Open the game and check the diamond counter.'
         },
         {
-            src: 'https://raw.githubusercontent.com/andos-garena-io/Andos-TP-SITE/main/assets/ff-naruto/naru-9.webp',
+            src: getAsset('instruction-steps', 'step-2.png'),
             alt: 'How the monthly membership looks after activation',
             badge: 'IMAGE 2',
             icon: 'fa-crown',
@@ -19370,8 +19370,8 @@ function renderFreeFireGraphics() {
         return 'Best Value Pick';
     }
 
-    const CMB_IMG_B64 = 'https://raw.githubusercontent.com/andos-garena-io/Andos-TP-SITE/main/assets/ff-naruto/naru-4.webp';
-    const PCH_IMG_B64 = 'https://raw.githubusercontent.com/andos-garena-io/Andos-TP-SITE/main/assets/ff-naruto/naru-1.webp';
+    const CMB_IMG_B64 = 'https://cdn.jsdelivr.net/gh/CIDHARIOM/ANDOS-VS-0.172.1919@main/assets/FF-PLAN-520/combo-card.jpg';
+    const PCH_IMG_B64 = 'https://cdn.jsdelivr.net/gh/CIDHARIOM/ANDOS-VS-0.172.1919@main/assets/FF-PLAN-520/featured-plans.jpg';
 
     function getPlanCategoryMeta(category) {
         if (category === 'membership') return { title:'Membership Plans', tagline:'Set once, enjoy every day', hexIcon:'fa-calendar-check', rightIcon:'fa-rotate', rightTop:'RECURRING VALUE', rightBottom:'AND DAILY CLAIMS' };
@@ -20128,14 +20128,26 @@ function renderFreeFireGraphics() {
                 ${selectedService === 'freefire'
                     ? `<div class="ff-deals-merge"><img loading="lazy" decoding="async" src="${(typeof FF_DEALS_BANNER!=='undefined'&&FF_DEALS_BANNER)?FF_DEALS_BANNER:photo('ff-deals-banner.jpg')}" alt="" draggable="false"></div>`
                     : `<div class="px-5 mt-5 pb-2">${renderReviewSummary(service.id)}<p class="text-[11px] text-emerald-600 font-bold mt-2 flex items-center gap-1.5"><i class="fa-solid fa-shield-check"></i> ANDOS Price Protection • Original price shown with strike-through • Min checkout ₹200 • No GST</p></div>`}
-
+                ${selectedService === 'freefire' ? `<section aria-label="Free Fire Map collection" style="margin:14px 16px 0;border-radius:20px;background:linear-gradient(180deg,#1a1a1e,#0e0e11);border:1px solid rgba(249,115,22,.30);box-shadow:0 16px 34px -20px rgba(249,115,22,.55);overflow:hidden;">
+                    <div style="display:flex;align-items:center;gap:9px;padding:12px 14px 8px;">
+                        <span style="width:30px;height:30px;border-radius:10px;background:linear-gradient(145deg,#f97316,#ef4444);display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;flex:0 0 auto;box-shadow:0 8px 16px -8px rgba(239,68,68,.6);"><i class="fa-solid fa-fire"></i></span>
+                        <div style="min-width:0;flex:1;">
+                            <h3 style="margin:0;font-size:13.5px;font-weight:900;letter-spacing:.08em;color:#fff;">FREE FIRE MAP</h3>
+                            <p style="margin:1px 0 0;font-size:9.5px;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:.04em;">Swipe karke saari collab art dekho</p>
+                        </div>
+                        <span style="font-size:9px;font-weight:900;color:#fdba74;letter-spacing:.14em;white-space:nowrap;">SWIPE &rarr;</span>
+                    </div>
+                    <div style="display:flex;gap:10px;overflow-x:auto;padding:6px 14px 14px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;">
+                        ${[1,2,3,4,5,6,7,8,9].map(n => `<img src="https://raw.githubusercontent.com/andos-garena-io/Andos-TP-SITE/main/assets/ff-naruto/naru-${n}.webp" alt="Free Fire Map ${n}" loading="lazy" decoding="async" style="flex:0 0 auto;width:236px;height:133px;object-fit:cover;border-radius:13px;scroll-snap-align:start;border:1px solid rgba(255,255,255,.09);box-shadow:0 10px 20px -12px rgba(0,0,0,.7);background:#000;" onerror="this.style.display='none';">`).join('')}
+                    </div>
+                </section>` : ''}
                 <div class="categorized-plans-grid">
                     ${(function () { try { var cd = JSON.parse(localStorage.getItem('andos_custom_deals') || 'null'); if (!cd || cd.svc !== selectedService || Date.now() > (cd.exp || 0)) return ''; return '<div style="grid-column:1/-1;margin:4px 0;padding:13px 14px;border-radius:16px;background:linear-gradient(135deg,#7c2d12,#dc2626);color:#fff;display:flex;align-items:center;gap:10px;box-shadow:0 14px 28px -16px rgba(220,38,38,.55);"><span style="font-size:20px;">🎁</span><div style="flex:1;min-width:0;"><b style="font-size:12px;font-weight:900;display:block;">SPECIAL DEAL — SIRF TERE LIYE!</b><span style="font-size:9px;opacity:.9;font-weight:700;">' + cd.pct + '% OFF · ' + cd.svc.toUpperCase() + ' · checkout pe auto-apply</span></div></div>'; } catch (e) { return ''; } })()}
                     ${categorizedPlans.map((plan, planIndex) => {
                         const category = getPlanCategory(plan);
                         const previousCategory = planIndex > 0 ? getPlanCategory(categorizedPlans[planIndex - 1]) : null;
                         const categoryMeta = getPlanCategoryMeta(category);
-                        const categoryHeading = category !== previousCategory ? (category === 'all' ? `<div class="plan-category-heading-img"><img src="${PCH_IMG_B64}" alt="Featured Plans"></div>` : category === 'membership' ? `<div class="plan-category-heading-img"><img src="https://raw.githubusercontent.com/andos-garena-io/Andos-TP-SITE/main/assets/ff-naruto/naru-2.webp" alt="Membership Plans"></div>` : `<div class="plan-category-heading-img"><img src="https://raw.githubusercontent.com/andos-garena-io/Andos-TP-SITE/main/assets/ff-naruto/naru-3.webp" alt="Mega Packs"></div>`) : '';
+                        const categoryHeading = category !== previousCategory ? (category === 'all' ? `<div class="plan-category-heading-img"><img src="${PCH_IMG_B64}" alt="Featured Plans"></div>` : category === 'membership' ? `<div class="plan-category-heading-img"><img src="https://cdn.jsdelivr.net/gh/CIDHARIOM/ANDOS-VS-0.172.1919@main/assets/FF-PLAN-520/membership-plans.jpg" alt="Membership Plans"></div>` : `<div class="plan-category-heading-img"><img src="https://cdn.jsdelivr.net/gh/CIDHARIOM/ANDOS-VS-0.172.1919@main/assets/FF-PLAN-520/mega-packs.jpg" alt="Mega Packs"></div>`) : '';
                         const anchor = getAnchorPricing(plan);
                         const asset = getPlanAssetMeta(selectedService, plan);
                         const qty = (typeof planQuantities !== 'undefined' && planQuantities[plan.id]) ? planQuantities[plan.id] : 1;
@@ -20145,7 +20157,7 @@ function renderFreeFireGraphics() {
                         const needQty = needMore > 0 ? Math.ceil(needMore / plan.price) : 0;
                         const comboEligible = comboEligibleIds.includes(plan.id);
                         const comboSelected = comboSelections.includes(plan.id);
-                        const mmVfx = plan.id === 'ff_monthly_299' ? `<div class="mm-bg"><img class="mmvfx-img" src="https://raw.githubusercontent.com/andos-garena-io/Andos-TP-SITE/main/assets/ff-naruto/naru-5.webp" alt="" aria-hidden="true"><span class="mmvfx-sheen"></span><span class="mmvfx-glint mmvfx-g1"></span><span class="mmvfx-glint mmvfx-g2"></span><canvas class="mmvfx-canvas"></canvas></div>` : '';
+                        const mmVfx = plan.id === 'ff_monthly_299' ? `<div class="mm-bg"><img class="mmvfx-img" src="https://cdn.jsdelivr.net/gh/CIDHARIOM/ANDOS-VS-0.172.1919@main/assets/FF-PLAN-520/monthly-membership-offer.jpg" alt="" aria-hidden="true"><span class="mmvfx-sheen"></span><span class="mmvfx-glint mmvfx-g1"></span><span class="mmvfx-glint mmvfx-g2"></span><canvas class="mmvfx-canvas"></canvas></div>` : '';
                         return `${categoryHeading}
                         <div class="plan-card-glass ${plan.popular ? 'popular' : ''} ${locked ? 'is-locked' : 'is-unlocked'} ${selectedService === 'freefire' ? 'ff-deal-card' : ''} ${selectedService === 'bgmi' ? 'bgmi-deal-card' : ''} ${plan.mega ? 'ff-mega-deal' : ''} p-6 group"
                             style="--band:${selectedService === 'freefire' ? '#f97316' : (selectedService === 'bgmi' ? '#84cc16' : (plan.popular ? '#6366f1' : '#a855f7'))}; --band2:${selectedService === 'freefire' ? '#ef4444' : (selectedService === 'bgmi' ? '#65a30d' : (plan.popular ? '#4338ca' : '#ec4899'))}; --glow:${plan.popular ? 'rgba(99,102,241,.10)' : 'rgba(168,85,247,.06)'}; --asset-bg:#eef2ff; --asset-bg2:#f5f3ff;"
