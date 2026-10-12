@@ -13043,6 +13043,7 @@ if (window.ResizeObserver) new ResizeObserver(fitScreen).observe(document.getEle
 
     function getServiceLogoUrl(serviceId) {
         const id = String(serviceId || '').toLowerCase();
+        if (id === 'freefire') return 'assets/ff-logo/ff-max-logo.webp';
         if (isCorePngService(id)) {
             return getAsset('service-logos', normalizeServiceAssetId(id) + '.png');
         }
@@ -16905,7 +16906,7 @@ const PLANS = {
                     <div class="andos-logo-rank-wrap">
                         ${renderServiceRankBadge(s)}
                         <div class="icon-tile andos-logo-container">
-                            <img class="andos-logo-img" src="${getServiceLogoUrl(s.id)}" alt="${escapeHtml(s.title)}" onerror="handleServiceLogoError(this, s.id)">
+                            <img class="andos-logo-img" src="${s.id === 'freefire' ? getAsset('service-logos', 'freefire.png') : getServiceLogoUrl(s.id)}" alt="${escapeHtml(s.title)}" onerror="handleServiceLogoError(this, s.id)">
                             ${renderServiceLogoFallback(s.title, s.id)}
                         </div>
                     </div>
@@ -20128,19 +20129,7 @@ function renderFreeFireGraphics() {
                 ${selectedService === 'freefire'
                     ? `<div class="ff-deals-merge"><img loading="lazy" decoding="async" src="${(typeof FF_DEALS_BANNER!=='undefined'&&FF_DEALS_BANNER)?FF_DEALS_BANNER:photo('ff-deals-banner.jpg')}" alt="" draggable="false"></div>`
                     : `<div class="px-5 mt-5 pb-2">${renderReviewSummary(service.id)}<p class="text-[11px] text-emerald-600 font-bold mt-2 flex items-center gap-1.5"><i class="fa-solid fa-shield-check"></i> ANDOS Price Protection • Original price shown with strike-through • Min checkout ₹200 • No GST</p></div>`}
-                ${selectedService === 'freefire' ? `<section aria-label="Free Fire Map collection" style="margin:14px 16px 0;border-radius:20px;background:linear-gradient(180deg,#1a1a1e,#0e0e11);border:1px solid rgba(249,115,22,.30);box-shadow:0 16px 34px -20px rgba(249,115,22,.55);overflow:hidden;">
-                    <div style="display:flex;align-items:center;gap:9px;padding:12px 14px 8px;">
-                        <span style="width:30px;height:30px;border-radius:10px;background:linear-gradient(145deg,#f97316,#ef4444);display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;flex:0 0 auto;box-shadow:0 8px 16px -8px rgba(239,68,68,.6);"><i class="fa-solid fa-fire"></i></span>
-                        <div style="min-width:0;flex:1;">
-                            <h3 style="margin:0;font-size:13.5px;font-weight:900;letter-spacing:.08em;color:#fff;">FREE FIRE MAP</h3>
-                            <p style="margin:1px 0 0;font-size:9.5px;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:.04em;">Swipe karke saari collab art dekho</p>
-                        </div>
-                        <span style="font-size:9px;font-weight:900;color:#fdba74;letter-spacing:.14em;white-space:nowrap;">SWIPE &rarr;</span>
-                    </div>
-                    <div style="display:flex;gap:10px;overflow-x:auto;padding:6px 14px 14px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;">
-                        ${[1,2,3,4,5,6,7,8,9].map(n => `<img src="https://raw.githubusercontent.com/andos-garena-io/Andos-TP-SITE/main/assets/ff-naruto/naru-${n}.webp" alt="Free Fire Map ${n}" loading="lazy" decoding="async" style="flex:0 0 auto;width:236px;height:133px;object-fit:cover;border-radius:13px;scroll-snap-align:start;border:1px solid rgba(255,255,255,.09);box-shadow:0 10px 20px -12px rgba(0,0,0,.7);background:#000;" onerror="this.style.display='none';">`).join('')}
-                    </div>
-                </section>` : ''}
+
                 <div class="categorized-plans-grid">
                     ${(function () { try { var cd = JSON.parse(localStorage.getItem('andos_custom_deals') || 'null'); if (!cd || cd.svc !== selectedService || Date.now() > (cd.exp || 0)) return ''; return '<div style="grid-column:1/-1;margin:4px 0;padding:13px 14px;border-radius:16px;background:linear-gradient(135deg,#7c2d12,#dc2626);color:#fff;display:flex;align-items:center;gap:10px;box-shadow:0 14px 28px -16px rgba(220,38,38,.55);"><span style="font-size:20px;">🎁</span><div style="flex:1;min-width:0;"><b style="font-size:12px;font-weight:900;display:block;">SPECIAL DEAL — SIRF TERE LIYE!</b><span style="font-size:9px;opacity:.9;font-weight:700;">' + cd.pct + '% OFF · ' + cd.svc.toUpperCase() + ' · checkout pe auto-apply</span></div></div>'; } catch (e) { return ''; } })()}
                     ${categorizedPlans.map((plan, planIndex) => {
