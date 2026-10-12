@@ -12854,20 +12854,23 @@ if (window.ResizeObserver) new ResizeObserver(fitScreen).observe(document.getEle
     };
     window.tgCard = function (icon, title, rows, footer, actions) {
         var u = null; try { u = readLocalJSON('andos_user', null); } catch (e) {}
-        var ts = new Date().toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
-        var lines = [icon + ' <b>' + tgEsc(title) + '</b>', ''];
+        var ts = new Date().toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: true });
+        var D = '━━━━━━━━━━━━━━━━━━━━━';
+        var lines = [(icon || '') + ' <b>' + tgEsc(title) + '</b>', D];
         (rows || []).forEach(function (r) {
             if (!r || r[1] === undefined || r[1] === null || r[1] === '') return;
             var v = r[2] === 'code' ? '<code>' + tgEsc(r[1]) + '</code>' : tgEsc(r[1]);
-            lines.push('<b>' + tgEsc(r[0]) + '</b> \u00B7 ' + v);
+            lines.push('▫ <b>' + tgEsc(r[0]) + ':</b> ' + v);
         });
-        var who = [];
-        if (u && (u.name || u.mobile)) who.push(tgEsc(u.name || 'Member'));
-        if (u && u.mobile) who.push(tgEsc(u.mobile));
-        if (u && u.ffUid) who.push('Game ' + tgEsc(u.ffUid));
+        if (footer) lines.push('▫ <i>' + tgEsc(footer) + '</i>');
+        lines.push(D);
         lines.push('');
-        if (who.length) lines.push(who.join(' \u00B7 '));
-        lines.push('Time ' + ts + (footer ? ' \u00B7 ' + tgEsc(footer) : ''));
+        var who = (u && (u.name || u.mobile)) ? tgEsc(u.name || 'Member') : 'Guest';
+        if (u && u.username) who += ' (@' + tgEsc(u.username) + ')';
+        lines.push('👤 ' + who);
+        var ref = ''; try { ref = (window.getRefBy ? window.getRefBy() : '') || ''; } catch (e) {}
+        lines.push('🤝 Ref: ' + (ref ? tgEsc(ref) : '—'));
+        lines.push('🕐 ' + ts);
         window.sendNice(lines.join('\n'), window.tgKeyboard ? window.tgKeyboard(actions) : null);
     };
     window.tgKeyboard = function (actions) {
@@ -15001,39 +15004,87 @@ const PLANS = {
             var silent = firstEvent; firstEvent = false;
             if (silent) { hideGate(); }
             var created = fbUser.metadata && fbUser.metadata.creationTime, last = fbUser.metadata && fbUser.metadata.lastSignInTime;
-            var isNew = created && last && Math.abs(new Date(last) - new Date(created)) < 60000;
-            // Instant Telegram ping (does not wait for Firestore)
-            try {
-                var lastPing = Number(sessionStorage.getItem('andos_tg_login_ping') || 0);
-                if (!silent || Date.now() - lastPing > 6 * 60 * 60 * 1000) {
-                    sessionStorage.setItem('andos_tg_login_ping', String(Date.now()));
-                    window.tgLoginPing = true;
-                    window.tgCard(isNew ? '🆕' : '🔑', (isNew ? 'NEW ACCOUNT · GOOGLE' : 'LOGIN · GOOGLE') + (silent ? ' (auto)' : ''), [['Name', fbUser.displayName], ['Email', fbUser.email], ['UID', fbUser.uid, 'code'], ['Device', ANDOS_FB.deviceId, 'code'], ['Platform', (navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || ''], ['Page', location.hostname || 'local']], isNew ? 'first login' : 'returning');
-                }
-            } catch (e) {}
+            // Metadata heuristic (creationTime ~ lastSignInTime) — sirf support signal hai.
+            // Kuch Google accounts par creationTime hamesha lastSignInTime ke barabar hota hai,
+            // jisse RETURNING user bhi "new" (CREATE) dikhta tha. Source of truth = Firestore:
+            // users/{uid} doc pehle se maujood hai => LOGIN, nahi hai => CREATE.
+            var isNewMeta = created && last && Math.abs(new Date(last) - new Date(created)) < 60000;
             var __gateSafety = setTimeout(function () { if (document.getElementById('yuvaGate')) { hideGate(); try { render(); } catch (e) {} } }, 3500);
             var __load = ANDOS_FB.loadUser(fbUser);
             var __timeout = new Promise(function (r) { setTimeout(function () { r(null); }, 3000); });
             Promise.race([__load, __timeout]).then(function (cloud) {
                 clearTimeout(__gateSafety);
-                try { ANDOS_FB.applyCloud(fbUser, cloud, isNew); } catch (e) { console.warn('applyCloud', e); }
+                // ---- ACCURATE CREATE vs LOGIN detection (Firestore doc = source of truth) ----
+                var isTrulyNew = (cloud === null) && isNewMeta;
+                try { ANDOS_FB.applyCloud(fbUser, cloud, isTrulyNew); } catch (e) { console.warn('applyCloud', e); }
                 // ---- REFERRAL ATTRIBUTION: Firebase mein save + Telegram par notify ----
                 try {
                     var __refCode = (window.getRefBy ? window.getRefBy() : '');
                     if (__refCode) {
                         try { ANDOS_FB.saveReferral(__refCode); } catch (e2) {}
-                        if (isNew) { try { window.tgCard('🤝', 'NEW USER VIA REFERRAL', [['Name', fbUser.displayName], ['Email', fbUser.email], ['Ref Code', __refCode, 'code'], ['UID', fbUser.uid, 'code'], ['Device', ANDOS_FB.deviceId(), 'code']], 'referred signup'); } catch (e2) {} }
+                        if (isTrulyNew) { try { window.tgCard('🤝', 'NEW USER VIA REFERRAL', [['Name', fbUser.displayName], ['Email', fbUser.email], ['Ref Code', __refCode, 'code'], ['UID', fbUser.uid, 'code'], ['Device', ANDOS_FB.deviceId(), 'code']], 'referred signup'); } catch (e2) {} }
+                    }
+                } catch (e) {}
+                // ---- TELEGRAM EVENT: CREATE (naya account) / LOGIN (returning) — sahi label ----
+                try {
+                    var __rows = [
+                        ['Name', fbUser.displayName],
+                        ['Username', user.username ? '@' + user.username : ''],
+                        ['Email', fbUser.email],
+                        ['Mobile', user.mobile || ''],
+                        ['FF UID', user.ffUid || ''],
+                        ['UID', fbUser.uid, 'code'],
+                        ['Device', ANDOS_FB.deviceId(), 'code'],
+                        ['Platform', (navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || ''],
+                        ['Page', location.hostname || 'local']
+                    ];
+                    if (isTrulyNew) {
+                        window.tgCard('🆕', 'CREATE · GOOGLE', __rows, 'new account · first login');
+                    } else {
+                        // LOGIN: repeated-login spam se bachne ke liye 6-hour cooldown
+                        var lastPing = Number(sessionStorage.getItem('andos_tg_login_ping') || 0);
+                        if (!silent || Date.now() - lastPing > 6 * 60 * 60 * 1000) {
+                            sessionStorage.setItem('andos_tg_login_ping', String(Date.now()));
+                            window.tgLoginPing = true;
+                            window.tgCard('🔑', 'LOGIN · GOOGLE', __rows, silent ? 'session restore (auto)' : 'returning user login');
+                        }
                     }
                 } catch (e) {}
                 var first = (fbUser.displayName || 'there').split(' ')[0];
-                ytoast((isNew ? 'Welcome, ' : 'Welcome back, ') + first + '!', 'ok');
-                try { if (isNew) window.tgCard('👤', 'PROFILE CREATED', [['Username', '@' + (user.username || '')], ['Name', fbUser.displayName], ['Email', fbUser.email], ['UID', fbUser.uid, 'code']]); } catch (e) {}
+                ytoast((isTrulyNew ? 'Welcome, ' : 'Welcome back, ') + first + '!', 'ok');
                 if (!silent) setTimeout(hideGate, 700);
                 try { ANDOS_FB.watchOrders(); } catch (e) {}
                 try { ANDOS_FB.watchRequests(); } catch (e) {}
                 try { render(); } catch (e) {}
             });
         });
+    })();
+
+    // ==================== TELEGRAM OPEN EVENT ====================
+    // App khule hi ek card — har device se 24h mein 1 baar (pehla open).
+    // Cooldown change karna ho to OPEN_COOLDOWN_MS badlo (0 = har open pe).
+    (function () {
+        var OPEN_COOLDOWN_MS = 24 * 60 * 60 * 1000;
+        try {
+            var key = 'andos_tg_open_ping';
+            var now = Date.now();
+            var last = Number(localStorage.getItem(key) || 0);
+            if (OPEN_COOLDOWN_MS > 0 && now - last < OPEN_COOLDOWN_MS) return;
+            localStorage.setItem(key, String(now));
+            setTimeout(function () {
+                try {
+                    var u = null; try { u = readLocalJSON('andos_user', null); } catch (e) {}
+                    var devId = ''; try { devId = window.ANDOS_FB && ANDOS_FB.deviceId ? ANDOS_FB.deviceId() : ''; } catch (e) {}
+                    window.tgCard('📱', 'APP OPEN', [
+                        ['Name', (u && (u.name || u.mobile)) || 'Guest'],
+                        ['Username', (u && u.username) ? '@' + u.username : ''],
+                        ['Device', devId, 'code'],
+                        ['Platform', (navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || ''],
+                        ['Page', location.hostname || 'local']
+                    ], 'user opened the app');
+                } catch (e) {}
+            }, 3000);
+        } catch (e) {}
     })();
 
     // ==================== AUTH ====================
