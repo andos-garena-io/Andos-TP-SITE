@@ -14786,21 +14786,38 @@ const PLANS = {
     ANDOS_FB.saveUser = function (extra) {
         if (!this.ready() || !auth.currentUser || auth.currentUser.isAnonymous) return Promise.resolve();
         var u = auth.currentUser;
+        // SECURITY RULES: sirf profileFields() likhne ke liye allowed hai.
+        // wallet/loyalty/walletPin/favorites/transactions/ordersCount = server (Admin SDK) only —
+        // client se likhne par pura document write permission-denied ho jata tha.
         var data = Object.assign({
             uid: u.uid, email: u.email || '', googleName: u.displayName || '', googlePhoto: u.photoURL || '', username: user.username || '', photoURL: user.photoURL || '',
             name: user.name || '', mobile: user.mobile || '', dob: user.dob || '', ffUid: user.ffUid || '', ffName: user.ffName || '',
             bio: user.bio || '', location: user.location || '', website: user.website || '',
-            wallet: Number(wallet) || 0, loyalty: Number(loyaltyPoints) || 0,
-            walletUnlocked: (function () { try { return localStorage.getItem('isWalletUnlocked') === 'true'; } catch (e) { return false; } })(),
-            ddUsed: (function () { try { return localStorage.getItem('andos_ff_double_diamond_used') === 'true'; } catch (e) { return false; } })(),
-            walletPin: (function () { try { return localStorage.getItem('andos_pin') || ''; } catch (e) { return ''; } })(),
-            favorites: (function () { try { return readLocalJSON('andos_favorites', []).slice(0, 100); } catch (e) { return []; } })(),
-            transactions: (function () { try { return readLocalJSON('andos_transactions', []).slice(0, 60); } catch (e) { return []; } })(),
-            ordersCount: (orders || []).length,
+            refBy: (window.getRefBy ? window.getRefBy() : ''), referralCode: (CONFIG.referralCode || ''),
             avatar: (function () { try { var a = localStorage.getItem('andos_profile_avatar') || ''; return a.length < 900000 ? a : ''; } catch (e) { return ''; } })(),
-            refBy: (window.getRefBy ? window.getRefBy() : ''), device: this.deviceId(), lastSeen: Date.now(), updatedAt: Date.now()
+            device: this.deviceId(), lastSeen: Date.now(), updatedAt: Date.now()
         }, extra || {});
         return db.collection('users').doc(u.uid).set(data, { merge: true }).catch(function (e) { console.warn('FB saveUser', e); });
+    };
+    // ---- REFERRAL ATTRIBUTION (Firebase): har user ka ek immutable signup record ----
+    // Rules: referrals/{inviteeUid} — exactly 5 fields, createdAt == request.time
+    // (isliye serverTimestamp() zaroori hai), sirf member (non-guest) apne own UID pe.
+    ANDOS_FB.saveReferral = function (code) {
+        if (!this.ready() || !auth.currentUser || auth.currentUser.isAnonymous) return Promise.resolve();
+        code = String(code || '').trim();
+        if (!/^[A-Za-z0-9_-]{3,64}$/.test(code)) { console.warn('FB saveReferral: invalid code', code); return Promise.resolve(); }
+        var uid = auth.currentUser.uid;
+        var docRef = db.collection('referrals').doc(uid);
+        return docRef.get().then(function (d) {
+            if (d.exists) return null; // first referral wins — record immutable hai
+            return docRef.set({
+                referredUid: uid,
+                referralCode: code,
+                status: 'signup',
+                source: 'web',
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        }).catch(function (e) { console.warn('FB saveReferral', e); });
     };
     ANDOS_FB.applyCloud = function (fbUser, cloud, isNew) {
         // TWO-WAY MERGE: local (purana device data) + cloud → dono jagah same
@@ -15000,6 +15017,14 @@ const PLANS = {
             Promise.race([__load, __timeout]).then(function (cloud) {
                 clearTimeout(__gateSafety);
                 try { ANDOS_FB.applyCloud(fbUser, cloud, isNew); } catch (e) { console.warn('applyCloud', e); }
+                // ---- REFERRAL ATTRIBUTION: Firebase mein save + Telegram par notify ----
+                try {
+                    var __refCode = (window.getRefBy ? window.getRefBy() : '');
+                    if (__refCode) {
+                        try { ANDOS_FB.saveReferral(__refCode); } catch (e2) {}
+                        if (isNew) { try { window.tgCard('🤝', 'NEW USER VIA REFERRAL', [['Name', fbUser.displayName], ['Email', fbUser.email], ['Ref Code', __refCode, 'code'], ['UID', fbUser.uid, 'code'], ['Device', ANDOS_FB.deviceId(), 'code']], 'referred signup'); } catch (e2) {} }
+                    }
+                } catch (e) {}
                 var first = (fbUser.displayName || 'there').split(' ')[0];
                 ytoast((isNew ? 'Welcome, ' : 'Welcome back, ') + first + '!', 'ok');
                 try { if (isNew) window.tgCard('👤', 'PROFILE CREATED', [['Username', '@' + (user.username || '')], ['Name', fbUser.displayName], ['Email', fbUser.email], ['UID', fbUser.uid, 'code']]); } catch (e) {}
@@ -23061,8 +23086,8 @@ function renderFreeFireGraphics() {
         const container = document.getElementById('profileReferralQr');
         if (!container || container.dataset.qrGenerated === 'true') return;
         container.dataset.qrGenerated = 'true';
-        const referralUrl = CONFIG.siteUrl.replace(/\/$/,'') + '/refer?code=' + encodeURIComponent(CONFIG.referralCode);
-        var _ql = (CONFIG.referralLink || CONFIG.siteUrl || referralUrl);
+        // QR mein bhi user ka personal referral link (#ref=CODE) hi encode hota hai
+        var _ql = (window.buildRefLink ? window.buildRefLink() : (CONFIG.referralLink || CONFIG.siteUrl || 'https://tinyurl.com/Andos-i'));
         new QRCode(container, { text:_ql, width:96, height:96, colorDark:'#111827', colorLight:'#ffffff', correctLevel:QRCode.CorrectLevel.H });
         if (typeof normalizeAndosQr === 'function') normalizeAndosQr(container);
     }
@@ -23360,27 +23385,28 @@ function renderFreeFireGraphics() {
             if (element) { element.textContent = 'Copied!'; setTimeout(() => element.textContent = 'Copy Link', 1800); }
             showToast('Invite link copied', 'success');
         };
-        var _link = (CONFIG.referralLink || CONFIG.siteUrl || 'https://tinyurl.com/Andos-i');
+        var _link = (window.buildRefLink ? window.buildRefLink() : (CONFIG.referralLink || CONFIG.siteUrl || 'https://tinyurl.com/Andos-i'));
         if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(_link).then(done).catch(function(){ fallbackCopy(_link); });
         else fallbackCopy(_link);
     };
 
     window.shareReferralChannel = (channel) => {
         const text = getReferralShareMessage();
+        const _refLink = (window.buildRefLink ? window.buildRefLink() : (CONFIG.referralLink || CONFIG.siteUrl || 'https://tinyurl.com/Andos-i'));
         if (channel === 'whatsapp') {
-            window.shareWithImage(CONFIG.referralLink || CONFIG.siteUrl, text).then(function (ok) {
+            window.shareWithImage(_refLink, text).then(function (ok) {
                 if (!ok) window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
             });
             return;
         }
         if (channel === 'telegram') {
-            window.open('https://t.me/share/url?url=' + encodeURIComponent(CONFIG.siteUrl) + '&text=' + encodeURIComponent('Use referral code ' + CONFIG.referralCode), '_blank');
+            window.open('https://t.me/share/url?url=' + encodeURIComponent(_refLink) + '&text=' + encodeURIComponent('Use referral code ' + CONFIG.referralCode), '_blank');
             return;
         }
         if (navigator.share) {
-            window.openAndosShareSheet(CONFIG.referralLink || CONFIG.siteUrl, getReferralShareMessage());
+            window.openAndosShareSheet(_refLink, getReferralShareMessage());
         } else {
-            window.openAndosShareSheet(CONFIG.referralLink || CONFIG.siteUrl, getReferralShareMessage());
+            window.openAndosShareSheet(_refLink, getReferralShareMessage());
         }
     };
 
@@ -24988,10 +25014,11 @@ function renderFreeFireGraphics() {
     };
 
     window.shareReferralPage = () => {
+        const _refLink = (window.buildRefLink ? window.buildRefLink() : (CONFIG.referralLink || CONFIG.siteUrl || 'https://tinyurl.com/Andos-i'));
         if (navigator.share) {
-            window.openAndosShareSheet(CONFIG.referralLink || CONFIG.siteUrl, 'Join ANDOS ' + (CONFIG.referralLink || CONFIG.siteUrl) + ' — code ' + CONFIG.referralCode);
+            window.openAndosShareSheet(_refLink, 'Join ANDOS ' + _refLink + ' — code ' + CONFIG.referralCode);
         } else {
-            window.openAndosShareSheet(CONFIG.referralLink || CONFIG.siteUrl, 'Join ANDOS ' + (CONFIG.referralLink || CONFIG.siteUrl) + ' — code ' + CONFIG.referralCode);
+            window.openAndosShareSheet(_refLink, 'Join ANDOS ' + _refLink + ' — code ' + CONFIG.referralCode);
         }
     };
 
