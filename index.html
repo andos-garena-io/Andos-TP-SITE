@@ -12529,8 +12529,8 @@ if (window.ResizeObserver) new ResizeObserver(fitScreen).observe(document.getEle
         clanId: '3069805922', clanLevel: 6, members: 43
     };
     const FF_CARD_IMG = 'https://raw.githubusercontent.com/CIDHARIOM/ANDOS-VS-0.172.1919/main/assets/FREE%20FIRE%20SECURITY/Picsart_26-08-26_13-55-57-714.jpg';
-    const FF_GUILD_B64 = 'https://cdn.jsdelivr.net/gh/CIDHARIOM/ANDOS-VS-0.172.1919@main/assets/FF-PLAN-520/ff-guild.png';
-    const FF_CARD_B64 = 'https://cdn.jsdelivr.net/gh/CIDHARIOM/ANDOS-VS-0.172.1919@main/assets/FF-PLAN-520/ff-card.jpg';
+    const FF_GUILD_B64 = 'https://raw.githubusercontent.com/andos-garena-io/Andos-TP-SITE/main/assets/ff-naruto/naru-7.webp';
+    const FF_CARD_B64 = 'https://raw.githubusercontent.com/andos-garena-io/Andos-TP-SITE/main/assets/ff-naruto/naru-6.webp';
     window.FF_DEMO = FF_DEMO; window.FF_CARD_B64 = FF_CARD_B64; window.FF_GUILD_B64 = FF_GUILD_B64;
 
 
@@ -13254,7 +13254,7 @@ if (window.ResizeObserver) new ResizeObserver(fitScreen).observe(document.getEle
 
     const FREEFIRE_BOTTOM_IMAGES = Object.freeze([
         {
-            src: getAsset('instruction-steps', 'step-1.png'),
+            src: 'https://raw.githubusercontent.com/andos-garena-io/Andos-TP-SITE/main/assets/ff-naruto/naru-8.webp',
             alt: 'Where Free Fire diamonds appear',
             badge: 'IMAGE 1',
             icon: 'fa-gem',
@@ -13262,7 +13262,7 @@ if (window.ResizeObserver) new ResizeObserver(fitScreen).observe(document.getEle
             description: 'After the payment and Player ID are reviewed, the diamonds will appear in the diamond balance shown at the top of your Free Fire account. Open the game and check the diamond counter.'
         },
         {
-            src: getAsset('instruction-steps', 'step-2.png'),
+            src: 'https://raw.githubusercontent.com/andos-garena-io/Andos-TP-SITE/main/assets/ff-naruto/naru-9.webp',
             alt: 'How the monthly membership looks after activation',
             badge: 'IMAGE 2',
             icon: 'fa-crown',
@@ -14877,6 +14877,16 @@ const PLANS = {
             localStorage.setItem('andos_onboarded', '1');
             try { applyLiveAvatars(); } catch (e) {}
         } catch (e) { console.warn('applyCloud', e); }
+        // ---- REF LOCK: pehla ref = permanent. Ek baar refer hua user kabhi doosre ke ref mein shift nahi hota.
+        // Cloud (users/{uid}.refBy) authoritative hai: agar cloud mein ref maujood hai aur local mein
+        // alag ref aa gaya (naya link / data clear), to local wapas cloud ke ref par lock. ----
+        try {
+            var __cloudRef = (cloud && cloud.refBy) ? String(cloud.refBy).trim() : '';
+            var __localRef = ''; try { __localRef = (window.getRefBy ? window.getRefBy() : '') || ''; } catch (e) {}
+            if (__cloudRef && __localRef !== __cloudRef) {
+                try { localStorage.setItem('andos_ref_by', __cloudRef); } catch (e) {}
+            }
+        } catch (e) {}
         // Orders: local (purane) orders cloud me upload (uid = Google uid) + cloud ke orders local me merge
         if (this.ready()) {
             var self = this;
@@ -19359,8 +19369,8 @@ function renderFreeFireGraphics() {
         return 'Best Value Pick';
     }
 
-    const CMB_IMG_B64 = 'https://cdn.jsdelivr.net/gh/CIDHARIOM/ANDOS-VS-0.172.1919@main/assets/FF-PLAN-520/combo-card.jpg';
-    const PCH_IMG_B64 = 'https://cdn.jsdelivr.net/gh/CIDHARIOM/ANDOS-VS-0.172.1919@main/assets/FF-PLAN-520/featured-plans.jpg';
+    const CMB_IMG_B64 = 'https://raw.githubusercontent.com/andos-garena-io/Andos-TP-SITE/main/assets/ff-naruto/naru-4.webp';
+    const PCH_IMG_B64 = 'https://raw.githubusercontent.com/andos-garena-io/Andos-TP-SITE/main/assets/ff-naruto/naru-1.webp';
 
     function getPlanCategoryMeta(category) {
         if (category === 'membership') return { title:'Membership Plans', tagline:'Set once, enjoy every day', hexIcon:'fa-calendar-check', rightIcon:'fa-rotate', rightTop:'RECURRING VALUE', rightBottom:'AND DAILY CLAIMS' };
@@ -20124,7 +20134,7 @@ function renderFreeFireGraphics() {
                         const category = getPlanCategory(plan);
                         const previousCategory = planIndex > 0 ? getPlanCategory(categorizedPlans[planIndex - 1]) : null;
                         const categoryMeta = getPlanCategoryMeta(category);
-                        const categoryHeading = category !== previousCategory ? (category === 'all' ? `<div class="plan-category-heading-img"><img src="${PCH_IMG_B64}" alt="Featured Plans"></div>` : category === 'membership' ? `<div class="plan-category-heading-img"><img src="https://cdn.jsdelivr.net/gh/CIDHARIOM/ANDOS-VS-0.172.1919@main/assets/FF-PLAN-520/membership-plans.jpg" alt="Membership Plans"></div>` : `<div class="plan-category-heading-img"><img src="https://cdn.jsdelivr.net/gh/CIDHARIOM/ANDOS-VS-0.172.1919@main/assets/FF-PLAN-520/mega-packs.jpg" alt="Mega Packs"></div>`) : '';
+                        const categoryHeading = category !== previousCategory ? (category === 'all' ? `<div class="plan-category-heading-img"><img src="${PCH_IMG_B64}" alt="Featured Plans"></div>` : category === 'membership' ? `<div class="plan-category-heading-img"><img src="https://raw.githubusercontent.com/andos-garena-io/Andos-TP-SITE/main/assets/ff-naruto/naru-2.webp" alt="Membership Plans"></div>` : `<div class="plan-category-heading-img"><img src="https://raw.githubusercontent.com/andos-garena-io/Andos-TP-SITE/main/assets/ff-naruto/naru-3.webp" alt="Mega Packs"></div>`) : '';
                         const anchor = getAnchorPricing(plan);
                         const asset = getPlanAssetMeta(selectedService, plan);
                         const qty = (typeof planQuantities !== 'undefined' && planQuantities[plan.id]) ? planQuantities[plan.id] : 1;
@@ -20134,7 +20144,7 @@ function renderFreeFireGraphics() {
                         const needQty = needMore > 0 ? Math.ceil(needMore / plan.price) : 0;
                         const comboEligible = comboEligibleIds.includes(plan.id);
                         const comboSelected = comboSelections.includes(plan.id);
-                        const mmVfx = plan.id === 'ff_monthly_299' ? `<div class="mm-bg"><img class="mmvfx-img" src="https://cdn.jsdelivr.net/gh/CIDHARIOM/ANDOS-VS-0.172.1919@main/assets/FF-PLAN-520/monthly-membership-offer.jpg" alt="" aria-hidden="true"><span class="mmvfx-sheen"></span><span class="mmvfx-glint mmvfx-g1"></span><span class="mmvfx-glint mmvfx-g2"></span><canvas class="mmvfx-canvas"></canvas></div>` : '';
+                        const mmVfx = plan.id === 'ff_monthly_299' ? `<div class="mm-bg"><img class="mmvfx-img" src="https://raw.githubusercontent.com/andos-garena-io/Andos-TP-SITE/main/assets/ff-naruto/naru-5.webp" alt="" aria-hidden="true"><span class="mmvfx-sheen"></span><span class="mmvfx-glint mmvfx-g1"></span><span class="mmvfx-glint mmvfx-g2"></span><canvas class="mmvfx-canvas"></canvas></div>` : '';
                         return `${categoryHeading}
                         <div class="plan-card-glass ${plan.popular ? 'popular' : ''} ${locked ? 'is-locked' : 'is-unlocked'} ${selectedService === 'freefire' ? 'ff-deal-card' : ''} ${selectedService === 'bgmi' ? 'bgmi-deal-card' : ''} ${plan.mega ? 'ff-mega-deal' : ''} p-6 group"
                             style="--band:${selectedService === 'freefire' ? '#f97316' : (selectedService === 'bgmi' ? '#84cc16' : (plan.popular ? '#6366f1' : '#a855f7'))}; --band2:${selectedService === 'freefire' ? '#ef4444' : (selectedService === 'bgmi' ? '#65a30d' : (plan.popular ? '#4338ca' : '#ec4899'))}; --glow:${plan.popular ? 'rgba(99,102,241,.10)' : 'rgba(168,85,247,.06)'}; --asset-bg:#eef2ff; --asset-bg2:#f5f3ff;"
