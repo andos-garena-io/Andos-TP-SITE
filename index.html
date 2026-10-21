@@ -3471,7 +3471,7 @@
         html.dark .order-tabs-scroller .tab-btn.active { background: #f8fafc !important; color: #0f172a !important; }
 
         button, [onclick], .tab-btn { cursor: pointer; }
-        button:focus-visible, [onclick]:focus-visible, input:focus-visible {
+        #app button:focus-visible, #app [onclick]:focus-visible, #app input:focus-visible {
             outline: 3px solid rgba(79,70,229,.28);
             outline-offset: 3px;
         }
@@ -7720,8 +7720,8 @@ html.dark .plan-asset-slot {
 .odd-like-card span { display:block; margin-top:4px; font-size:11px; font-weight:900; }
 
 
-input[type="text"]:focus, input[type="tel"]:focus, input[type="email"]:focus,
-input[type="number"]:focus, input[type="search"]:focus, textarea:focus, .input-field:focus {
+#app input[type="text"]:focus, #app input[type="tel"]:focus, #app input[type="email"]:focus,
+#app input[type="number"]:focus, #app input[type="search"]:focus, #app textarea:focus, #app .input-field:focus {
   outline: none !important;
   border-color: #f97316 !important;
   animation: inputFire 1s ease-in-out infinite;
@@ -11428,7 +11428,7 @@ main.andos-main{overscroll-behavior-x:none}
 .so-no{width:100%;padding:14px;border:0;border-radius:16px;background:#f1f5f9;color:#0f172a;font-weight:800;font-size:14px;margin-top:8px}
 </style>
 
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <!--YG-->
 <style id="andosOriginalLoginScopedStyles">
@@ -11501,12 +11501,7 @@ main.andos-main{overscroll-behavior-x:none}
 @keyframes screenIn{from{opacity:0}to{opacity:1}}
 
 /* ---------- space particles (canvas) ---------- */
-#yuvaGate #space{
-  touch-action:none;
-  position:absolute;inset:0;width:100%;height:100%;
-  z-index:0;pointer-events:none;
-  opacity:0;animation:algFadeIn 2.4s .6s ease forwards;
-}@keyframes charge{
+#yuvaGate #space{display:none !important;opacity:0 !important;visibility:hidden !important;pointer-events:none !important}@keyframes charge{
   0%  {opacity:0;  transform:scale(.2)}
   12% {opacity:.35;transform:scale(1)}
   85% {opacity:.75;transform:scale(5.2)}
@@ -11637,9 +11632,9 @@ main.andos-main{overscroll-behavior-x:none}
 #yuvaGate .title .w{will-change:transform,opacity}@keyframes lineGrow{to{opacity:1;transform:scaleX(1)}}/* ---------- app ka naam logo ke niche (ChatGPT style) ---------- */
 /* ---------- pehli screen ka background (halka blur) ---------- */
 #yuvaGate #loginScreen::before{
-  content:"";position:absolute;inset:calc(-30 * var(--u));z-index:0;pointer-events:none;
-  background:url("https://lh3.googleusercontent.com/d/1AqqzcDzUDbNzrVyeQINXuIAUbiV-quL4") center/cover no-repeat;
-  filter:blur(calc(3 * var(--u)));opacity:.96;
+  content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse 95% 42% at 50% 0%,#f8fafc 0%,#ffffff 72%);
+  filter:none;opacity:1;
 }
 #yuvaGate #loginScreen .bottom{z-index:3}
 
@@ -11786,27 +11781,71 @@ main.andos-main{overscroll-behavior-x:none}
 /* buttons ke beech barabar doori */
 #yuvaGate .btn-box + .btn-box{margin-top:calc(20 * var(--u))}
 
-/* ---------- saved account wala kaala button (sabse upar) ---------- */
-#yuvaGate .btn-box-account{height:calc(130 * var(--u))}
-#yuvaGate .gbtn.accountbtn{background:#101010;border-color:#101010;color:#fff;justify-content:flex-start;
-  padding:0 calc(34 * var(--u));gap:calc(24 * var(--u));box-shadow:none;border-radius:calc(65 * var(--u))}
-#yuvaGate .acc-avatar{width:calc(84 * var(--u));height:calc(84 * var(--u));border-radius:50%;flex:none;
-  background:#0e7569;color:#fff;display:flex;align-items:center;justify-content:center;
-  font-size:calc(30 * var(--u));font-weight:700;overflow:hidden;position:relative;z-index:4}
+/* ---------- Upgraded Premium "Continue with this account" + Cool "Last Used" Badge ---------- */
+#yuvaGate .btn-box-account{height:calc(138 * var(--u))}
+#yuvaGate .gbtn.accountbtn{
+  background:linear-gradient(135deg,#0b0f19 0%,#161f33 100%);
+  border:1px solid rgba(255,255,255,.14);color:#ffffff;justify-content:flex-start;
+  padding:0 calc(26 * var(--u));gap:calc(20 * var(--u));
+  box-shadow:0 calc(10 * var(--u)) calc(28 * var(--u)) rgba(15,23,42,.18);
+  border-radius:calc(69 * var(--u));
+  font-family:"Plus Jakarta Sans","Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+#yuvaGate .acc-avatar{
+  width:calc(86 * var(--u));height:calc(86 * var(--u));border-radius:50%;flex:none;
+  background:linear-gradient(145deg,#0f766e,#10b981);color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-family:"Plus Jakarta Sans","Inter",sans-serif;
+  font-size:calc(31 * var(--u));font-weight:800;letter-spacing:-.02em;
+  box-shadow:0 0 0 calc(2.5 * var(--u)) rgba(255,255,255,.18);
+  overflow:hidden;position:relative;z-index:4;
+}
 #yuvaGate .acc-avatar img{width:100%;height:100%;object-fit:cover;display:block}
 #yuvaGate .acc-avatar:has(img){
-  background:linear-gradient(220deg,#b8b1ff 0%,#7d92ff 38%,#2f7cf6 78%,#2b76f5 100%);
-  padding:calc(4 * var(--u));
+  background:linear-gradient(220deg,#b8b1ff 0%,#7d92ff 38%,#2f7cf6 78%,#10b981 100%);
+  padding:calc(3.5 * var(--u));
 }
-#yuvaGate .acc-avatar:has(img) img{border:calc(3 * var(--u)) solid #ffffff;border-radius:50%}
-#yuvaGate .acc-text{display:flex;flex-direction:column;align-items:flex-start;gap:calc(3 * var(--u));
-  line-height:1.25;position:relative;z-index:4;min-width:0;text-align:left}
-#yuvaGate .acc-title{font-size:calc(33 * var(--u));font-weight:700;white-space:nowrap}
-#yuvaGate .acc-mail{font-size:calc(25 * var(--u));font-weight:400;color:rgba(255,255,255,.62);
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:calc(500 * var(--u))}
-#yuvaGate .gbtn.accountbtn .ripple{background:rgba(255,255,255,.25)}
+#yuvaGate .acc-avatar:has(img) img{border:calc(2.5 * var(--u)) solid #0b0f19;border-radius:50%}
+#yuvaGate .acc-text{
+  display:flex;flex-direction:column;align-items:flex-start;gap:calc(5 * var(--u));
+  line-height:1.2;position:relative;z-index:4;min-width:0;flex:1;text-align:left;
+}
+#yuvaGate .acc-head-row{
+  display:flex;align-items:center;gap:calc(12 * var(--u));width:100%;min-width:0;
+}
+#yuvaGate .acc-title{
+  font-family:"Plus Jakarta Sans","Inter",sans-serif;
+  font-size:calc(29.5 * var(--u));font-weight:700;letter-spacing:-.02em;
+  color:#f8fafc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+#yuvaGate .acc-last-badge{
+  display:inline-flex;align-items:center;gap:calc(7 * var(--u));flex:none;
+  padding:calc(4.5 * var(--u)) calc(13 * var(--u));border-radius:999px;
+  background:linear-gradient(135deg,rgba(16,185,129,.22),rgba(56,189,248,.18));
+  border:1px solid rgba(52,211,153,.42);
+  color:#6ee7b7;font-family:"Plus Jakarta Sans","Inter",sans-serif;
+  font-size:calc(18.5 * var(--u));font-weight:800;letter-spacing:.04em;text-transform:uppercase;
+  line-height:1;white-space:nowrap;box-shadow:0 0 calc(14 * var(--u)) rgba(16,185,129,.16);
+}
+#yuvaGate .acc-last-dot{
+  width:calc(9 * var(--u));height:calc(9 * var(--u));border-radius:50%;flex:none;
+  background:#34d399;box-shadow:0 0 calc(8 * var(--u)) #34d399;
+}
+#yuvaGate .acc-mail{
+  font-family:"Plus Jakarta Sans","Inter",sans-serif;
+  font-size:calc(23.5 * var(--u));font-weight:500;letter-spacing:-.005em;
+  color:rgba(226,232,240,.78);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;
+}
+#yuvaGate .acc-arrow{
+  flex:none;position:relative;z-index:4;display:flex;align-items:center;justify-content:center;
+  width:calc(44 * var(--u));height:calc(44 * var(--u));border-radius:50%;
+  background:rgba(255,255,255,.08);color:rgba(255,255,255,.85);
+}
+#yuvaGate .acc-arrow svg{width:calc(24 * var(--u));height:calc(24 * var(--u));position:static}
+#yuvaGate .gbtn.accountbtn .ripple{background:rgba(255,255,255,.22)}
 @media (hover:hover) and (pointer:fine){
-  #yuvaGate .gbtn.accountbtn:hover{box-shadow:0 calc(6 * var(--u)) calc(20 * var(--u)) rgba(0,0,0,.25)}
+  #yuvaGate .gbtn.accountbtn:hover{box-shadow:0 calc(12 * var(--u)) calc(32 * var(--u)) rgba(15,23,42,.26)}
 }
 
 /* ---------- guest button ---------- */
@@ -11857,9 +11896,11 @@ main.andos-main{overscroll-behavior-x:none}
 /* DP container - baahar gradient ring, beech me safed gap (user ka design) */
 #yuvaGate .dp{
   width:calc(244 * var(--u));height:calc(244 * var(--u));border-radius:50%;
-  padding:calc(20 * var(--u));position:relative;
+  padding:calc(20 * var(--u));position:relative;cursor:pointer;
   display:flex;align-items:center;justify-content:center;
+  transition:transform .16s cubic-bezier(.22,1,.36,1);
 }
+#yuvaGate .dp:active{transform:scale(.96)}
 #yuvaGate .dp-ring{position:absolute;inset:0;width:100%;height:100%;display:block}
 #yuvaGate .dp-in{
   width:100%;height:100%;border-radius:50%;
@@ -11904,13 +11945,34 @@ main.andos-main{overscroll-behavior-x:none}
 
 /* ---------- auth page (screenshot wala style) ---------- */
 #yuvaGate .float-field{position:relative;margin-bottom:calc(30 * var(--u))}
+#yuvaGate, #yuvaGate *{
+  -webkit-touch-callout:none !important;
+  -webkit-tap-highlight-color:transparent !important;
+  -webkit-user-select:none !important;
+  -moz-user-select:none !important;
+  -ms-user-select:none !important;
+  user-select:none !important;
+}
+#yuvaGate input, #yuvaGate textarea{
+  -webkit-user-select:text !important;
+  user-select:text !important;
+  -webkit-touch-callout:none !important;
+}
 #yuvaGate .float-field input{
+  appearance:none;-webkit-appearance:none;
   width:100%;padding:calc(34 * var(--u)) calc(28 * var(--u));
-  border:1px solid rgba(15,23,42,.28);border-radius:calc(20 * var(--u));
-  font-family:inherit;font-size:calc(31 * var(--u));color:#111827;background:#fff;outline:none;
+  border:1px solid rgba(15,23,42,.28) !important;border-radius:calc(20 * var(--u));
+  font-family:inherit;font-size:calc(31 * var(--u));color:#111827 !important;background:#ffffff !important;
+  outline:none !important;outline-width:0 !important;box-shadow:none !important;animation:none !important;
+  --tw-ring-offset-shadow:0 0 #0000 !important;--tw-ring-shadow:0 0 #0000 !important;
   transition:border-color .18s ease, box-shadow .18s ease;
 }
-#yuvaGate .float-field input:focus{border-color:#111827;box-shadow:0 0 0 1px #111827}
+#yuvaGate .float-field input:focus,
+#yuvaGate .float-field input:focus-visible{
+  outline:none !important;outline-width:0 !important;animation:none !important;
+  --tw-ring-offset-shadow:0 0 #0000 !important;--tw-ring-shadow:0 0 #0000 !important;
+  border-color:#111827 !important;box-shadow:0 0 0 1px #111827 !important;background:#ffffff !important;
+}
 #yuvaGate .float-field label{
   position:absolute;top:50%;left:calc(28 * var(--u));transform:translateY(-50%);
   font-size:calc(30 * var(--u));font-weight:400;color:#6b7280;pointer-events:none;
@@ -12000,7 +12062,14 @@ main.andos-main{overscroll-behavior-x:none}
       <div class="btn-box btn-box-account" id="accountBox" style="display:none">
         <button class="gbtn accountbtn" id="accountBtn" type="button">
           <span class="acc-avatar" id="accAvatar">A</span>
-          <span class="acc-text"><span class="acc-title">Continue with this account</span><span class="acc-mail" id="accMail"></span></span>
+          <span class="acc-text">
+            <span class="acc-head-row">
+              <span class="acc-title">Continue with this account</span>
+              <span class="acc-last-badge"><span class="acc-last-dot"></span>Last Used</span>
+            </span>
+            <span class="acc-mail" id="accMail"></span>
+          </span>
+          <span class="acc-arrow" aria-hidden="true"><svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7.5 4.5L13 10L7.5 15.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
         </button>
       </div>
 
@@ -12046,7 +12115,7 @@ main.andos-main{overscroll-behavior-x:none}
       <h2 class="page-title">Make it yours</h2>
       <p class="page-sub">Set your name and photo so people can recognize you. You can also skip this step.</p>
       <div class="dp-wrap">
-        <div class="dp" id="dpPreview"><svg class="dp-ring" viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="alg_svg_dpGrad" x1="100%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#b8b1ff"/><stop offset="38%" stop-color="#7d92ff"/><stop offset="78%" stop-color="#2f7cf6"/><stop offset="100%" stop-color="#2b76f5"/></linearGradient></defs><circle cx="50" cy="50" r="46" fill="none" stroke="url(#alg_svg_dpGrad)" stroke-width="8"/></svg><div class="dp-in"><span id="dpInitial">?</span><img id="dpImg" alt="" hidden></div></div>
+        <label class="dp" id="dpPreview" for="dpInput" role="button" tabindex="0" aria-label="Upload profile photo"><svg class="dp-ring" viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="alg_svg_dpGrad" x1="100%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#b8b1ff"/><stop offset="38%" stop-color="#7d92ff"/><stop offset="78%" stop-color="#2f7cf6"/><stop offset="100%" stop-color="#2b76f5"/></linearGradient></defs><circle cx="50" cy="50" r="46" fill="none" stroke="url(#alg_svg_dpGrad)" stroke-width="8"/></svg><div class="dp-in"><span id="dpInitial">?</span><img id="dpImg" alt="" hidden></div></label>
         <label class="dp-btn" for="dpInput">Upload photo</label>
         <input id="dpInput" type="file" accept="image/*" hidden>
       </div>
@@ -15542,58 +15611,7 @@ const PLANS = {
 
         // === ORIGINAL ANIMATIONS, CANVAS PARTICLES & MATERIAL RIPPLE FROM andos-login (5).html ===
         (function initOriginalLoginVisuals() {
-            var c = document.getElementById('space');
-            if (c && !(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)) {
-                var x = c.getContext('2d'), W = 0, H = 0, dpr = 1, D = [], t0 = performance.now(), raf = null;
-                function build() {
-                    D = [];
-                    var n = Math.max(24, Math.min(Math.round(W * H / 26000), 44));
-                    for (var i = 0; i < n; i++) {
-                        D.push({
-                            x: Math.random() * W, y: Math.random() * H, r: .8 + Math.random() * 1.6,
-                            a: .10 + Math.random() * .22, vy: -(.05 + Math.random() * .10),
-                            ph: Math.random() * 6.28, ps: .3 + Math.random() * .5
-                        });
-                    }
-                }
-                function size() {
-                    dpr = Math.min(window.devicePixelRatio || 1, 2);
-                    W = c.clientWidth || Math.min(window.innerWidth || 420, 600);
-                    H = c.clientHeight || (window.innerHeight || 820);
-                    c.width = W * dpr; c.height = H * dpr;
-                    x.setTransform(dpr, 0, 0, dpr, 0, 0);
-                    build();
-                }
-                function draw(now) {
-                    if (document.documentElement.getAttribute('data-auth') !== 'ok') {
-                        var t = (now - t0) / 1000;
-                        x.clearRect(0, 0, W, H);
-                        for (var i = 0; i < D.length; i++) {
-                            var d = D[i];
-                            d.y += d.vy;
-                            d.x += Math.sin(t * .25 + d.ph) * .06;
-                            if (d.y < -5) { d.y = H + 5; d.x = Math.random() * W; }
-                            var tw = d.a * (.55 + .45 * Math.sin(t * d.ps + d.ph));
-                            if (tw < 0) tw = 0;
-                            x.beginPath(); x.arc(d.x, d.y, d.r, 0, 6.2832);
-                            x.fillStyle = 'rgba(100,116,139,' + tw.toFixed(3) + ')';
-                            x.fill();
-                        }
-                    }
-                    raf = requestAnimationFrame(draw);
-                }
-                try {
-                    size();
-                    raf = requestAnimationFrame(draw);
-                    var rto;
-                    window.addEventListener('resize', function () { clearTimeout(rto); rto = setTimeout(size, 180); });
-                    document.addEventListener('visibilitychange', function () {
-                        if (document.hidden) { if (raf) cancelAnimationFrame(raf); raf = null; }
-                        else if (!raf) { t0 = performance.now(); raf = requestAnimationFrame(draw); }
-                    });
-                } catch (e) {}
-            }
-
+            // Clean Google-style minimal soft-white background: particle dots removed
             if (gateEl) {
                 gateEl.querySelectorAll('.gbtn').forEach(function (b) {
                     b.addEventListener('pointerdown', function (e) {
@@ -15674,6 +15692,16 @@ const PLANS = {
         }
         window.__showPage = showPage;
 
+        if (gateEl) {
+            gateEl.addEventListener('contextmenu', function (ev) { ev.preventDefault(); }, true);
+            gateEl.addEventListener('selectstart', function (ev) { ev.preventDefault(); }, true);
+            gateEl.addEventListener('dragstart', function (ev) { ev.preventDefault(); }, true);
+        }
+        if (dpPreview && dpInput) {
+            dpPreview.addEventListener('keydown', function (ev) {
+                if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); dpInput.click(); }
+            });
+        }
         if (gateEl) {
             gateEl.querySelectorAll('[data-back]').forEach(function (b) {
                 b.addEventListener('click', function () { showPage(b.getAttribute('data-goto') || 'loginScreen'); });
