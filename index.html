@@ -15490,16 +15490,35 @@ const PLANS = {
         }
 
         function showLoginGate() {
+            var liveGate = document.getElementById('yuvaGate');
+            var liveLogin = document.getElementById('loginScreen');
+            if (!liveGate || !liveLogin) {
+                // Fail-safe: never leave user on a white blank screen if DOM was mutated
+                window.location.reload();
+                return;
+            }
+            gateEl = liveGate;
             document.documentElement.classList.add('yg-lock');
             document.documentElement.setAttribute('data-auth', 'login');
-            if (gateEl) {
-                gateEl.classList.remove('yg-out');
-                gateEl.style.display = 'flex';
-            }
+            setGoogleBusy(false);
+            try {
+                var gs = document.getElementById('guestSave'), gk = document.getElementById('guestSkip'), gn = document.getElementById('guestNote'), gi = document.getElementById('guestName');
+                if (gs) { gs.classList.remove('busy'); gs.textContent = 'Save & Continue'; }
+                if (gk) { gk.classList.remove('busy'); }
+                if (gn) { gn.textContent = ''; }
+                if (gi) { gi.value = ''; gi.dispatchEvent(new Event('input')); }
+            } catch (e) {}
+            liveGate.classList.remove('yg-out');
+            liveGate.style.display = 'flex';
+            liveGate.style.opacity = '1';
+            liveGate.style.pointerEvents = 'auto';
             if (welcome) welcome.classList.remove('show');
             if (window.__showPage) window.__showPage('loginScreen');
             loadSavedAccount();
-            try { if (typeof window.__andosApplyStatus === 'function') window.__andosApplyStatus(); } catch (e) {}
+            requestAnimationFrame(function () {
+                try { window.dispatchEvent(new Event('resize')); } catch (e) {}
+                try { if (typeof window.__andosApplyStatus === 'function') window.__andosApplyStatus(); } catch (e) {}
+            });
         }
 
         function hideLoginGate() {
@@ -16197,184 +16216,6 @@ const PLANS = {
         });
     })();
 
-    // ==================== YUVA LOGIN GATE (Google sign-in required) ====================
-    (function () {
-        var TOAST = document.querySelector('#yuvaGate #toast');
-        var tt; function ytoast(m, k) { if (!TOAST) return; clearTimeout(tt); TOAST.textContent = m; TOAST.style.whiteSpace = 'pre-line'; TOAST.className = 'toast show ' + (k || ''); tt = setTimeout(function () { TOAST.className = 'toast ' + (k || ''); }, 4000); }
-        if (TOAST) TOAST.addEventListener('click', function () { TOAST.classList.remove('show'); });
-        var btn = document.getElementById('ygGoogleBtn'); var box = btn && btn.parentNode; var busyT;
-        function busy(on) { clearTimeout(busyT); if (!btn) return; if (on) { busyT = setTimeout(function () { btn.classList.add('busy'); box.classList.add('loading'); }, 420); } else { btn.classList.remove('busy'); box.classList.remove('loading'); } }
-        window.__ygBusy = busy;
-        function hideGate() {
-            document.documentElement.classList.remove('yg-lock');
-            var g = document.getElementById('yuvaGate'); if (!g) return;
-            g.classList.add('yg-out'); setTimeout(function () { g.remove(); try { window.__andosApplyStatus && window.__andosApplyStatus(); } catch (e) {} }, 500);
-            if (!g.classList.contains('yg-on')) { g.remove(); }
-        }
-        function showGate() {
-            var g = document.getElementById('yuvaGate'); if (!g) return;
-            document.documentElement.classList.add('yg-lock');
-            var reveal = function () { g.classList.add('yg-on'); try { fitYuva(); } catch (e) {} };
-            if (window.__andosSplashDone) reveal(); else document.addEventListener('andos:splash:done', reveal, { once: true });
-        }
-        function fitYuva() { var el = document.querySelector('#yuvaGate .screen'); if (!el) return; var w = Math.min(el.parentElement.clientWidth || el.clientWidth || window.innerWidth, 520); if (w > 0) { el.style.setProperty('--u', (w / 843) + 'px'); } }
-        window.__ygHide = hideGate; window.__ygShow = showGate;
-        document.documentElement.classList.add('yg-lock');
-        if (!isFirebaseEnabled || !auth) { showGate(); ytoast('Firebase config missing', 'err'); return; }
-        // safety: if Firebase never answers (offline), show gate after 6s
-        var __authTimer = setTimeout(function () { if (!(auth.currentUser) && !window.__andosGuestMode) showGate(); }, 6000);
-        var provider = new firebase.auth.GoogleAuthProvider(); provider.setCustomParameters({ prompt: 'select_account' });
-        var inApp = /FBAN|FBAV|Instagram|Line\/|MicroMessenger|Twitter/i.test(navigator.userAgent);
-        var standalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true || /source=pwa/.test(location.search);
-        var GOOGLE_CLIENT_ID = '669879998185-rih4vbicj7tlclqlprr1oecq6cv6id98.apps.googleusercontent.com';
-        function doRedirect() { try { sessionStorage.setItem('andos_auth_redirect', '1'); } catch (e) {} return auth.signInWithRedirect(provider); }
-        // ---- Google Identity Services (FedCM / One Tap) → Firebase credential. Works in installed PWA & partitioned-storage browsers ----
-        function gisSignIn() {
-            return new Promise(function (resolve, reject) {
-                var done = false;
-                var finish = function (fn) { return function (v) { if (done) return; done = true; fn(v); }; };
-                var ok = finish(resolve), fail = finish(reject);
-                var load = window.google && window.google.accounts && window.google.accounts.id ? Promise.resolve() : new Promise(function (r, j) { var sc = document.createElement('script'); sc.src = 'https://accounts.google.com/gsi/client'; sc.async = true; sc.onload = r; sc.onerror = j; document.head.appendChild(sc); });
-                load.then(function () {
-                    google.accounts.id.initialize({
-                        client_id: GOOGLE_CLIENT_ID, use_fedcm_for_prompt: true, auto_select: false, cancel_on_tap_outside: false, itp_support: true, context: 'signin',
-                        callback: function (resp) {
-                            if (!resp || !resp.credential) return fail({ code: 'gis/no-credential' });
-                            var cred = firebase.auth.GoogleAuthProvider.credential(resp.credential);
-                            auth.signInWithCredential(cred).then(ok, fail);
-                        }
-                    });
-                    google.accounts.id.prompt(function (n) {
-                        try {
-                            var reason = (n.isNotDisplayed && n.isNotDisplayed()) ? n.getNotDisplayedReason() : (n.isSkippedMoment && n.isSkippedMoment()) ? n.getSkippedReason() : '';
-                            if (reason) fail({ code: 'gis/' + reason });
-                        } catch (e) { fail({ code: 'gis/unknown' }); }
-                    });
-                    setTimeout(function () { fail({ code: 'gis/timeout' }); }, 25000);
-                }).catch(function () { fail({ code: 'gis/load-failed' }); });
-            });
-        }
-        function afterSignIn(res) { if (res && res.user) setTimeout(function () { if (document.getElementById('yuvaGate') && auth.currentUser) hideGate(); }, 4000); }
-        function popupSignIn() {
-            return auth.signInWithPopup(provider).then(afterSignIn).catch(function (e) {
-                var c = e && e.code || '';
-                if (c === 'auth/popup-blocked' || c === 'auth/operation-not-supported-in-this-environment' || c === 'auth/web-storage-unsupported' || c === 'auth/popup-closed-by-user' || c === 'auth/cancelled-popup-request') {
-                    // popup route failed (common in installed PWA / Custom Tab) → FedCM route, then redirect as last resort
-                    return gisSignIn().then(afterSignIn).catch(function (e2) {
-                        console.warn('GIS fallback failed:', e2 && e2.code);
-                        if (c === 'auth/popup-closed-by-user' && !standalone) throw e; // user really cancelled in browser
-                        return doRedirect();
-                    });
-                }
-                throw e;
-            });
-        }
-        window.__andosGoogleSignIn = function () {
-            try {
-                if (!auth) return;
-                if (btn && btn.classList.contains('busy')) return;
-                if (location.protocol === 'file:') { ytoast('Local server se kholein', 'err'); return; }
-                busy(true);
-                auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).then(function () {
-                    if (inApp) return doRedirect();
-                    if (standalone) {
-                        // Installed app: Firebase popup is unreliable → try FedCM first, then popup, then redirect
-                        return gisSignIn().then(afterSignIn).catch(function (e2) { console.warn('GIS first failed:', e2 && e2.code); return popupSignIn(); });
-                    }
-                    return popupSignIn();
-                }).catch(function (e) { busy(false); handleErr(e); });
-            } catch (e) { console.warn('signIn', e); }
-        };
-        if (btn) btn.addEventListener('click', function () { window.__andosGoogleSignIn(); });
-        window.__andosGuestEnter = function () {
-            try { window.__andosGuestMode = true; window.__ygHide && window.__ygHide(); } catch (e) {}
-        };
-        // Returning from a redirect sign-in
-        (function () {
-            var wasRedirect = false; try { wasRedirect = sessionStorage.getItem('andos_auth_redirect') === '1'; sessionStorage.removeItem('andos_auth_redirect'); } catch (e) {}
-            if (wasRedirect) busy(true);
-            auth.getRedirectResult().then(function (res) {
-                if (wasRedirect && !(res && res.user)) {
-                    setTimeout(function () {
-                        if (!auth.currentUser) { busy(false); showGate(); ytoast('Login complete nahi hua — Firebase me authDomain apne hosting domain (' + location.hostname + ') pe set karein ya Authorized domains check karein.', 'err'); }
-                    }, 2500);
-                }
-            }).catch(function (e) { busy(false); showGate(); handleErr(e); });
-        })();
-        function handleErr(e) {
-            if (!e || !e.code) return;
-            var map = { 'auth/popup-closed-by-user': null, 'auth/cancelled-popup-request': null, 'auth/popup-blocked': 'Popup block hua — dobara try karein', 'auth/unauthorized-domain': 'Yeh domain Firebase me allowed nahi hai.', 'auth/operation-not-allowed': 'Google sign-in abhi enable nahi hai', 'auth/network-request-failed': 'Internet check karein', 'auth/too-many-requests': 'Thodi der baad try karein' };
-            if (e.code === 'auth/popup-closed-by-user' || e.code === 'auth/cancelled-popup-request') { ytoast('Login poora nahi hua — dobara "Continue with Google" dabayein.', 'err'); return; }
-            if (e.code in map) { if (map[e.code]) ytoast(map[e.code], 'err'); return; }
-            console.error(e); ytoast('Sign-in nahi ho paya (' + e.code + ')', 'err');
-        }
-        // ---- Auth state: gate opens ONLY after Firebase confirms user ----
-        setInterval(function () { try { if (auth.currentUser && !auth.currentUser.isAnonymous && document.getElementById('yuvaGate') && document.getElementById('yuvaGate').classList.contains('yg-on')) { hideGate(); render(); } } catch (e) {} }, 2500);
-        var firstEvent = true;
-        auth.onAuthStateChanged(function (fbUser) {
-            clearTimeout(__authTimer);
-            if (!fbUser || fbUser.isAnonymous) { if (window.__andosGuestMode) return; busy(false); showGate(); firstEvent = false; return; }
-            var silent = firstEvent; firstEvent = false;
-            if (silent) { hideGate(); }
-            var created = fbUser.metadata && fbUser.metadata.creationTime, last = fbUser.metadata && fbUser.metadata.lastSignInTime;
-            // Metadata heuristic (creationTime ~ lastSignInTime) — sirf support signal hai.
-            // Kuch Google accounts par creationTime hamesha lastSignInTime ke barabar hota hai,
-            // jisse RETURNING user bhi "new" (CREATE) dikhta tha. Source of truth = Firestore:
-            // users/{uid} doc pehle se maujood hai => LOGIN, nahi hai => CREATE.
-            var isNewMeta = created && last && Math.abs(new Date(last) - new Date(created)) < 60000;
-            var __gateSafety = setTimeout(function () { if (document.getElementById('yuvaGate')) { hideGate(); try { render(); } catch (e) {} } }, 3500);
-            var __load = ANDOS_FB.loadUser(fbUser);
-            var __timeout = new Promise(function (r) { setTimeout(function () { r(null); }, 3000); });
-            Promise.race([__load, __timeout]).then(function (cloud) {
-                clearTimeout(__gateSafety);
-                // ---- ACCURATE CREATE vs LOGIN detection (Firestore doc = source of truth) ----
-                var isTrulyNew = (cloud === null) && isNewMeta;
-                try { ANDOS_FB.applyCloud(fbUser, cloud, isTrulyNew); } catch (e) { console.warn('applyCloud', e); }
-                // ---- cloud notifications -> Notification Center ----
-                try { ANDOS_SYNC.syncNotifications(); } catch (e) {}
-                // ---- REFERRAL ATTRIBUTION: Firebase mein save + Telegram par notify ----
-                try {
-                    var __refCode = (window.getRefBy ? window.getRefBy() : '');
-                    if (__refCode) {
-                        try { ANDOS_FB.saveReferral(__refCode); } catch (e2) {}
-                        if (isTrulyNew) { try { window.tgCard('🤝', 'NEW USER VIA REFERRAL', [['Name', fbUser.displayName], ['Email', fbUser.email], ['Ref Code', __refCode, 'code'], ['UID', fbUser.uid, 'code'], ['Device', ANDOS_FB.deviceId(), 'code']], 'referred signup'); } catch (e2) {} }
-                    }
-                } catch (e) {}
-                // ---- TELEGRAM EVENT: CREATE (naya account) / LOGIN (returning) — sahi label ----
-                try {
-                    var __rows = [
-                        ['Name', fbUser.displayName],
-                        ['Username', user.username ? '@' + user.username : ''],
-                        ['Email', fbUser.email],
-                        ['Mobile', user.mobile || ''],
-                        ['FF UID', user.ffUid || ''],
-                        ['UID', fbUser.uid, 'code'],
-                        ['Device', ANDOS_FB.deviceId(), 'code'],
-                        ['Platform', (navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || ''],
-                        ['Page', location.hostname || 'local']
-                    ];
-                    if (isTrulyNew) {
-                        window.tgCard('🆕', 'CREATE · GOOGLE', __rows, 'new account · first login');
-                    } else {
-                        // LOGIN: repeated-login spam se bachne ke liye 6-hour cooldown
-                        var lastPing = Number(sessionStorage.getItem('andos_tg_login_ping') || 0);
-                        if (!silent || Date.now() - lastPing > 6 * 60 * 60 * 1000) {
-                            sessionStorage.setItem('andos_tg_login_ping', String(Date.now()));
-                            window.tgLoginPing = true;
-                            window.tgCard('🔑', 'LOGIN · GOOGLE', __rows, silent ? 'session restore (auto)' : 'returning user login');
-                        }
-                    }
-                } catch (e) {}
-                var first = (fbUser.displayName || 'there').split(' ')[0];
-                ytoast((isTrulyNew ? 'Welcome, ' : 'Welcome back, ') + first + '!', 'ok');
-                if (!silent) setTimeout(hideGate, 700);
-                try { ANDOS_FB.watchOrders(); } catch (e) {}
-                try { ANDOS_FB.watchRequests(); } catch (e) {}
-                try { render(); } catch (e) {}
-            });
-        });
-    })();
-
     // ==================== TELEGRAM OPEN EVENT ====================
     // App khule hi ek card — har device se 24h mein 1 baar (pehla open).
     // Cooldown change karna ho to OPEN_COOLDOWN_MS badlo (0 = har open pe).
@@ -17027,8 +16868,13 @@ const PLANS = {
                 try { localStorage.clear(); } catch (e) {}
                 try { if (lastAcc) localStorage.setItem('andos_last_account', lastAcc); } catch (e) {}
                 try { sessionStorage.setItem('andos_splash_done', '1'); } catch (e) {}
+                try { if (typeof hardCloseChrome === 'function') hardCloseChrome(); } catch (e) {}
                 user = { uid: '', name: '', username: '', publicId: '', mobile: '', email: '', loggedIn: false, isAdmin: false, isOfficer: false };
+                orders = [];
+                wallet = 0;
+                paymentVerification = null;
                 currentPage = 'home';
+                if (typeof window.mountSidebar === 'function') { try { window.mountSidebar(true); } catch (e) {} }
                 if (typeof window.__ygShow === 'function') window.__ygShow();
             });
         };
