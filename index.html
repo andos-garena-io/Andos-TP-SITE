@@ -11697,80 +11697,31 @@ main.andos-main{overscroll-behavior-x:none}
   display:flex;align-items:center;justify-content:center;gap:calc(27 * var(--u));
   cursor:pointer;overflow:hidden;
   box-shadow:none;
-  opacity:0;
-  animation:btnIn .9s 1.35s cubic-bezier(.22,1,.36,1) forwards;
-  transition:transform .2s cubic-bezier(.34,1.56,.64,1),box-shadow .3s ease;
-}
-@keyframes btnIn{
-  from{opacity:0;transform:translateY(calc(30 * var(--u))) scale(.96)}
-  to  {opacity:1;transform:translateY(0) scale(1)}
+  opacity:1;
+  transform:none;
+  animation:none;
+  transition:background-color .15s ease,border-color .15s ease,transform .12s ease;
 }
 @media (hover:hover) and (pointer:fine){
-  #yuvaGate .gbtn:hover{box-shadow:none}
+  #yuvaGate .gbtn:hover{border-color:rgba(15,23,42,.26)}
 }
-/* never let :active transform compete with the press keyframes */
-#yuvaGate .gbtn:active:not(.tapped){transform:scale(.965)}
+#yuvaGate .gbtn:active{transform:scale(.988)}
 #yuvaGate .gbtn.shown{opacity:1;animation:none}
-#yuvaGate .gbtn:focus-visible{outline:calc(3 * var(--u)) solid rgba(66,133,244,.75);outline-offset:calc(4 * var(--u))}
+#yuvaGate .gbtn:focus-visible{outline:2px solid #0f172a;outline-offset:2px}
 
 #yuvaGate .gbtn svg{
   width:calc(47 * var(--u));height:calc(48 * var(--u));
   flex:none;display:block;position:relative;z-index:4;
-  transition:transform .45s cubic-bezier(.34,1.4,.5,1);
 }
 #yuvaGate .gbtn .lbl{position:relative;z-index:4;color:#0d0d0d}
 
-/* light sweep across the pill */
-#yuvaGate .gbtn::before{
-  content:"";position:absolute;inset:0;z-index:2;
-  background:linear-gradient(105deg,transparent 33%,rgba(0,0,0,.07) 48%,transparent 63%);
-  transform:translateX(-130%);
-  animation:shine 4.5s 2.6s ease-in-out infinite;
-}
-@keyframes shine{0%{transform:translateX(-130%)}45%,100%{transform:translateX(130%)}}
+/* Clean functional UI: disable shimmer sweep, floating motion, wobble & rubber bounce */
+#yuvaGate .gbtn::before,
+#yuvaGate .gbtn::after{display:none !important;animation:none !important}
+#yuvaGate .btn-box{animation:none !important;transform:none !important}
+#yuvaGate .gbtn.shown.tapped, #yuvaGate .gbtn.tapped{opacity:1;animation:none !important}
 
-/* ripple on press */
-#yuvaGate .gbtn::after{
-  content:"";position:absolute;z-index:2;
-  left:var(--rx,50%);top:var(--ry,50%);
-  width:calc(760 * var(--u));height:calc(760 * var(--u));
-  margin:calc(-380 * var(--u));border-radius:50%;
-  background:radial-gradient(circle,rgba(0,0,0,.14),rgba(0,0,0,0) 65%);
-  transform:scale(0);opacity:0;
-}
-#yuvaGate .gbtn.tapped::after{animation:ripple .68s cubic-bezier(.22,1,.36,1)}
-@keyframes ripple{0%{transform:scale(0);opacity:1}100%{transform:scale(1);opacity:0}}
-
-/* the pill lifts and settles very slowly, like it's floating */
-#yuvaGate .btn-box{animation:btnFloat 7s 2.6s ease-in-out infinite}
-@keyframes btnFloat{
-  0%,100%{transform:translateY(0)}
-  50%    {transform:translateY(calc(-3 * var(--u)))}
-}
-
-
-
-/* ---- touch feedback: sirf Material ripple (neeche JS se banta hai) ---- */
-
-#yuvaGate .gbtn .lbl{transition:transform .45s cubic-bezier(.34,1.4,.5,1),letter-spacing .45s ease}
-#yuvaGate .gbtn:not(.busy).tapped .lbl{animation:lblNudge .6s cubic-bezier(.34,1.4,.5,1)}
-@keyframes lblNudge{
-  0%{transform:translateX(0);letter-spacing:calc(-.3 * var(--u))}
-  40%{transform:translateX(calc(3 * var(--u)));letter-spacing:calc(.5 * var(--u))}
-  100%{transform:translateX(0);letter-spacing:calc(-.3 * var(--u))}
-}
-/* the whole pill squashes then springs back */
-#yuvaGate .gbtn.shown.tapped, #yuvaGate .gbtn.tapped{opacity:1;animation:press .5s cubic-bezier(.34,1.5,.5,1)}
-@keyframes press{
-  0%  {transform:scale(1)}
-  30% {transform:scale(.955)}
-  60% {transform:scale(1.015)}
-  100%{transform:scale(1)}
-}
-
-
-
-/* ---------- Material ripple (Google apps wala touch effect) ---------- */
+/* ---------- Subtle ripple ---------- */
 #yuvaGate .ripple{position:absolute;z-index:2;border-radius:50%;pointer-events:none;
   background:rgba(15,23,42,.14);transform:translate(-50%,-50%) scale(0);
   animation:rippleIn .65s ease-out forwards}
@@ -11781,112 +11732,132 @@ main.andos-main{overscroll-behavior-x:none}
 /* buttons ke beech barabar doori */
 #yuvaGate .btn-box + .btn-box{margin-top:calc(20 * var(--u))}
 
-/* ---------- Upgraded Modern "Last Used" Account Card (Floating Top-Border Pill + Left Circular Avatar + Center Email + Sleek Right >) ---------- */
+/* ---------- Clean, Simple, Premium "Last Used" Account Card + Floating Top-Border Pill + Corner Gmail Logo Badge ---------- */
 #yuvaGate #accountBox.btn-box-account{
   position:relative;
   height:auto !important;
-  min-height:calc(146 * var(--u));
+  min-height:0;
   overflow:visible !important;
-  margin-bottom:calc(8 * var(--u));
+  margin-bottom:calc(10 * var(--u));
+  animation:none !important;
+  transform:none !important;
 }
 #yuvaGate .acc-floating-pill{
   position:absolute;
   top:0;
-  left:calc(30 * var(--u));
+  left:18px;
   transform:translateY(-50%);
   z-index:9;
   display:inline-flex;
   align-items:center;
-  gap:calc(8 * var(--u));
-  padding:calc(6 * var(--u)) calc(18 * var(--u));
+  padding:2.5px 9px;
   border-radius:999px;
-  background:#0f172a;
-  border:1.5px solid #ffffff;
-  color:#ffffff;
+  background:#ffffff;
+  border:1px solid #cbd5e1;
+  color:#475569;
   font-family:"Plus Jakarta Sans","Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-  font-size:calc(18.5 * var(--u));
-  font-weight:800;
+  font-size:10px;
+  font-weight:700;
   letter-spacing:.08em;
   text-transform:uppercase;
-  line-height:1;
+  line-height:1.2;
   white-space:nowrap;
   pointer-events:none;
-  box-shadow:0 calc(4 * var(--u)) calc(12 * var(--u)) rgba(15,23,42,.18);
-}
-#yuvaGate .acc-last-dot{
-  width:calc(9 * var(--u));
-  height:calc(9 * var(--u));
-  border-radius:50%;
-  flex:none;
-  background:#10b981;
-  box-shadow:0 0 calc(8 * var(--u)) rgba(16,185,129,.85);
 }
 #yuvaGate .gbtn.accountbtn{
   width:100%;
-  min-height:calc(146 * var(--u));
+  min-height:66px;
   height:auto;
   background:#ffffff !important;
-  border:1.5px solid rgba(15,23,42,.15) !important;
-  border-radius:calc(30 * var(--u)) !important;
+  border:1px solid #dfe3ea !important;
+  border-radius:16px !important;
   color:#0f172a !important;
-  justify-content:space-between;
+  justify-content:flex-start;
   align-items:center;
-  padding:calc(24 * var(--u)) calc(26 * var(--u)) calc(20 * var(--u)) !important;
-  gap:calc(18 * var(--u));
-  box-shadow:0 calc(10 * var(--u)) calc(28 * var(--u)) rgba(15,23,42,.08), 0 1px 2px rgba(15,23,42,.04);
+  padding:13px 16px !important;
+  gap:13px;
+  box-shadow:0 2px 8px rgba(15,23,42,.04);
   font-family:"Plus Jakarta Sans","Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  animation:none !important;
+  transform:none;
+}
+#yuvaGate .gbtn.accountbtn:active{background:#f8fafc !important;transform:scale(.992)}
+#yuvaGate .acc-avatar-wrap{
+  position:relative;
+  width:44px;
+  height:44px;
+  flex:none;
+  z-index:4;
 }
 #yuvaGate .acc-avatar{
-  width:calc(84 * var(--u));
-  height:calc(84 * var(--u));
+  width:44px;
+  height:44px;
   border-radius:50%;
-  flex:none;
   background:#f1f5f9;
-  border:1.5px solid rgba(15,23,42,.10);
+  border:1px solid #e2e8f0;
   color:#0f172a;
   display:flex;
   align-items:center;
   justify-content:center;
   font-family:"Plus Jakarta Sans","Inter",sans-serif;
-  font-size:calc(32 * var(--u));
-  font-weight:800;
+  font-size:16px;
+  font-weight:700;
   overflow:hidden;
-  position:relative;
-  z-index:4;
 }
 #yuvaGate .acc-avatar img{width:100%;height:100%;object-fit:cover;display:block;border-radius:50%}
-#yuvaGate .acc-avatar svg{width:calc(42 * var(--u));height:calc(42 * var(--u));position:static;color:#334155}
+#yuvaGate .acc-avatar svg{width:22px;height:22px;position:static;color:#475569}
+#yuvaGate .acc-gmail-badge{
+  position:absolute;
+  right:-3px;
+  bottom:-2px;
+  width:19px;
+  height:19px;
+  border-radius:50%;
+  background:#ffffff;
+  border:1.5px solid #ffffff;
+  box-shadow:0 1px 4px rgba(15,23,42,.18);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  pointer-events:none;
+  z-index:6;
+}
+#yuvaGate .acc-gmail-badge svg{
+  width:12.5px !important;
+  height:12.5px !important;
+  position:static;
+  display:block;
+}
 #yuvaGate .acc-text{
   display:flex;
   flex-direction:column;
-  align-items:center;
+  align-items:flex-start;
   justify-content:center;
-  gap:calc(4 * var(--u));
-  line-height:1.25;
+  gap:2px;
+  line-height:1.28;
   position:relative;
   z-index:4;
   min-width:0;
   flex:1;
-  text-align:center;
-  padding:0 calc(6 * var(--u));
+  text-align:left;
 }
 #yuvaGate .acc-name-sub{
-  font-family:"Plus Jakarta Sans","Inter",sans-serif;
-  font-size:calc(22 * var(--u));
-  font-weight:600;
-  letter-spacing:-.01em;
-  color:#64748b;
+  font-family:"Plus Jakarta Sans","Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  font-size:14.5px;
+  font-weight:700;
+  letter-spacing:-.015em;
+  color:#0f172a;
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
   max-width:100%;
 }
 #yuvaGate .acc-mail{
-  font-family:"Plus Jakarta Sans","Inter",sans-serif;
-  font-size:calc(27.5 * var(--u));
-  font-weight:700;
-  letter-spacing:-.015em;
-  color:#0f172a;
+  font-family:"Plus Jakarta Sans","Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  font-size:12.5px;
+  font-weight:500;
+  letter-spacing:0;
+  color:#64748b;
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
@@ -11899,17 +11870,14 @@ main.andos-main{overscroll-behavior-x:none}
   display:flex;
   align-items:center;
   justify-content:center;
-  width:calc(38 * var(--u));
-  height:calc(38 * var(--u));
-  color:#64748b;
-  transition:transform .2s ease, color .2s ease;
+  width:20px;
+  height:20px;
+  color:#94a3b8;
 }
-#yuvaGate .acc-arrow svg{width:calc(26 * var(--u));height:calc(26 * var(--u));position:static}
-#yuvaGate .gbtn.accountbtn:active .acc-arrow{transform:translateX(calc(4 * var(--u)));color:#0f172a}
-#yuvaGate .gbtn.accountbtn .ripple{background:rgba(15,23,42,.09)}
+#yuvaGate .acc-arrow svg{width:17px !important;height:17px !important;position:static}
+#yuvaGate .gbtn.accountbtn .ripple{display:none !important}
 @media (hover:hover) and (pointer:fine){
-  #yuvaGate .gbtn.accountbtn:hover{border-color:rgba(15,23,42,.28) !important;box-shadow:0 calc(14 * var(--u)) calc(34 * var(--u)) rgba(15,23,42,.12)}
-  #yuvaGate .gbtn.accountbtn:hover .acc-arrow{transform:translateX(calc(3 * var(--u)));color:#0f172a}
+  #yuvaGate .gbtn.accountbtn:hover{border-color:#cbd5e1 !important;background:#fcfdff !important}
 }
 
 /* ---------- guest button ---------- */
@@ -12151,14 +12119,25 @@ main.andos-main{overscroll-behavior-x:none}
 
     <div class="bottom">
       <div class="btn-box btn-box-account" id="accountBox" style="display:none">
-        <span class="acc-floating-pill"><span class="acc-last-dot"></span>LAST USED</span>
+        <span class="acc-floating-pill">LAST USED</span>
         <button class="gbtn accountbtn" id="accountBtn" type="button">
-          <span class="acc-avatar" id="accAvatar" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="8.5" r="4" stroke="currentColor" stroke-width="1.8"/><path d="M5 19.5C5.9 16.4 8.65 14.5 12 14.5C15.35 14.5 18.1 16.4 19 19.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>
-          <span class="acc-text">
-            <span class="acc-mail" id="accMail"></span>
-            <span class="acc-name-sub" id="accNameSub" style="display:none"></span>
+          <span class="acc-avatar-wrap">
+            <span class="acc-avatar" id="accAvatar" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="8.5" r="4" stroke="currentColor" stroke-width="1.8"/><path d="M5 19.5C5.9 16.4 8.65 14.5 12 14.5C15.35 14.5 18.1 16.4 19 19.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>
+            <span class="acc-gmail-badge" title="Google Account" aria-hidden="true">
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path fill="#4285F4" d="M2 6.5v11.25c0 .97.78 1.75 1.75 1.75H6.5V10.8L2 7.42V6.5z"/>
+                <path fill="#34A853" d="M17.5 19.5h2.75c.97 0 1.75-.78 1.75-1.75V6.5v.92L17.5 10.8v8.7z"/>
+                <path fill="#FBBC04" d="M17.5 5.4v5.4L22 7.42V6.15c0-1.44-1.65-2.27-2.8-1.4L17.5 5.4z"/>
+                <path fill="#EA4335" d="M6.5 10.8V5.4L12 9.53 17.5 5.4v5.4L12 14.93 6.5 10.8z"/>
+                <path fill="#C5221F" d="M2 6.15v1.27L6.5 10.8V5.4L4.8 4.75C3.65 3.88 2 4.71 2 6.15z"/>
+              </svg>
+            </span>
           </span>
-          <span class="acc-arrow" aria-hidden="true"><svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7.5 4.25L13.25 10L7.5 15.75" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <span class="acc-text">
+            <span class="acc-name-sub" id="accNameSub"></span>
+            <span class="acc-mail" id="accMail"></span>
+          </span>
+          <span class="acc-arrow" aria-hidden="true"><svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7.5 4.5L13 10L7.5 15.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
         </button>
       </div>
 
@@ -12199,12 +12178,12 @@ main.andos-main{overscroll-behavior-x:none}
         <label class="dp-btn" for="dpInput">Upload photo</label>
       </div>
       <div class="float-field">
-        <input id="guestName" type="text" maxlength="40" autocomplete="off" autocorrect="off" autocapitalize="words" spellcheck="false" placeholder=" ">
+        <input id="guestName" type="text" value="" maxlength="40" autocomplete="off" autocorrect="off" autocapitalize="words" spellcheck="false" placeholder=" ">
         <label for="guestName">Your name</label>
       </div>
       <button type="button" class="primary-btn" id="guestSave">Save &amp; Continue</button>
       <button type="button" class="ghost-btn" id="guestSkip">Skip for now</button>
-      <p class="page-note" id="guestNote">Skip assigns a friendly name like Sonu, Sagar, Aman or Kabir — editable anytime in Profile.</p>
+      <p class="page-note" id="guestNote">Skip generates a unique random gaming handle — editable anytime in Profile.</p>
     </div>
   </main>
 
@@ -15576,16 +15555,47 @@ const PLANS = {
         var WORKER_GUEST_CONVERT   = API_BASE + '/api/guest/convert';
         var WORKER_MEMBER_REGISTER = API_BASE + '/api/member/register';
         var WORKER_PROFILE_UPDATE  = API_BASE + '/api/profile/update';
+        var SSO_BRIDGE_URL         = 'https://andos-49b6a.firebaseapp.com/sso.html';
         var GOOGLE_CLIENT_ID = '669879998185-rih4vbicj7tlclqlprr1oecq6cv6id98.apps.googleusercontent.com';
-        var FRIENDLY_GUEST_NAMES = ['Sonu', 'Sagar', 'Aman', 'Kabir', 'Rocky', 'Vicky', 'Rohan', 'Aarav', 'Karan', 'Yash', 'Rahul', 'Sameer', 'Arjun', 'Dev', 'Nikhil', 'Aditya'];
-        function pickFriendlyGuestName() {
-            var arr = new Uint32Array(1);
+
+        // Unlimited Algorithmic Random Name Engine: 64 Cool Prefixes × 64 Gaming/Cool Nouns × 9000 4-digit tags = 36,864,000+ unique combinations!
+        var COOL_PREFIXES = [
+            'Shadow', 'Cyber', 'Hyper', 'Nova', 'Apex', 'Blaze', 'Frost', 'Phantom',
+            'Turbo', 'Quantum', 'Crimson', 'Vortex', 'Titan', 'Omega', 'Stealth', 'Neon',
+            'Astra', 'Cosmic', 'Pulse', 'Rogue', 'Storm', 'Drift', 'Solar', 'Lunar',
+            'Ultra', 'Alpha', 'Sigma', 'Zenith', 'Vector', 'Matrix', 'Prism', 'Echo',
+            'Pyre', 'Onyx', 'Cobalt', 'Silver', 'Golden', 'Iron', 'Savage', 'Swift',
+            'Fury', 'Legend', 'Royal', 'Prime', 'Elite', 'Spark', 'Thunder', 'Glitch',
+            'Cipher', 'Aero', 'Magma', 'Zero', 'Stratos', 'Radiant', 'Night', 'Vivid',
+            'Kinetic', 'Sonic', 'Valor', 'Mystic', 'Obsidian', 'Eclipse', 'Horizon', 'Nexus'
+        ];
+        var COOL_NOUNS = [
+            'Falcon', 'Knight', 'Viper', 'Phoenix', 'Rider', 'Wolf', 'Striker', 'Hunter',
+            'Reaper', 'Ninja', 'Spartan', 'Dragon', 'Ranger', 'Samurai', 'Sniper', 'Ghost',
+            'Hawk', 'Panther', 'Tiger', 'Raven', 'Warden', 'Pilot', 'Blade', 'Scout',
+            'Guardian', 'Maverick', 'Voyager', 'Nomad', 'Seeker', 'Wizard', 'Gladiator', 'Champion',
+            'Crusader', 'Sentinel', 'Outlaw', 'Racer', 'Brawler', 'Cobra', 'Lynx', 'Shark',
+            'Griffin', 'Valkyrie', 'Shogun', 'Ronin', 'Corsair', 'Prowler', 'Specter', 'Wraith',
+            'Drifter', 'Ace', 'Monarch', 'Rebel', 'Paladin', 'Archer', 'Gunner', 'Baron',
+            'Viking', 'Cyborg', 'Surge', 'Comet', 'Meteor', 'Tempest', 'Kestrel', 'Vanguard'
+        ];
+        function generateAlgorithmicGuestName() {
+            var arr = new Uint32Array(3);
             if (window.crypto && window.crypto.getRandomValues) window.crypto.getRandomValues(arr);
-            else arr[0] = Math.floor(Math.random() * 100000);
-            return FRIENDLY_GUEST_NAMES[arr[0] % FRIENDLY_GUEST_NAMES.length];
+            else {
+                arr[0] = Math.floor(Math.random() * 1000000);
+                arr[1] = Math.floor(Math.random() * 1000000);
+                arr[2] = Math.floor(Math.random() * 1000000);
+            }
+            var p = COOL_PREFIXES[arr[0] % COOL_PREFIXES.length];
+            var n = COOL_NOUNS[arr[1] % COOL_NOUNS.length];
+            var d = 1000 + (arr[2] % 9000);
+            return p + n + d;
         }
+        window.__generateAlgorithmicGuestName = generateAlgorithmicGuestName;
+
         function previewHandleSlug(raw) {
-            var s = String(raw || '').trim().toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 16);
+            var s = String(raw || '').trim().toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 18);
             return s || 'user';
         }
 
@@ -15646,13 +15656,9 @@ const PLANS = {
                 if (!s || !s.email) { accountBox.style.display = 'none'; return; }
                 accMail.textContent = s.email;
                 if (accNameSub) {
-                    var cleanDisp = String(s.name || '').trim();
-                    if (cleanDisp && cleanDisp.toLowerCase() !== String(s.email).toLowerCase()) {
-                        accNameSub.textContent = cleanDisp;
-                        accNameSub.style.display = '';
-                    } else {
-                        accNameSub.style.display = 'none';
-                    }
+                    var cleanDisp = String(s.name || s.email.split('@')[0] || 'Google Account').trim();
+                    accNameSub.textContent = cleanDisp;
+                    accNameSub.style.display = '';
                 }
                 accAvatar.innerHTML = '';
                 if (s.photo) {
@@ -15790,23 +15796,19 @@ const PLANS = {
             if (guestNote && !guestOnboardingInFlight) {
                 guestNote.textContent = n
                     ? ('Username preview: @' + previewHandleSlug(n) + '_<uid> · editable anytime in Profile.')
-                    : 'Skip assigns a friendly name like Sonu, Sagar, Aman or Kabir — editable anytime in Profile.';
+                    : 'Skip generates a unique random gaming handle — editable anytime in Profile.';
             }
         }
-        function prefillGuest() {
-            try {
-                var g = JSON.parse(localStorage.getItem('andos_guest_profile') || 'null');
-                if (g) {
-                    if (g.name && nameIn && !nameIn.value) nameIn.value = g.name;
-                    if (g.photo) setPhoto(g.photo);
-                }
-            } catch (e) {}
+        // Strictly blank input box on Guest Setup open — NEVER pre-fill any name!
+        function resetGuestForm() {
+            if (nameIn) nameIn.value = '';
+            setPhoto('');
             updateInitial();
         }
         function showPage(id) {
             pages.forEach(function (x) { var e = document.getElementById(x); if (e) e.hidden = (x !== id); });
             window.scrollTo(0, 0);
-            if (id === 'guestPage') prefillGuest();
+            if (id === 'guestPage') resetGuestForm();
         }
         window.__showPage = showPage;
 
@@ -15993,7 +15995,7 @@ const PLANS = {
             guestOnboardingInFlight = true;
             setGuestSetupBusy(true);
             var rawInputName = String((profileInput && profileInput.name) || '').trim().slice(0, 40);
-            var effectiveName = rawInputName || pickFriendlyGuestName();
+            var effectiveName = rawInputName || generateAlgorithmicGuestName();
             if (guestNote) guestNote.textContent = 'Setting up profile for ' + effectiveName + '...';
             try {
                 var anonUser = (auth.currentUser && auth.currentUser.isAnonymous)
@@ -16001,9 +16003,11 @@ const PLANS = {
                     : (await auth.signInAnonymously()).user;
 
                 var serverResp = await postLifecycleWorker(WORKER_GUEST_CREATE, anonUser, {
-                    name: effectiveName
+                    name: rawInputName // empty string triggers server-side 36.8M-combo algorithmic name + handle!
                 });
-                var verified = applyVerifiedServerIdentity(anonUser, serverResp, effectiveName, (profileInput && profileInput.photo) || photoData || '');
+                var serverProfile = (serverResp && serverResp.profile) ? serverResp.profile : serverResp;
+                var finalAssignedName = (serverProfile && serverProfile.name) || effectiveName;
+                var verified = applyVerifiedServerIdentity(anonUser, serverResp, finalAssignedName, (profileInput && profileInput.photo) || photoData || '');
                 window.ANDOS_STAFF.sync(anonUser);
                 try { ANDOS_FB.watchOrders(); ANDOS_FB.watchRequests(); applyLiveAvatars(); } catch (e) {}
 
@@ -16045,20 +16049,13 @@ const PLANS = {
         }
         if (skipBtn) {
             skipBtn.addEventListener('click', function () {
-                var friendly = pickFriendlyGuestName();
-                window.__andosGuestLogin({ name: friendly, photo: photoData }).catch(function () {});
+                window.__andosGuestLogin({ name: '', photo: photoData }).catch(function () {});
             });
         }
 
-        // === INSTANT ZERO-HANG GOOGLE SIGN-IN (SYNCHRONOUS GESTURE POPUP + IMMEDIATE 0ms DASHBOARD UNLOCK) ===
+        // === ZERO-BLOCKER FIRST-PARTY GOOGLE AUTH FLOW (IMMUNE TO COOP, POPUP BLOCKERS, PWA ISOLATION & 3P COOKIE PARTITIONING) ===
         var gProvider = new firebase.auth.GoogleAuthProvider();
         gProvider.setCustomParameters({ prompt: 'select_account' });
-        var isInApp = /FBAN|FBAV|Instagram|Line\/|MicroMessenger|Twitter/i.test(navigator.userAgent);
-
-        function doGoogleRedirect() {
-            try { sessionStorage.setItem('andos_auth_redirect', '1'); } catch (e) {}
-            return auth.signInWithRedirect(gProvider);
-        }
 
         // Immediately seed dashboard user & hide login gate in 0ms as soon as Google auth resolves!
         function unlockDashboardImmediatelyForMember(fbUser) {
@@ -16097,7 +16094,7 @@ const PLANS = {
             var map = {
                 'auth/popup-closed-by-user': null,
                 'auth/cancelled-popup-request': null,
-                'auth/popup-blocked': 'The popup was blocked — redirecting safely...',
+                'auth/popup-blocked': 'Redirecting to Google sign-in…',
                 'auth/unauthorized-domain': 'Add this domain in Firebase:\n' + location.hostname,
                 'auth/operation-not-allowed': 'Sign-in method is not enabled in Firebase Console.',
                 'auth/network-request-failed': 'Network problem — please check your internet connection.',
@@ -16107,44 +16104,33 @@ const PLANS = {
             loginToast('Sign-in failed: ' + e.code, 'err');
         }
 
-        window.__andosGoogleSignIn = function () {
+        window.__andosGoogleSignIn = function (hintEmail) {
             if (!auth) return;
             if ((mainGbtn && mainGbtn.classList.contains('busy')) || (accountBtn && accountBtn.classList.contains('busy'))) return;
             if (location.protocol === 'file:') {
-                loginToast('Open this page from a local server or hosting — Google sign-in will not work on file://.', 'err');
+                loginToast('Open this page from hosting — Google sign-in does not run on file://.', 'err');
                 return;
             }
             setGoogleBusy(true);
-            if (isInApp) {
-                doGoogleRedirect().catch(handleLoginError);
-                return;
-            }
-            // Synchronous call inside user tap gesture — NO async delay before signInWithPopup!
-            auth.signInWithPopup(gProvider).then(function (cred) {
-                if (cred && cred.user) {
-                    unlockDashboardImmediatelyForMember(cred.user);
-                } else {
-                    setGoogleBusy(false);
-                }
-            }).catch(function (e) {
-                var c = (e && e.code) || '';
-                if (c === 'auth/popup-blocked' || c === 'auth/operation-not-supported-in-this-environment' || c === 'auth/web-storage-unsupported') {
-                    return doGoogleRedirect().catch(handleLoginError);
-                }
-                handleLoginError(e);
-            });
+            var nonceBytes = new Uint8Array(16);
+            if (window.crypto && window.crypto.getRandomValues) window.crypto.getRandomValues(nonceBytes);
+            var nonce = Array.from(nonceBytes, function (b) { return b.toString(16).padStart(2, '0'); }).join('');
+            try { sessionStorage.setItem('andos_sso_nonce', nonce); } catch (e) {}
+            var qs = 'start=1&nonce=' + encodeURIComponent(nonce) + '&ret=' + encodeURIComponent(window.location.origin);
+            if (hintEmail) qs += '&hint=' + encodeURIComponent(String(hintEmail).trim());
+            window.location.assign(SSO_BRIDGE_URL + '?' + qs);
         };
 
         if (mainGbtn) mainGbtn.addEventListener('click', function () {
-            gProvider.setCustomParameters({ prompt: 'select_account' });
-            window.__andosGoogleSignIn();
+            window.__andosGoogleSignIn('');
         });
         if (accountBtn) accountBtn.addEventListener('click', function () {
+            var hint = '';
             try {
                 var s = JSON.parse(localStorage.getItem('andos_last_account') || 'null');
-                if (s && s.email) gProvider.setCustomParameters({ prompt: 'select_account', login_hint: s.email });
+                if (s && s.email) hint = s.email;
             } catch (e) {}
-            window.__andosGoogleSignIn();
+            window.__andosGoogleSignIn(hint);
         });
 
         // Secondary screens from andos-login (5).html: #anotherBtn, #authPage, #passPage, #setPassPage
@@ -16255,22 +16241,73 @@ const PLANS = {
             }
         };
 
-        // Handle returning redirect result cleanly
+        // Handle returning first-party Google SSO payload (#andos_gauth=...) or redirect result cleanly
         loadSavedAccount();
         if (!isFirebaseEnabled || !auth) {
             showLoginGate();
             loginToast('Firebase config unavailable', 'err');
             return;
         }
+
+        var ssoRedeemInFlight = false;
+        (function processReturningGoogleSso() {
+            var rawHash = String(window.location.hash || '');
+            if (!rawHash || rawHash.indexOf('andos_g') === -1) return;
+            try { history.replaceState(null, '', window.location.pathname + window.location.search); } catch (e) {}
+            var hp = new URLSearchParams(rawHash.replace(/^#+/, ''));
+            if (hp.get('andos_gcancel')) {
+                setGoogleBusy(false);
+                showLoginGate();
+                return;
+            }
+            if (hp.get('andos_gerr')) {
+                setGoogleBusy(false);
+                showLoginGate();
+                loginToast('Sign-in failed: ' + hp.get('andos_gerr'), 'err');
+                return;
+            }
+            var encoded = hp.get('andos_gauth');
+            if (!encoded) return;
+            ssoRedeemInFlight = true;
+            setGoogleBusy(true);
+            try {
+                var b64 = encoded.replace(/-/g, '+').replace(/_/g, '/');
+                b64 += '='.repeat((4 - (b64.length % 4)) % 4);
+                var bin = atob(b64);
+                var bytes = new Uint8Array(bin.length);
+                for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+                var data = JSON.parse(new TextDecoder().decode(bytes));
+                var signInPromise = data.customToken
+                    ? auth.signInWithCustomToken(data.customToken)
+                    : auth.signInWithCredential(firebase.auth.GoogleAuthProvider.credential(data.idToken || null, data.accessToken || null));
+                signInPromise.then(function (cred) {
+                    ssoRedeemInFlight = false;
+                    if (cred && cred.user) {
+                        unlockDashboardImmediatelyForMember(cred.user);
+                    }
+                }).catch(function (err) {
+                    ssoRedeemInFlight = false;
+                    setGoogleBusy(false);
+                    showLoginGate();
+                    handleLoginError(err);
+                });
+            } catch (err2) {
+                ssoRedeemInFlight = false;
+                setGoogleBusy(false);
+                showLoginGate();
+            }
+        })();
+
         auth.getRedirectResult().catch(handleLoginError);
 
         var authBootFallback = setTimeout(function () {
-            if (!auth.currentUser) showLoginGate();
+            if (!auth.currentUser && !ssoRedeemInFlight) showLoginGate();
         }, 4000);
 
         var firstAuthEvent = true;
         auth.onAuthStateChanged(async function (fbUser) {
             clearTimeout(authBootFallback);
+            if (ssoRedeemInFlight && !fbUser) return;
             setGoogleBusy(false);
 
             // 1) Signed out -> Lock & display original Login UI immediately
@@ -16290,11 +16327,10 @@ const PLANS = {
                     if (cloudGuest && cloudGuest.publicId && cloudGuest.username) {
                         var cachedGp = null;
                         try { cachedGp = JSON.parse(localStorage.getItem('andos_guest_profile') || 'null'); } catch (e) {}
-                        applyVerifiedServerIdentity(fbUser, cloudGuest, cloudGuest.name || (cachedGp && cachedGp.name) || pickFriendlyGuestName(), (cachedGp && cachedGp.photo) || '');
+                        applyVerifiedServerIdentity(fbUser, cloudGuest, cloudGuest.name || (cachedGp && cachedGp.name) || generateAlgorithmicGuestName(), (cachedGp && cachedGp.photo) || '');
                     } else {
-                        var fallbackFriendly = pickFriendlyGuestName();
-                        var minted = await postLifecycleWorker(WORKER_GUEST_CREATE, fbUser, { name: fallbackFriendly });
-                        applyVerifiedServerIdentity(fbUser, minted, fallbackFriendly, '');
+                        var minted = await postLifecycleWorker(WORKER_GUEST_CREATE, fbUser, { name: '' });
+                        applyVerifiedServerIdentity(fbUser, minted, '', '');
                     }
                     firstAuthEvent = false;
                     try { ANDOS_FB.watchOrders(); ANDOS_FB.watchRequests(); applyLiveAvatars(); } catch (e) {}
