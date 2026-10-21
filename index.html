@@ -11555,6 +11555,7 @@ main.andos-main{overscroll-behavior-x:none}
   z-index:99;opacity:0;pointer-events:none;
   transition:transform .45s cubic-bezier(.22,1,.36,1),opacity .35s ease;
 }
+#yuvaGate .toast:empty{display:none !important}
 #yuvaGate .toast.show{transform:translate(-50%,0);opacity:1}
 #yuvaGate .toast.err{border-color:rgba(234,67,53,.5)}
 #yuvaGate .toast.ok{border-color:rgba(52,168,83,.5)}
@@ -11901,7 +11902,7 @@ main.andos-main{overscroll-behavior-x:none}
 #yuvaGate [hidden]{display:none !important}
 #yuvaGate .page .gbtn{animation:none;opacity:1}
 #yuvaGate .page .btn-box{animation:none}
-#yuvaGate .screen.page{background:#fff;overflow-y:auto}
+#yuvaGate .screen.page{background:#fff;overflow-y:auto;animation:none !important;opacity:1 !important;transform:none !important}
 #yuvaGate .page-wrap{
   min-height:100%;display:flex;flex-direction:column;justify-content:center;
   padding:calc(env(safe-area-inset-top) + 70 * var(--u)) calc(42 * var(--u)) calc(env(safe-area-inset-bottom) + 60 * var(--u));
@@ -15624,7 +15625,7 @@ const PLANS = {
         var guestOnboardingInFlight = false;
 
         function loginToast(msg, kind) {
-            if (!toastEl) return;
+            if (!toastEl || !msg || !String(msg).trim()) return;
             clearTimeout(toastTimer);
             toastEl.textContent = String(msg || '');
             toastEl.style.whiteSpace = 'pre-line';
