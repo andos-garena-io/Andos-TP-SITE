@@ -11645,10 +11645,10 @@ main.andos-main{overscroll-behavior-x:none}
   font-size:calc(94 * var(--u));font-weight:700;letter-spacing:calc(-1.6 * var(--u));line-height:1;
   text-shadow:0 calc(2 * var(--u)) calc(4 * var(--u)) rgba(15,23,42,.20), 0 calc(10 * var(--u)) calc(26 * var(--u)) rgba(15,23,42,.10);
 }
+#yuvaGate .brand{opacity:1 !important;transform:none !important;animation:none !important}
 #yuvaGate .appname .app-l{
-  display:inline-block;opacity:0;transform:translate3d(0,calc(18 * var(--u)),0);
-  will-change:transform,opacity;
-  animation:nameLetter .6s cubic-bezier(.22,1,.36,1) both;
+  display:inline-block;opacity:1 !important;transform:none !important;
+  animation:none !important;
 }
 @keyframes nameLetter{
   0%{opacity:0;transform:translate3d(0,calc(18 * var(--u)),0)}
@@ -11738,7 +11738,7 @@ main.andos-main{overscroll-behavior-x:none}
   height:auto !important;
   min-height:0;
   overflow:visible !important;
-  margin-bottom:calc(10 * var(--u));
+  margin-bottom:calc(24 * var(--u));
   animation:none !important;
   transform:none !important;
 }
@@ -11765,8 +11765,10 @@ main.andos-main{overscroll-behavior-x:none}
   pointer-events:none;
 }
 #yuvaGate .gbtn.accountbtn{
+  position:relative !important;
+  inset:auto !important;
   width:100%;
-  min-height:66px;
+  min-height:68px;
   height:auto;
   background:#ffffff !important;
   border:1px solid #dfe3ea !important;
