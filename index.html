@@ -16281,6 +16281,11 @@ const PLANS = {
                     ? auth.signInWithCustomToken(data.customToken)
                     : auth.signInWithCredential(firebase.auth.GoogleAuthProvider.credential(data.idToken || null, data.accessToken || null));
                 signInPromise.then(function (cred) {
+                    if (cred && cred.user && !cred.user.email) {
+                        return cred.user.reload().then(function () { return cred; }).catch(function () { return cred; });
+                    }
+                    return cred;
+                }).then(function (cred) {
                     ssoRedeemInFlight = false;
                     if (cred && cred.user) {
                         unlockDashboardImmediatelyForMember(cred.user);
@@ -27026,10 +27031,15 @@ function renderFreeFireGraphics() {
         setTimeout(function () { window.__andosSilentBoot = false; }, 4000);
         document.documentElement.classList.remove('dark');
         const storedIdentity = readLocalJSON('andos_user', null);
-        const defaultIdentity = { uid:'guest_uid_9999', name:'ANDOS Member', username:'andos_member', email:'member@andos.shop', mobile:'9999999999', loggedIn:true, isAdmin:false };
-        user = storedIdentity && storedIdentity.loggedIn ? { ...defaultIdentity, ...storedIdentity } : defaultIdentity;
-        user.photoURL = localStorage.getItem('andos_profile_avatar') || user.photoURL || DEFAULT_AVATAR_URL;
-        localStorage.setItem('andos_user', JSON.stringify(user));
+        const emptyIdentity = { uid:'', publicId:'', name:'', username:'', email:'', mobile:'', loggedIn:false, isAdmin:false, isGuest:false };
+        const fbCurr = (typeof auth !== 'undefined' && auth) ? auth.currentUser : null;
+        if (storedIdentity && storedIdentity.loggedIn && storedIdentity.uid && storedIdentity.uid !== 'guest_uid_9999' && (!fbCurr || fbCurr.uid === storedIdentity.uid)) {
+            user = { ...emptyIdentity, ...storedIdentity };
+            user.photoURL = localStorage.getItem('andos_profile_avatar') || user.photoURL || DEFAULT_AVATAR_URL;
+        } else {
+            user = { ...emptyIdentity, photoURL: DEFAULT_AVATAR_URL };
+            try { localStorage.removeItem('andos_user'); } catch (e) {}
+        }
         if (typeof syncAdminSessionOnBoot === 'function') syncAdminSessionOnBoot();
         currentPage = 'home';
         authInitialized = true;
