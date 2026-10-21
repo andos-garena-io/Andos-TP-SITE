@@ -11781,71 +11781,135 @@ main.andos-main{overscroll-behavior-x:none}
 /* buttons ke beech barabar doori */
 #yuvaGate .btn-box + .btn-box{margin-top:calc(20 * var(--u))}
 
-/* ---------- Upgraded Premium "Continue with this account" + Cool "Last Used" Badge ---------- */
-#yuvaGate .btn-box-account{height:calc(138 * var(--u))}
+/* ---------- Upgraded Modern "Last Used" Account Card (Floating Top-Border Pill + Left Circular Avatar + Center Email + Sleek Right >) ---------- */
+#yuvaGate #accountBox.btn-box-account{
+  position:relative;
+  height:auto !important;
+  min-height:calc(146 * var(--u));
+  overflow:visible !important;
+  margin-bottom:calc(8 * var(--u));
+}
+#yuvaGate .acc-floating-pill{
+  position:absolute;
+  top:0;
+  left:calc(30 * var(--u));
+  transform:translateY(-50%);
+  z-index:9;
+  display:inline-flex;
+  align-items:center;
+  gap:calc(8 * var(--u));
+  padding:calc(6 * var(--u)) calc(18 * var(--u));
+  border-radius:999px;
+  background:#0f172a;
+  border:1.5px solid #ffffff;
+  color:#ffffff;
+  font-family:"Plus Jakarta Sans","Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  font-size:calc(18.5 * var(--u));
+  font-weight:800;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  line-height:1;
+  white-space:nowrap;
+  pointer-events:none;
+  box-shadow:0 calc(4 * var(--u)) calc(12 * var(--u)) rgba(15,23,42,.18);
+}
+#yuvaGate .acc-last-dot{
+  width:calc(9 * var(--u));
+  height:calc(9 * var(--u));
+  border-radius:50%;
+  flex:none;
+  background:#10b981;
+  box-shadow:0 0 calc(8 * var(--u)) rgba(16,185,129,.85);
+}
 #yuvaGate .gbtn.accountbtn{
-  background:linear-gradient(135deg,#0b0f19 0%,#161f33 100%);
-  border:1px solid rgba(255,255,255,.14);color:#ffffff;justify-content:flex-start;
-  padding:0 calc(26 * var(--u));gap:calc(20 * var(--u));
-  box-shadow:0 calc(10 * var(--u)) calc(28 * var(--u)) rgba(15,23,42,.18);
-  border-radius:calc(69 * var(--u));
+  width:100%;
+  min-height:calc(146 * var(--u));
+  height:auto;
+  background:#ffffff !important;
+  border:1.5px solid rgba(15,23,42,.15) !important;
+  border-radius:calc(30 * var(--u)) !important;
+  color:#0f172a !important;
+  justify-content:space-between;
+  align-items:center;
+  padding:calc(24 * var(--u)) calc(26 * var(--u)) calc(20 * var(--u)) !important;
+  gap:calc(18 * var(--u));
+  box-shadow:0 calc(10 * var(--u)) calc(28 * var(--u)) rgba(15,23,42,.08), 0 1px 2px rgba(15,23,42,.04);
   font-family:"Plus Jakarta Sans","Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 }
 #yuvaGate .acc-avatar{
-  width:calc(86 * var(--u));height:calc(86 * var(--u));border-radius:50%;flex:none;
-  background:linear-gradient(145deg,#0f766e,#10b981);color:#fff;
-  display:flex;align-items:center;justify-content:center;
+  width:calc(84 * var(--u));
+  height:calc(84 * var(--u));
+  border-radius:50%;
+  flex:none;
+  background:#f1f5f9;
+  border:1.5px solid rgba(15,23,42,.10);
+  color:#0f172a;
+  display:flex;
+  align-items:center;
+  justify-content:center;
   font-family:"Plus Jakarta Sans","Inter",sans-serif;
-  font-size:calc(31 * var(--u));font-weight:800;letter-spacing:-.02em;
-  box-shadow:0 0 0 calc(2.5 * var(--u)) rgba(255,255,255,.18);
-  overflow:hidden;position:relative;z-index:4;
+  font-size:calc(32 * var(--u));
+  font-weight:800;
+  overflow:hidden;
+  position:relative;
+  z-index:4;
 }
-#yuvaGate .acc-avatar img{width:100%;height:100%;object-fit:cover;display:block}
-#yuvaGate .acc-avatar:has(img){
-  background:linear-gradient(220deg,#b8b1ff 0%,#7d92ff 38%,#2f7cf6 78%,#10b981 100%);
-  padding:calc(3.5 * var(--u));
-}
-#yuvaGate .acc-avatar:has(img) img{border:calc(2.5 * var(--u)) solid #0b0f19;border-radius:50%}
+#yuvaGate .acc-avatar img{width:100%;height:100%;object-fit:cover;display:block;border-radius:50%}
+#yuvaGate .acc-avatar svg{width:calc(42 * var(--u));height:calc(42 * var(--u));position:static;color:#334155}
 #yuvaGate .acc-text{
-  display:flex;flex-direction:column;align-items:flex-start;gap:calc(5 * var(--u));
-  line-height:1.2;position:relative;z-index:4;min-width:0;flex:1;text-align:left;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:calc(4 * var(--u));
+  line-height:1.25;
+  position:relative;
+  z-index:4;
+  min-width:0;
+  flex:1;
+  text-align:center;
+  padding:0 calc(6 * var(--u));
 }
-#yuvaGate .acc-head-row{
-  display:flex;align-items:center;gap:calc(12 * var(--u));width:100%;min-width:0;
-}
-#yuvaGate .acc-title{
+#yuvaGate .acc-name-sub{
   font-family:"Plus Jakarta Sans","Inter",sans-serif;
-  font-size:calc(29.5 * var(--u));font-weight:700;letter-spacing:-.02em;
-  color:#f8fafc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-}
-#yuvaGate .acc-last-badge{
-  display:inline-flex;align-items:center;gap:calc(7 * var(--u));flex:none;
-  padding:calc(4.5 * var(--u)) calc(13 * var(--u));border-radius:999px;
-  background:linear-gradient(135deg,rgba(16,185,129,.22),rgba(56,189,248,.18));
-  border:1px solid rgba(52,211,153,.42);
-  color:#6ee7b7;font-family:"Plus Jakarta Sans","Inter",sans-serif;
-  font-size:calc(18.5 * var(--u));font-weight:800;letter-spacing:.04em;text-transform:uppercase;
-  line-height:1;white-space:nowrap;box-shadow:0 0 calc(14 * var(--u)) rgba(16,185,129,.16);
-}
-#yuvaGate .acc-last-dot{
-  width:calc(9 * var(--u));height:calc(9 * var(--u));border-radius:50%;flex:none;
-  background:#34d399;box-shadow:0 0 calc(8 * var(--u)) #34d399;
+  font-size:calc(22 * var(--u));
+  font-weight:600;
+  letter-spacing:-.01em;
+  color:#64748b;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  max-width:100%;
 }
 #yuvaGate .acc-mail{
   font-family:"Plus Jakarta Sans","Inter",sans-serif;
-  font-size:calc(23.5 * var(--u));font-weight:500;letter-spacing:-.005em;
-  color:rgba(226,232,240,.78);
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;
+  font-size:calc(27.5 * var(--u));
+  font-weight:700;
+  letter-spacing:-.015em;
+  color:#0f172a;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  max-width:100%;
 }
 #yuvaGate .acc-arrow{
-  flex:none;position:relative;z-index:4;display:flex;align-items:center;justify-content:center;
-  width:calc(44 * var(--u));height:calc(44 * var(--u));border-radius:50%;
-  background:rgba(255,255,255,.08);color:rgba(255,255,255,.85);
+  flex:none;
+  position:relative;
+  z-index:4;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:calc(38 * var(--u));
+  height:calc(38 * var(--u));
+  color:#64748b;
+  transition:transform .2s ease, color .2s ease;
 }
-#yuvaGate .acc-arrow svg{width:calc(24 * var(--u));height:calc(24 * var(--u));position:static}
-#yuvaGate .gbtn.accountbtn .ripple{background:rgba(255,255,255,.22)}
+#yuvaGate .acc-arrow svg{width:calc(26 * var(--u));height:calc(26 * var(--u));position:static}
+#yuvaGate .gbtn.accountbtn:active .acc-arrow{transform:translateX(calc(4 * var(--u)));color:#0f172a}
+#yuvaGate .gbtn.accountbtn .ripple{background:rgba(15,23,42,.09)}
 @media (hover:hover) and (pointer:fine){
-  #yuvaGate .gbtn.accountbtn:hover{box-shadow:0 calc(12 * var(--u)) calc(32 * var(--u)) rgba(15,23,42,.26)}
+  #yuvaGate .gbtn.accountbtn:hover{border-color:rgba(15,23,42,.28) !important;box-shadow:0 calc(14 * var(--u)) calc(34 * var(--u)) rgba(15,23,42,.12)}
+  #yuvaGate .gbtn.accountbtn:hover .acc-arrow{transform:translateX(calc(3 * var(--u)));color:#0f172a}
 }
 
 /* ---------- guest button ---------- */
@@ -11901,19 +11965,25 @@ main.andos-main{overscroll-behavior-x:none}
   transition:transform .16s cubic-bezier(.22,1,.36,1);
 }
 #yuvaGate .dp:active{transform:scale(.96)}
-#yuvaGate .dp-ring{position:absolute;inset:0;width:100%;height:100%;display:block}
+#yuvaGate .dp-ring{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none}
 #yuvaGate .dp-in{
   width:100%;height:100%;border-radius:50%;
   border:calc(7 * var(--u)) solid #ffffff;
   background:#eef2f7;overflow:hidden;position:relative;
   display:flex;align-items:center;justify-content:center;
   font-size:calc(80 * var(--u));font-weight:700;color:#94a3b8;
+  pointer-events:none;
 }
 #yuvaGate .dp-in::after{
   content:"";position:absolute;inset:0;border-radius:50%;pointer-events:none;
   box-shadow:inset 0 0 0 1px rgba(13,27,42,.28);
 }
-#yuvaGate .dp img{width:100%;height:100%;object-fit:cover;display:block}
+#yuvaGate .dp img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
+#yuvaGate #dpInput{
+  position:absolute !important;inset:0 !important;width:100% !important;height:100% !important;
+  opacity:0 !important;cursor:pointer !important;z-index:12 !important;
+  display:block !important;margin:0 !important;padding:0 !important;border:0 !important;
+}
 #yuvaGate .dp-btn{
   font-size:calc(28 * var(--u));font-weight:700;color:#0d0d0d;cursor:pointer;
   border:1px solid rgba(15,23,42,.18);border-radius:999px;padding:calc(14 * var(--u)) calc(30 * var(--u));
@@ -11961,41 +12031,62 @@ main.andos-main{overscroll-behavior-x:none}
 #yuvaGate .float-field input{
   appearance:none;-webkit-appearance:none;
   width:100%;padding:calc(34 * var(--u)) calc(28 * var(--u));
-  border:1px solid rgba(15,23,42,.28) !important;border-radius:calc(20 * var(--u));
+  border:1px solid rgba(15,23,42,.24) !important;border-radius:calc(20 * var(--u));
   font-family:inherit;font-size:calc(31 * var(--u));color:#111827 !important;background:#ffffff !important;
-  outline:none !important;outline-width:0 !important;box-shadow:none !important;animation:none !important;
+  background-color:#ffffff !important;background-image:none !important;
+  outline:none !important;outline-width:0 !important;
+  box-shadow:0 0 0 1000px #ffffff inset !important;-webkit-box-shadow:0 0 0 1000px #ffffff inset !important;
+  -webkit-text-fill-color:#111827 !important;
+  animation:none !important;filter:none !important;
   --tw-ring-offset-shadow:0 0 #0000 !important;--tw-ring-shadow:0 0 #0000 !important;
-  transition:border-color .18s ease, box-shadow .18s ease;
+  transition:border-color .18s ease;
 }
 #yuvaGate .float-field input:focus,
 #yuvaGate .float-field input:focus-visible{
-  outline:none !important;outline-width:0 !important;animation:none !important;
+  outline:none !important;outline-width:0 !important;animation:none !important;filter:none !important;
   --tw-ring-offset-shadow:0 0 #0000 !important;--tw-ring-shadow:0 0 #0000 !important;
-  border-color:#111827 !important;box-shadow:0 0 0 1px #111827 !important;background:#ffffff !important;
+  border-color:#111827 !important;
+  box-shadow:0 0 0 1px #111827, 0 0 0 1000px #ffffff inset !important;
+  -webkit-box-shadow:0 0 0 1px #111827, 0 0 0 1000px #ffffff inset !important;
+  background:#ffffff !important;background-color:#ffffff !important;
+  -webkit-text-fill-color:#111827 !important;
 }
 #yuvaGate .float-field label{
   position:absolute;top:50%;left:calc(28 * var(--u));transform:translateY(-50%);
   font-size:calc(30 * var(--u));font-weight:400;color:#6b7280;pointer-events:none;
-  transition:all .18s ease;
+  transition:all .18s ease;z-index:3;
 }
 #yuvaGate .float-field input:focus + label, #yuvaGate .float-field input:not(:placeholder-shown) + label{
   top:0;font-size:calc(23 * var(--u));
   background:#fff;padding:0 calc(10 * var(--u));
 }
 #yuvaGate .float-field input:focus + label{color:#111827}
-#yuvaGate .float-field label{line-height:1;z-index:1}
+#yuvaGate .float-field label{line-height:1}
 #yuvaGate .float-field input:focus + label, #yuvaGate .float-field input:not(:placeholder-shown) + label, #yuvaGate .float-field input:-webkit-autofill + label{left:calc(18 * var(--u))}
 #yuvaGate .float-field input{caret-color:#111827;color-scheme:light}
-#yuvaGate .float-field input::selection{background:rgba(17,24,39,.12)}
-#yuvaGate .float-field input:-webkit-autofill, #yuvaGate .float-field input:-webkit-autofill:hover, #yuvaGate .float-field input:-webkit-autofill:active{
-  -webkit-text-fill-color:#111827;
-  -webkit-box-shadow:0 0 0 1000px #ffffff inset;
-  box-shadow:0 0 0 1000px #ffffff inset;
-  transition:background-color 99999s ease-in-out 0s;
+#yuvaGate .float-field input::selection,
+#app input::selection,
+#app textarea::selection{background:rgba(15,23,42,.10) !important;color:#111827 !important;-webkit-text-fill-color:#111827 !important}
+#yuvaGate .float-field input:-webkit-autofill,
+#yuvaGate .float-field input:-webkit-autofill:hover,
+#yuvaGate .float-field input:-webkit-autofill:active,
+#app input:-webkit-autofill,
+#app input:-webkit-autofill:hover,
+#app input:-webkit-autofill:active{
+  -webkit-text-fill-color:#111827 !important;
+  -webkit-box-shadow:0 0 0 1000px #ffffff inset !important;
+  box-shadow:0 0 0 1000px #ffffff inset !important;
+  background-color:#ffffff !important;
+  filter:none !important;
+  transition:background-color 999999s ease-in-out 0s !important;
 }
-#yuvaGate .float-field input:-webkit-autofill:focus{
-  -webkit-box-shadow:0 0 0 1px #111827, 0 0 0 1000px #ffffff inset;
-  box-shadow:0 0 0 1px #111827, 0 0 0 1000px #ffffff inset;
+#yuvaGate .float-field input:-webkit-autofill:focus,
+#app input:-webkit-autofill:focus{
+  -webkit-text-fill-color:#111827 !important;
+  -webkit-box-shadow:0 0 0 1px #111827, 0 0 0 1000px #ffffff inset !important;
+  box-shadow:0 0 0 1px #111827, 0 0 0 1000px #ffffff inset !important;
+  background-color:#ffffff !important;
+  filter:none !important;
 }
 #yuvaGate .mail-shown{
   display:flex;align-items:center;justify-content:space-between;gap:12px;
@@ -12060,39 +12151,28 @@ main.andos-main{overscroll-behavior-x:none}
 
     <div class="bottom">
       <div class="btn-box btn-box-account" id="accountBox" style="display:none">
+        <span class="acc-floating-pill"><span class="acc-last-dot"></span>LAST USED</span>
         <button class="gbtn accountbtn" id="accountBtn" type="button">
-          <span class="acc-avatar" id="accAvatar">A</span>
+          <span class="acc-avatar" id="accAvatar" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="8.5" r="4" stroke="currentColor" stroke-width="1.8"/><path d="M5 19.5C5.9 16.4 8.65 14.5 12 14.5C15.35 14.5 18.1 16.4 19 19.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>
           <span class="acc-text">
-            <span class="acc-head-row">
-              <span class="acc-title">Continue with this account</span>
-              <span class="acc-last-badge"><span class="acc-last-dot"></span>Last Used</span>
-            </span>
             <span class="acc-mail" id="accMail"></span>
+            <span class="acc-name-sub" id="accNameSub" style="display:none"></span>
           </span>
-          <span class="acc-arrow" aria-hidden="true"><svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7.5 4.5L13 10L7.5 15.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <span class="acc-arrow" aria-hidden="true"><svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7.5 4.25L13.25 10L7.5 15.75" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
         </button>
       </div>
 
       <div class="btn-box">
-        <button class="gbtn" type="button">
+        <button class="gbtn" id="mainGoogleBtn" type="button">
           <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" overflow="hidden" viewBox="0 0 268.152 273.883"><defs><linearGradient id="alg_svg_a"><stop offset="0" stop-color="#0fbc5c"/><stop offset="1" stop-color="#0cba65"/></linearGradient><linearGradient id="alg_svg_g"><stop offset=".231" stop-color="#0fbc5f"/><stop offset=".312" stop-color="#0fbc5f"/><stop offset=".366" stop-color="#0fbc5e"/><stop offset=".458" stop-color="#0fbc5d"/><stop offset=".54" stop-color="#12bc58"/><stop offset=".699" stop-color="#28bf3c"/><stop offset=".771" stop-color="#38c02b"/><stop offset=".861" stop-color="#52c218"/><stop offset=".915" stop-color="#67c30f"/><stop offset="1" stop-color="#86c504"/></linearGradient><linearGradient id="alg_svg_h"><stop offset=".142" stop-color="#1abd4d"/><stop offset=".248" stop-color="#6ec30d"/><stop offset=".312" stop-color="#8ac502"/><stop offset=".366" stop-color="#a2c600"/><stop offset=".446" stop-color="#c8c903"/><stop offset=".54" stop-color="#ebcb03"/><stop offset=".616" stop-color="#f7cd07"/><stop offset=".699" stop-color="#fdcd04"/><stop offset=".771" stop-color="#fdce05"/><stop offset=".861" stop-color="#ffce0a"/></linearGradient><linearGradient id="alg_svg_f"><stop offset=".316" stop-color="#ff4c3c"/><stop offset=".604" stop-color="#ff692c"/><stop offset=".727" stop-color="#ff7825"/><stop offset=".885" stop-color="#ff8d1b"/><stop offset="1" stop-color="#ff9f13"/></linearGradient><linearGradient id="alg_svg_b"><stop offset=".231" stop-color="#ff4541"/><stop offset=".312" stop-color="#ff4540"/><stop offset=".458" stop-color="#ff4640"/><stop offset=".54" stop-color="#ff473f"/><stop offset=".699" stop-color="#ff5138"/><stop offset=".771" stop-color="#ff5b33"/><stop offset=".861" stop-color="#ff6c29"/><stop offset="1" stop-color="#ff8c18"/></linearGradient><linearGradient id="alg_svg_d"><stop offset=".408" stop-color="#fb4e5a"/><stop offset="1" stop-color="#ff4540"/></linearGradient><linearGradient id="alg_svg_c"><stop offset=".132" stop-color="#0cba65"/><stop offset=".21" stop-color="#0bb86d"/><stop offset=".297" stop-color="#09b479"/><stop offset=".396" stop-color="#08ad93"/><stop offset=".477" stop-color="#0aa6a9"/><stop offset=".568" stop-color="#0d9cc6"/><stop offset=".667" stop-color="#1893dd"/><stop offset=".769" stop-color="#258bf1"/><stop offset=".859" stop-color="#3086ff"/></linearGradient><linearGradient id="alg_svg_e"><stop offset=".366" stop-color="#ff4e3a"/><stop offset=".458" stop-color="#ff8a1b"/><stop offset=".54" stop-color="#ffa312"/><stop offset=".616" stop-color="#ffb60c"/><stop offset=".771" stop-color="#ffcd0a"/><stop offset=".861" stop-color="#fecf0a"/><stop offset=".915" stop-color="#fecf08"/><stop offset="1" stop-color="#fdcd01"/></linearGradient><linearGradient xlink:href="#alg_svg_a" id="alg_svg_s" x1="219.7" x2="254.467" y1="329.535" y2="329.535" gradientUnits="userSpaceOnUse"/><radialGradient xlink:href="#alg_svg_b" id="alg_svg_m" cx="109.627" cy="135.862" r="71.46" fx="109.627" fy="135.862" gradientTransform="matrix(-1.93688 1.043 1.45573 2.55542 290.525 -400.634)" gradientUnits="userSpaceOnUse"/><radialGradient xlink:href="#alg_svg_c" id="alg_svg_n" cx="45.259" cy="279.274" r="71.46" fx="45.259" fy="279.274" gradientTransform="matrix(-3.5126 -4.45809 -1.69255 1.26062 870.8 191.554)" gradientUnits="userSpaceOnUse"/><radialGradient xlink:href="#alg_svg_d" id="alg_svg_l" cx="304.017" cy="118.009" r="47.854" fx="304.017" fy="118.009" gradientTransform="matrix(2.06435 0 0 2.59204 -297.679 -151.747)" gradientUnits="userSpaceOnUse"/><radialGradient xlink:href="#alg_svg_e" id="alg_svg_o" cx="181.001" cy="177.201" r="71.46" fx="181.001" fy="177.201" gradientTransform="matrix(-.24858 2.08314 2.96249 .33417 -255.146 -331.164)" gradientUnits="userSpaceOnUse"/><radialGradient xlink:href="#alg_svg_f" id="alg_svg_p" cx="207.673" cy="108.097" r="41.102" fx="207.673" fy="108.097" gradientTransform="matrix(-1.2492 1.34326 -3.89684 -3.4257 880.501 194.905)" gradientUnits="userSpaceOnUse"/><radialGradient xlink:href="#alg_svg_g" id="alg_svg_r" cx="109.627" cy="135.862" r="71.46" fx="109.627" fy="135.862" gradientTransform="matrix(-1.93688 -1.043 1.45573 -2.55542 290.525 838.683)" gradientUnits="userSpaceOnUse"/><radialGradient xlink:href="#alg_svg_h" id="alg_svg_j" cx="154.87" cy="145.969" r="71.46" fx="154.87" fy="145.969" gradientTransform="matrix(-.0814 -1.93722 2.92674 -.11625 -215.135 632.86)" gradientUnits="userSpaceOnUse"/><filter id="alg_svg_q" width="1.097" height="1.116" x="-.048" y="-.058" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="1.701"/></filter><filter id="alg_svg_k" width="1.033" height="1.02" x="-.017" y="-.01" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation=".242"/></filter><clipPath id="alg_svg_i" clipPathUnits="userSpaceOnUse"><path d="M371.378 193.24H237.083v53.438h77.167c-1.241 7.563-4.026 15.003-8.105 21.786-4.674 7.773-10.451 13.69-16.373 18.196-17.74 13.498-38.42 16.258-52.783 16.258-36.283 0-67.283-23.286-79.285-54.928-.484-1.149-.805-2.335-1.197-3.507a81.115 81.115 0 0 1-4.101-25.448c0-9.226 1.569-18.057 4.43-26.398 11.285-32.897 42.985-57.467 80.179-57.467 7.481 0 14.685.884 21.517 2.648a77.668 77.668 0 0 1 33.425 18.25l40.834-39.712c-24.839-22.616-57.219-36.32-95.844-36.32-30.878 0-59.386 9.553-82.748 25.7-18.945 13.093-34.483 30.625-44.97 50.985-9.753 18.879-15.094 39.8-15.094 62.294 0 22.495 5.35 43.633 15.103 62.337v.126c10.302 19.857 25.368 36.954 43.678 49.988 15.997 11.386 44.68 26.551 84.031 26.551 22.63 0 42.687-4.051 60.375-11.644 12.76-5.478 24.065-12.622 34.301-21.804 13.525-12.132 24.117-27.139 31.347-44.404 7.23-17.265 11.097-36.79 11.097-57.957 0-9.858-.998-19.87-2.689-28.968Z"/></clipPath></defs><g clip-path="url(#alg_svg_i)" transform="matrix(.95792 0 0 .98525 -90.174 -78.856)"><path fill="url(#alg_svg_j)" d="M92.076 219.958c.148 22.14 6.501 44.983 16.117 63.424v.127c6.949 13.392 16.445 23.97 27.26 34.452l65.327-23.67c-12.36-6.235-14.246-10.055-23.105-17.026-9.054-9.066-15.802-19.473-20.004-31.677h-.17l.17-.127c-2.765-8.058-3.037-16.613-3.14-25.503Z" filter="url(#alg_svg_k)"/><path fill="url(#alg_svg_l)" d="M237.083 79.025c-6.456 22.526-3.988 44.421 0 57.161 7.457.006 14.64.888 21.45 2.647a77.662 77.662 0 0 1 33.424 18.25l41.88-40.726c-24.81-22.59-54.667-37.297-96.754-37.332Z" filter="url(#alg_svg_k)"/><path fill="url(#alg_svg_m)" d="M236.943 78.847c-31.67 0-60.91 9.798-84.871 26.359a145.533 145.533 0 0 0-24.332 21.15c-1.904 17.744 14.257 39.551 46.262 39.37 15.528-17.936 38.495-29.542 64.056-29.542l.07.002-1.044-57.335c-.048 0-.093-.004-.14-.004Z" filter="url(#alg_svg_k)"/><path fill="url(#alg_svg_n)" d="m341.475 226.379-28.268 19.285c-1.24 7.562-4.028 15.002-8.107 21.786-4.674 7.772-10.45 13.69-16.373 18.196-17.702 13.47-38.328 16.244-52.687 16.255-14.842 25.102-17.444 37.675 1.043 57.934 22.877-.016 43.157-4.117 61.046-11.796 12.931-5.551 24.388-12.792 34.761-22.097 13.706-12.295 24.442-27.503 31.769-45 7.327-17.497 11.245-37.282 11.245-58.734Z" filter="url(#alg_svg_k)"/><path fill="#3086ff" d="M234.996 191.21v57.498h136.006c1.196-7.874 5.152-18.064 5.152-26.5 0-9.858-.996-21.899-2.687-30.998Z" filter="url(#alg_svg_k)"/><path fill="url(#alg_svg_o)" d="M128.39 124.327c-8.394 9.119-15.564 19.326-21.249 30.364-9.753 18.879-15.094 41.83-15.094 64.324 0 .317.026.627.029.944 4.32 8.224 59.666 6.649 62.456 0-.004-.31-.039-.613-.039-.924 0-9.226 1.57-16.026 4.43-24.367 3.53-10.289 9.056-19.763 16.123-27.926 1.602-2.031 5.875-6.397 7.121-9.016.475-.997-.862-1.557-.937-1.908-.083-.393-1.876-.077-2.277-.37-1.275-.929-3.8-1.414-5.334-1.845-3.277-.921-8.708-2.953-11.725-5.06-9.536-6.658-24.417-14.612-33.505-24.216Z" filter="url(#alg_svg_k)"/><path fill="url(#alg_svg_p)" d="M162.099 155.857c22.112 13.301 28.471-6.714 43.173-12.977l-25.574-52.664a144.74 144.74 0 0 0-26.543 14.504c-12.316 8.512-23.192 18.9-32.176 30.72Z" filter="url(#alg_svg_q)"/><path fill="url(#alg_svg_r)" d="M171.099 290.222c-29.683 10.641-34.33 11.023-37.062 29.29a144.806 144.806 0 0 0 16.792 13.984c15.996 11.386 46.766 26.551 86.118 26.551.046 0 .09-.004.137-.004v-59.157l-.094.002c-14.736 0-26.512-3.843-38.585-10.527-2.977-1.648-8.378 2.777-11.123.799-3.786-2.729-12.9 2.35-16.183-.938Z" filter="url(#alg_svg_k)"/><path fill="url(#alg_svg_s)" d="M219.7 299.023v59.996c5.506.64 11.236 1.028 17.247 1.028 6.026 0 11.855-.307 17.52-.872v-59.748a105.119 105.119 0 0 1-17.477 1.461c-5.932 0-11.7-.686-17.29-1.865Z" filter="url(#alg_svg_k)" opacity=".5"/></g></svg>
           <span class="lbl"><span class="txt-idle">Continue with Google</span><span class="txt-busy">Signing in<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span></span></span>
-          
-                  </button>
+        </button>
       </div>
 
       <div class="btn-box">
         <button class="gbtn guestbtn" id="guestBtn" type="button">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><path fill="#111827" d="M12 13c2.396 0 4.575.694 6.178 1.671c.8.49 1.484 1.065 1.978 1.69c.486.616.844 1.352.844 2.139c0 .845-.411 1.511-1.003 1.986c-.56.45-1.299.748-2.084.956c-1.578.417-3.684.558-5.913.558s-4.335-.14-5.913-.558c-.785-.208-1.524-.506-2.084-.956C3.41 20.01 3 19.345 3 18.5c0-.787.358-1.523.844-2.139c.494-.625 1.177-1.2 1.978-1.69C7.425 13.694 9.605 13 12 13"/><path fill="#111827" d="M12 2c3.849 0 6.255 4.167 4.33 7.5A5 5 0 0 1 12 12c-3.849 0-6.255-4.167-4.33-7.5A5 5 0 0 1 12 2" opacity=".3"/></svg>
           <span class="lbl"><span class="txt-idle">Continue as Guest</span><span class="txt-busy">Please wait<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span></span></span>
-          
-        </button>
-      </div>
-
-      <div class="btn-box btn-box-another">
-        <button class="gbtn anotherbtn" id="anotherBtn" type="button">
-          
-          <span class="lbl"><span class="txt-idle">Login with another way</span><span class="txt-busy">Please wait<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span></span></span>
         </button>
       </div>
 
@@ -12115,17 +12195,16 @@ main.andos-main{overscroll-behavior-x:none}
       <h2 class="page-title">Make it yours</h2>
       <p class="page-sub">Set your name and photo so people can recognize you. You can also skip this step.</p>
       <div class="dp-wrap">
-        <label class="dp" id="dpPreview" for="dpInput" role="button" tabindex="0" aria-label="Upload profile photo"><svg class="dp-ring" viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="alg_svg_dpGrad" x1="100%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#b8b1ff"/><stop offset="38%" stop-color="#7d92ff"/><stop offset="78%" stop-color="#2f7cf6"/><stop offset="100%" stop-color="#2b76f5"/></linearGradient></defs><circle cx="50" cy="50" r="46" fill="none" stroke="url(#alg_svg_dpGrad)" stroke-width="8"/></svg><div class="dp-in"><span id="dpInitial">?</span><img id="dpImg" alt="" hidden></div></label>
+        <div class="dp" id="dpPreview" role="button" tabindex="0" aria-label="Upload profile photo"><svg class="dp-ring" viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="alg_svg_dpGrad" x1="100%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#b8b1ff"/><stop offset="38%" stop-color="#7d92ff"/><stop offset="78%" stop-color="#2f7cf6"/><stop offset="100%" stop-color="#2b76f5"/></linearGradient></defs><circle cx="50" cy="50" r="46" fill="none" stroke="url(#alg_svg_dpGrad)" stroke-width="8"/></svg><div class="dp-in"><span id="dpInitial">?</span><img id="dpImg" alt="" hidden></div><input id="dpInput" type="file" accept="image/*" aria-label="Choose profile photo"></div>
         <label class="dp-btn" for="dpInput">Upload photo</label>
-        <input id="dpInput" type="file" accept="image/*" hidden>
       </div>
       <div class="float-field">
-        <input id="guestName" type="text" maxlength="40" autocomplete="name" placeholder=" ">
+        <input id="guestName" type="text" maxlength="40" autocomplete="off" autocorrect="off" autocapitalize="words" spellcheck="false" placeholder=" ">
         <label for="guestName">Your name</label>
       </div>
       <button type="button" class="primary-btn" id="guestSave">Save &amp; Continue</button>
       <button type="button" class="ghost-btn" id="guestSkip">Skip for now</button>
-      <p class="page-note" id="guestNote">If you skip, a random username will be generated for you.</p>
+      <p class="page-note" id="guestNote">Skip assigns a friendly name like Sonu, Sagar, Aman or Kabir — editable anytime in Profile.</p>
     </div>
   </main>
 
@@ -15496,16 +15575,32 @@ const PLANS = {
         var WORKER_GUEST_CREATE    = API_BASE + '/api/guest/create';
         var WORKER_GUEST_CONVERT   = API_BASE + '/api/guest/convert';
         var WORKER_MEMBER_REGISTER = API_BASE + '/api/member/register';
+        var WORKER_PROFILE_UPDATE  = API_BASE + '/api/profile/update';
         var GOOGLE_CLIENT_ID = '669879998185-rih4vbicj7tlclqlprr1oecq6cv6id98.apps.googleusercontent.com';
+        var FRIENDLY_GUEST_NAMES = ['Sonu', 'Sagar', 'Aman', 'Kabir', 'Rocky', 'Vicky', 'Rohan', 'Aarav', 'Karan', 'Yash', 'Rahul', 'Sameer', 'Arjun', 'Dev', 'Nikhil', 'Aditya'];
+        function pickFriendlyGuestName() {
+            var arr = new Uint32Array(1);
+            if (window.crypto && window.crypto.getRandomValues) window.crypto.getRandomValues(arr);
+            else arr[0] = Math.floor(Math.random() * 100000);
+            return FRIENDLY_GUEST_NAMES[arr[0] % FRIENDLY_GUEST_NAMES.length];
+        }
+        function previewHandleSlug(raw) {
+            var s = String(raw || '').trim().toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 16);
+            return s || 'user';
+        }
+
+        // Pre-configure Firebase LOCAL persistence once at boot so click handlers stay 100% synchronous user gestures
+        try { if (auth && firebase.auth.Auth && firebase.auth.Auth.Persistence) auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(function () {}); } catch (e) {}
 
         var gateEl      = document.getElementById('yuvaGate');
         var toastEl     = gateEl ? gateEl.querySelector('#toast') : null;
-        var mainGbtn    = gateEl ? gateEl.querySelector('#loginScreen .bottom > .btn-box:not(.btn-box-account):not(.btn-box-another) > .gbtn:not(.guestbtn)') : null;
+        var mainGbtn    = document.getElementById('mainGoogleBtn') || (gateEl ? gateEl.querySelector('#loginScreen .bottom > .btn-box:not(.btn-box-account) > .gbtn:not(.guestbtn)') : null);
         var guestBtn    = document.getElementById('guestBtn');
         var accountBox  = document.getElementById('accountBox');
         var accountBtn  = document.getElementById('accountBtn');
         var accAvatar   = document.getElementById('accAvatar');
         var accMail     = document.getElementById('accMail');
+        var accNameSub  = document.getElementById('accNameSub');
         var welcome     = document.getElementById('welcome');
         var wAvatar     = document.getElementById('wAvatar');
         var wName       = document.getElementById('wName');
@@ -15513,6 +15608,7 @@ const PLANS = {
         var signOutBtn  = document.getElementById('signOutBtn');
 
         var toastTimer = null;
+        var busySafetyTimer = null;
         var guestOnboardingInFlight = false;
 
         function loginToast(msg, kind) {
@@ -15523,17 +15619,25 @@ const PLANS = {
             toastEl.className = 'toast show ' + (kind || '');
             toastTimer = setTimeout(function () { toastEl.className = 'toast ' + (kind || ''); }, 4200);
         }
-        if (toastEl) toastEl.addEventListener('click', function () { toastEl.classList.remove('show'); });
+        if (toastEl) toastEl.addEventListener('click', function () { toastEl.className = 'toast ' + (kind || ''); });
 
         function setGoogleBusy(on) {
+            clearTimeout(busySafetyTimer);
             if (mainGbtn) mainGbtn.classList.toggle('busy', !!on);
+            if (accountBtn) accountBtn.classList.toggle('busy', !!on);
             var ag = document.getElementById('authGoogleBtn');
             if (ag) ag.classList.toggle('busy', !!on);
+            if (on) {
+                // Watchdog: never allow "Signing in..." to stay stuck forever if mobile popup closes silently
+                busySafetyTimer = setTimeout(function () { setGoogleBusy(false); }, 12000);
+            }
         }
 
         function hiResPhoto(u) {
             return u ? String(u).replace(/=s\d+-c/, '=s512-c') : u;
         }
+
+        var DEFAULT_USER_CIRCLE_SVG = '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="8.5" r="4" stroke="currentColor" stroke-width="1.8"/><path d="M5 19.5C5.9 16.4 8.65 14.5 12 14.5C15.35 14.5 18.1 16.4 19 19.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
 
         function loadSavedAccount() {
             if (!accountBox || !accAvatar || !accMail) return;
@@ -15541,16 +15645,25 @@ const PLANS = {
                 var s = JSON.parse(localStorage.getItem('andos_last_account') || 'null');
                 if (!s || !s.email) { accountBox.style.display = 'none'; return; }
                 accMail.textContent = s.email;
+                if (accNameSub) {
+                    var cleanDisp = String(s.name || '').trim();
+                    if (cleanDisp && cleanDisp.toLowerCase() !== String(s.email).toLowerCase()) {
+                        accNameSub.textContent = cleanDisp;
+                        accNameSub.style.display = '';
+                    } else {
+                        accNameSub.style.display = 'none';
+                    }
+                }
+                accAvatar.innerHTML = '';
                 if (s.photo) {
-                    accAvatar.innerHTML = '';
                     var im = document.createElement('img');
                     im.src = hiResPhoto(s.photo);
                     im.alt = '';
                     im.referrerPolicy = 'no-referrer';
+                    im.onerror = function () { accAvatar.innerHTML = DEFAULT_USER_CIRCLE_SVG; };
                     accAvatar.appendChild(im);
                 } else {
-                    var parts = String(s.name || s.email).replace(/[^a-zA-Z ]/g, ' ').trim().split(/\s+/);
-                    accAvatar.textContent = ((parts[0] || 'A')[0] + (parts[1] ? parts[1][0] : '')).toUpperCase();
+                    accAvatar.innerHTML = DEFAULT_USER_CIRCLE_SVG;
                 }
                 accountBox.style.display = '';
             } catch (e) {
@@ -15674,6 +15787,11 @@ const PLANS = {
             if (!dpInitial || !nameIn) return;
             var n = (nameIn.value || '').trim();
             dpInitial.textContent = n ? n[0].toUpperCase() : '?';
+            if (guestNote && !guestOnboardingInFlight) {
+                guestNote.textContent = n
+                    ? ('Username preview: @' + previewHandleSlug(n) + '_<uid> · editable anytime in Profile.')
+                    : 'Skip assigns a friendly name like Sonu, Sagar, Aman or Kabir — editable anytime in Profile.';
+            }
         }
         function prefillGuest() {
             try {
@@ -15831,6 +15949,40 @@ const PLANS = {
             return { publicId: pubId, username: uname, name: finalName };
         }
 
+        // Live Profile Name + @Username Sync to Server Worker (POST /api/profile/update)
+        window.andosSyncProfileToServer = async function (nextName, nextUsername) {
+            if (!auth || !auth.currentUser) return null;
+            try {
+                var resp = await postLifecycleWorker(WORKER_PROFILE_UPDATE, auth.currentUser, {
+                    name: String(nextName || '').trim().slice(0, 40),
+                    username: String(nextUsername || '').replace(/^@+/, '').trim().toLowerCase().slice(0, 28)
+                });
+                var prof = (resp && resp.profile) ? resp.profile : resp;
+                if (prof && prof.username) {
+                    user.name = prof.name || user.name;
+                    user.username = prof.username;
+                    if (prof.publicId) user.publicId = String(prof.publicId);
+                    try {
+                        localStorage.setItem('andos_handle', user.username);
+                        localStorage.setItem('andos_user', JSON.stringify(user));
+                        if (user.isGuest) {
+                            var gpPrev = JSON.parse(localStorage.getItem('andos_guest_profile') || '{}') || {};
+                            gpPrev.name = user.name;
+                            gpPrev.username = user.username;
+                            if (user.publicId) gpPrev.publicId = user.publicId;
+                            localStorage.setItem('andos_guest_profile', JSON.stringify(gpPrev));
+                        }
+                    } catch (e) {}
+                }
+                return prof;
+            } catch (err) {
+                if (err && Number(err.status) === 409) {
+                    try { showToast('That @username is already taken — choose another one.', 'warning'); } catch (e2) {}
+                }
+                throw err;
+            }
+        };
+
         // === LIVE GUEST LOGIN FLOW: signInAnonymously() -> POST /api/guest/create WITH BEARER TOKEN ===
         window.__andosGuestLogin = async function (profileInput) {
             if (guestOnboardingInFlight) return;
@@ -15840,26 +15992,26 @@ const PLANS = {
             }
             guestOnboardingInFlight = true;
             setGuestSetupBusy(true);
-            var cleanName = String((profileInput && profileInput.name) || '').trim().slice(0, 40);
-            if (guestNote) guestNote.textContent = 'Verifying guest session & generating secure 7-digit UID...';
+            var rawInputName = String((profileInput && profileInput.name) || '').trim().slice(0, 40);
+            var effectiveName = rawInputName || pickFriendlyGuestName();
+            if (guestNote) guestNote.textContent = 'Setting up profile for ' + effectiveName + '...';
             try {
-                await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
                 var anonUser = (auth.currentUser && auth.currentUser.isAnonymous)
                     ? auth.currentUser
                     : (await auth.signInAnonymously()).user;
 
                 var serverResp = await postLifecycleWorker(WORKER_GUEST_CREATE, anonUser, {
-                    name: cleanName || 'Guest'
+                    name: effectiveName
                 });
-                var verified = applyVerifiedServerIdentity(anonUser, serverResp, cleanName, (profileInput && profileInput.photo) || photoData || '');
+                var verified = applyVerifiedServerIdentity(anonUser, serverResp, effectiveName, (profileInput && profileInput.photo) || photoData || '');
                 window.ANDOS_STAFF.sync(anonUser);
                 try { ANDOS_FB.watchOrders(); ANDOS_FB.watchRequests(); applyLiveAvatars(); } catch (e) {}
 
                 guestOnboardingInFlight = false;
                 setGuestSetupBusy(false);
-                if (guestNote) guestNote.textContent = 'Verified: @' + verified.username + ' · UID ' + verified.publicId;
+                if (guestNote) guestNote.textContent = 'Ready: @' + verified.username + ' · UID ' + verified.publicId;
                 hideLoginGate();
-                try { showToast('Welcome ' + verified.name + ' (@' + verified.username + ' · UID ' + verified.publicId + ')', 'success'); } catch (e) {}
+                try { showToast('Welcome ' + verified.name + ' (@' + verified.username + ')', 'success'); } catch (e) {}
                 return anonUser;
             } catch (err) {
                 guestOnboardingInFlight = false;
@@ -15893,58 +16045,50 @@ const PLANS = {
         }
         if (skipBtn) {
             skipBtn.addEventListener('click', function () {
-                window.__andosGuestLogin({ name: '', photo: photoData }).catch(function () {});
+                var friendly = pickFriendlyGuestName();
+                window.__andosGuestLogin({ name: friendly, photo: photoData }).catch(function () {});
             });
         }
 
-        // === GOOGLE SIGN-IN + EMAIL/LINK FLOWS FROM andos-login (5).html ===
+        // === INSTANT ZERO-HANG GOOGLE SIGN-IN (SYNCHRONOUS GESTURE POPUP + IMMEDIATE 0ms DASHBOARD UNLOCK) ===
         var gProvider = new firebase.auth.GoogleAuthProvider();
         gProvider.setCustomParameters({ prompt: 'select_account' });
         var isInApp = /FBAN|FBAV|Instagram|Line\/|MicroMessenger|Twitter/i.test(navigator.userAgent);
-        var isStandalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true || /source=pwa/.test(location.search);
-        var isMobileUA = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
         function doGoogleRedirect() {
             try { sessionStorage.setItem('andos_auth_redirect', '1'); } catch (e) {}
             return auth.signInWithRedirect(gProvider);
         }
 
-        function gisSignIn() {
-            return new Promise(function (resolve, reject) {
-                var done = false;
-                var finish = function (fn) { return function (v) { if (done) return; done = true; fn(v); }; };
-                var ok = finish(resolve), fail = finish(reject);
-                var load = (window.google && window.google.accounts && window.google.accounts.id)
-                    ? Promise.resolve()
-                    : new Promise(function (r, j) {
-                        var sc = document.createElement('script');
-                        sc.src = 'https://accounts.google.com/gsi/client';
-                        sc.async = true; sc.onload = r; sc.onerror = j;
-                        document.head.appendChild(sc);
-                    });
-                load.then(function () {
-                    google.accounts.id.initialize({
-                        client_id: GOOGLE_CLIENT_ID,
-                        use_fedcm_for_prompt: true,
-                        auto_select: false,
-                        cancel_on_tap_outside: false,
-                        itp_support: true,
-                        context: 'signin',
-                        callback: function (resp) {
-                            if (!resp || !resp.credential) return fail({ code: 'gis/no-credential' });
-                            var cred = firebase.auth.GoogleAuthProvider.credential(resp.credential);
-                            auth.signInWithCredential(cred).then(ok, fail);
-                        }
-                    });
-                    google.accounts.id.prompt(function (n) {
-                        try {
-                            var reason = (n.isNotDisplayed && n.isNotDisplayed()) ? n.getNotDisplayedReason() : (n.isSkippedMoment && n.isSkippedMoment()) ? n.getSkippedReason() : '';
-                            if (reason) fail({ code: 'gis/' + reason });
-                        } catch (e) { fail({ code: 'gis/unknown' }); }
-                    });
-                    setTimeout(function () { fail({ code: 'gis/timeout' }); }, 25000);
-                }).catch(function () { fail({ code: 'gis/load-failed' }); });
-            });
+        // Immediately seed dashboard user & hide login gate in 0ms as soon as Google auth resolves!
+        function unlockDashboardImmediatelyForMember(fbUser) {
+            if (!fbUser) return;
+            setGoogleBusy(false);
+            if (fbUser.email) {
+                try {
+                    localStorage.setItem('andos_last_account', JSON.stringify({
+                        name: fbUser.displayName || fbUser.email.split('@')[0],
+                        email: fbUser.email,
+                        photo: fbUser.photoURL || ''
+                    }));
+                } catch (e) {}
+            }
+            user.uid = fbUser.uid;
+            user.name = user.name && user.uid === fbUser.uid && user.name !== 'ANDOS Member'
+                ? user.name
+                : (fbUser.displayName || (fbUser.email ? fbUser.email.split('@')[0] : 'ANDOS Member'));
+            user.email = fbUser.email || user.email || '';
+            user.photoURL = localStorage.getItem('andos_profile_avatar') || fbUser.photoURL || user.photoURL || DEFAULT_AVATAR_URL;
+            user.isGuest = false;
+            user.provider = 'google';
+            user.loggedIn = true;
+            window.ANDOS_STAFF.sync(fbUser);
+            try {
+                localStorage.setItem('andos_user', JSON.stringify(user));
+                localStorage.setItem('andos_onboarded', '1');
+                applyLiveAvatars();
+            } catch (e) {}
+            hideLoginGate();
         }
 
         function handleLoginError(e) {
@@ -15953,7 +16097,7 @@ const PLANS = {
             var map = {
                 'auth/popup-closed-by-user': null,
                 'auth/cancelled-popup-request': null,
-                'auth/popup-blocked': 'The popup was blocked — please try again.',
+                'auth/popup-blocked': 'The popup was blocked — redirecting safely...',
                 'auth/unauthorized-domain': 'Add this domain in Firebase:\n' + location.hostname,
                 'auth/operation-not-allowed': 'Sign-in method is not enabled in Firebase Console.',
                 'auth/network-request-failed': 'Network problem — please check your internet connection.',
@@ -15965,25 +16109,30 @@ const PLANS = {
 
         window.__andosGoogleSignIn = function () {
             if (!auth) return;
-            if (mainGbtn && mainGbtn.classList.contains('busy')) return;
+            if ((mainGbtn && mainGbtn.classList.contains('busy')) || (accountBtn && accountBtn.classList.contains('busy'))) return;
             if (location.protocol === 'file:') {
                 loginToast('Open this page from a local server or hosting — Google sign-in will not work on file://.', 'err');
                 return;
             }
             setGoogleBusy(true);
-            auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).then(function () {
-                if (isInApp) return doGoogleRedirect();
-                if (isStandalone) {
-                    return gisSignIn().catch(function () { return auth.signInWithPopup(gProvider); });
+            if (isInApp) {
+                doGoogleRedirect().catch(handleLoginError);
+                return;
+            }
+            // Synchronous call inside user tap gesture — NO async delay before signInWithPopup!
+            auth.signInWithPopup(gProvider).then(function (cred) {
+                if (cred && cred.user) {
+                    unlockDashboardImmediatelyForMember(cred.user);
+                } else {
+                    setGoogleBusy(false);
                 }
-                return auth.signInWithPopup(gProvider).catch(function (e) {
-                    var c = (e && e.code) || '';
-                    if (c === 'auth/popup-blocked' || c === 'auth/operation-not-supported-in-this-environment' || c === 'auth/web-storage-unsupported') {
-                        return isMobileUA ? doGoogleRedirect() : gisSignIn().catch(function () { return doGoogleRedirect(); });
-                    }
-                    throw e;
-                });
-            }).catch(handleLoginError);
+            }).catch(function (e) {
+                var c = (e && e.code) || '';
+                if (c === 'auth/popup-blocked' || c === 'auth/operation-not-supported-in-this-environment' || c === 'auth/web-storage-unsupported') {
+                    return doGoogleRedirect().catch(handleLoginError);
+                }
+                handleLoginError(e);
+            });
         };
 
         if (mainGbtn) mainGbtn.addEventListener('click', function () {
@@ -16141,10 +16290,11 @@ const PLANS = {
                     if (cloudGuest && cloudGuest.publicId && cloudGuest.username) {
                         var cachedGp = null;
                         try { cachedGp = JSON.parse(localStorage.getItem('andos_guest_profile') || 'null'); } catch (e) {}
-                        applyVerifiedServerIdentity(fbUser, cloudGuest, (cachedGp && cachedGp.name) || cloudGuest.name || 'Guest', (cachedGp && cachedGp.photo) || '');
+                        applyVerifiedServerIdentity(fbUser, cloudGuest, cloudGuest.name || (cachedGp && cachedGp.name) || pickFriendlyGuestName(), (cachedGp && cachedGp.photo) || '');
                     } else {
-                        var minted = await postLifecycleWorker(WORKER_GUEST_CREATE, fbUser, { name: 'Guest' });
-                        applyVerifiedServerIdentity(fbUser, minted, 'Guest', '');
+                        var fallbackFriendly = pickFriendlyGuestName();
+                        var minted = await postLifecycleWorker(WORKER_GUEST_CREATE, fbUser, { name: fallbackFriendly });
+                        applyVerifiedServerIdentity(fbUser, minted, fallbackFriendly, '');
                     }
                     firstAuthEvent = false;
                     try { ANDOS_FB.watchOrders(); ANDOS_FB.watchRequests(); applyLiveAvatars(); } catch (e) {}
@@ -16157,90 +16307,81 @@ const PLANS = {
                 return;
             }
 
-            // 3) Verified Google / Email Member -> Sync Staff RBAC + Load Firestore Cloud + Mint Server 7-digit UID if missing
+            // 3) Verified Google / Email Member -> Open Dashboard IMMEDIATELY in 0ms, then sync Cloud + Worker in background!
             var silentRestore = firstAuthEvent;
             firstAuthEvent = false;
 
-            if (fbUser.email) {
+            unlockDashboardImmediatelyForMember(fbUser);
+
+            // Background non-blocking Firestore + Server Identity backfill/sync
+            (async function syncMemberCloudInBackground() {
+                var cloud = null;
                 try {
-                    localStorage.setItem('andos_last_account', JSON.stringify({
-                        name: fbUser.displayName || fbUser.email.split('@')[0],
-                        email: fbUser.email,
-                        photo: fbUser.photoURL || ''
-                    }));
+                    cloud = await Promise.race([
+                        ANDOS_FB.loadUser(fbUser),
+                        new Promise(function (r) { setTimeout(function () { r(null); }, 4000); })
+                    ]);
                 } catch (e) {}
-            }
 
-            window.ANDOS_STAFF.sync(fbUser);
+                if (!cloud || !cloud.publicId || !cloud.username) {
+                    try {
+                        var regResp = await postLifecycleWorker(WORKER_MEMBER_REGISTER, fbUser, {
+                            name: String(fbUser.displayName || (fbUser.email ? fbUser.email.split('@')[0] : 'Member')).slice(0, 40)
+                        });
+                        var regProf = (regResp && regResp.profile) ? regResp.profile : regResp;
+                        cloud = Object.assign({}, cloud || {}, {
+                            publicId: (regProf && regProf.publicId) || (cloud && cloud.publicId) || '',
+                            username: (regProf && regProf.username) || (cloud && cloud.username) || ''
+                        });
+                    } catch (e) {
+                        console.warn('Member Worker sync note:', e && e.message);
+                    }
+                }
 
-            var cloud = null;
-            try {
-                cloud = await Promise.race([
-                    ANDOS_FB.loadUser(fbUser),
-                    new Promise(function (r) { setTimeout(function () { r(null); }, 3500); })
-                ]);
-            } catch (e) {}
+                var created = fbUser.metadata && fbUser.metadata.creationTime;
+                var last = fbUser.metadata && fbUser.metadata.lastSignInTime;
+                var isNewMeta = created && last && Math.abs(new Date(last) - new Date(created)) < 60000;
+                var isTrulyNew = (cloud === null) && isNewMeta;
 
-            // If member does not yet have a server-minted 7-digit publicId / username, register on Worker /api/member/register!
-            if (!cloud || !cloud.publicId || !cloud.username) {
+                try { ANDOS_FB.applyCloud(fbUser, cloud, isTrulyNew); } catch (e) { console.warn('applyCloud', e); }
+                try { ANDOS_FB.watchOrders(); ANDOS_FB.watchRequests(); ANDOS_SYNC.syncNotifications(); } catch (e) {}
+                try { if (typeof render === 'function') render(); } catch (e) {}
+
                 try {
-                    var regResp = await postLifecycleWorker(WORKER_MEMBER_REGISTER, fbUser, {
-                        name: String(fbUser.displayName || (fbUser.email ? fbUser.email.split('@')[0] : 'Member')).slice(0, 40)
-                    });
-                    var regProf = (regResp && regResp.profile) ? regResp.profile : regResp;
-                    cloud = Object.assign({}, cloud || {}, {
-                        publicId: (regProf && regProf.publicId) || (cloud && cloud.publicId) || '',
-                        username: (regProf && regProf.username) || (cloud && cloud.username) || ''
-                    });
-                } catch (e) {
-                    console.warn('Member Worker sync note:', e && e.message);
-                }
-            }
+                    var __refCode = (window.getRefBy ? window.getRefBy() : '');
+                    if (__refCode) {
+                        try { ANDOS_FB.saveReferral(__refCode); } catch (e2) {}
+                        if (isTrulyNew) {
+                            try { window.tgCard('🤝', 'NEW USER VIA REFERRAL', [['Name', fbUser.displayName], ['Email', fbUser.email], ['Ref Code', __refCode, 'code'], ['UID', fbUser.uid, 'code'], ['Device', ANDOS_FB.deviceId(), 'code']], 'referred signup'); } catch (e2) {}
+                        }
+                    }
+                } catch (e) {}
 
-            var created = fbUser.metadata && fbUser.metadata.creationTime;
-            var last = fbUser.metadata && fbUser.metadata.lastSignInTime;
-            var isNewMeta = created && last && Math.abs(new Date(last) - new Date(created)) < 60000;
-            var isTrulyNew = (cloud === null) && isNewMeta;
-
-            try { ANDOS_FB.applyCloud(fbUser, cloud, isTrulyNew); } catch (e) { console.warn('applyCloud', e); }
-            try { ANDOS_FB.watchOrders(); ANDOS_FB.watchRequests(); ANDOS_SYNC.syncNotifications(); } catch (e) {}
-
-            try {
-                var __refCode = (window.getRefBy ? window.getRefBy() : '');
-                if (__refCode) {
-                    try { ANDOS_FB.saveReferral(__refCode); } catch (e2) {}
+                try {
+                    var __rows = [
+                        ['Name', fbUser.displayName || user.name],
+                        ['Username', user.username ? '@' + user.username : ''],
+                        ['Public UID', user.publicId || ''],
+                        ['Email', fbUser.email],
+                        ['Mobile', user.mobile || ''],
+                        ['FF UID', user.ffUid || ''],
+                        ['UID', fbUser.uid, 'code'],
+                        ['Device', ANDOS_FB.deviceId(), 'code'],
+                        ['Platform', (navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || ''],
+                        ['Page', location.hostname || 'local']
+                    ];
                     if (isTrulyNew) {
-                        try { window.tgCard('🤝', 'NEW USER VIA REFERRAL', [['Name', fbUser.displayName], ['Email', fbUser.email], ['Ref Code', __refCode, 'code'], ['UID', fbUser.uid, 'code'], ['Device', ANDOS_FB.deviceId(), 'code']], 'referred signup'); } catch (e2) {}
+                        window.tgCard('🆕', 'CREATE · GOOGLE', __rows, 'new account · first login');
+                    } else {
+                        var lastPing = Number(sessionStorage.getItem('andos_tg_login_ping') || 0);
+                        if (!silentRestore || Date.now() - lastPing > 6 * 60 * 60 * 1000) {
+                            sessionStorage.setItem('andos_tg_login_ping', String(Date.now()));
+                            window.tgLoginPing = true;
+                            window.tgCard('🔑', 'LOGIN · GOOGLE', __rows, silentRestore ? 'session restore (auto)' : 'returning user login');
+                        }
                     }
-                }
-            } catch (e) {}
-
-            try {
-                var __rows = [
-                    ['Name', fbUser.displayName || user.name],
-                    ['Username', user.username ? '@' + user.username : ''],
-                    ['Public UID', user.publicId || ''],
-                    ['Email', fbUser.email],
-                    ['Mobile', user.mobile || ''],
-                    ['FF UID', user.ffUid || ''],
-                    ['UID', fbUser.uid, 'code'],
-                    ['Device', ANDOS_FB.deviceId(), 'code'],
-                    ['Platform', (navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || ''],
-                    ['Page', location.hostname || 'local']
-                ];
-                if (isTrulyNew) {
-                    window.tgCard('🆕', 'CREATE · GOOGLE', __rows, 'new account · first login');
-                } else {
-                    var lastPing = Number(sessionStorage.getItem('andos_tg_login_ping') || 0);
-                    if (!silentRestore || Date.now() - lastPing > 6 * 60 * 60 * 1000) {
-                        sessionStorage.setItem('andos_tg_login_ping', String(Date.now()));
-                        window.tgLoginPing = true;
-                        window.tgCard('🔑', 'LOGIN · GOOGLE', __rows, silentRestore ? 'session restore (auto)' : 'returning user login');
-                    }
-                }
-            } catch (e) {}
-
-            hideLoginGate();
+                } catch (e) {}
+            })();
         });
     })();
 
@@ -22889,24 +23030,35 @@ function renderFreeFireGraphics() {
 
     window.saveProfileDetails = function () {
         var g = function (id) { return document.getElementById(id); };
-        var n = g('epName') || g('pfName'), m = g('epMobile') || g('pfMobile'), e = g('epEmail') || g('pfEmail'), f = g('epFf');
+        var n = g('epName') || g('pfName'), u = g('epUsername') || g('pfUsername'), m = g('epMobile') || g('pfMobile'), e = g('epEmail') || g('pfEmail'), f = g('epFf');
         if (!user) user = {};
         if (n) user.name = String(n.value || '').replace(/[<>]/g,'').trim().slice(0,40) || user.name;
+        if (u) {
+            var uv = String(u.value || '').trim().replace(/^@+/, '').toLowerCase().replace(/[^a-z0-9_]/g, '').slice(0, 28);
+            if (uv && uv.length < 3) { showToast('Username must be at least 3 characters', 'warning'); return; }
+            if (uv) user.username = uv;
+        }
         if (m) { var mv = String(m.value || '').replace(/\D/g,'').slice(-10); if (mv && mv.length !== 10) { showToast('Enter a valid 10-digit mobile', 'warning'); return; } user.mobile = mv; }
         if (e) { var ev = String(e.value || '').replace(/[<>]/g,'').trim().slice(0,80); if (ev && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(ev)) { showToast('Enter a valid email', 'warning'); return; } user.email = ev; }
         var dobEl = g('pfDob'); if (dobEl && dobEl.value) user.dob = dobEl.value;
         if (g('epBio')) user.bio = String(g('epBio').value || '').replace(/[<>]/g,'').trim().slice(0,160);
         if (g('epLoc')) user.location = String(g('epLoc').value || '').replace(/[<>]/g,'').trim().slice(0,30);
         if (g('epWeb')) user.website = String(g('epWeb').value || '').replace(/[<>"']/g,'').trim().slice(0,100);
-        if (f) { user.ffUid = String(f.value || '').replace(/\D/g,'').slice(0,12); var fn = g('epFfName'); user.ffName = (fn && fn.getAttribute('data-name')) || (user.ffUid ? user.ffName || '' : ''); try { localStorage.setItem('andos_ff_uid', user.ffUid); localStorage.setItem('andos_ff_name', user.ffName || ''); } catch (err) {} }
-        try { localStorage.setItem('andos_user_profile', JSON.stringify({ name: user.name, mobile: user.mobile, email: user.email, dob: user.dob || '', ffUid: user.ffUid || '', ffName: user.ffName || '', bio: user.bio || '', location: user.location || '', website: user.website || '' })); } catch (err) {}
+        if (f) { user.ffUid = String(f.value || '').replace(/\D/g,'').slice(0,12); var fn = g('epFfName'); user.ffName = (fn && fn.getAttribute('data-name')) || (user.ffUid ? user.ffName || '' : ''); try { localStorage.setItem('andos_ff_uid', user.ffUid); localStorage.ffName = user.ffName || ''; localStorage.setItem('andos_ff_name', user.ffName || ''); } catch (err) {} }
+        try { if (user.username) localStorage.setItem('andos_handle', user.username); } catch (err) {}
+        try { localStorage.setItem('andos_user_profile', JSON.stringify({ name: user.name, username: user.username || '', publicId: user.publicId || '', mobile: user.mobile, email: user.email, dob: user.dob || '', ffUid: user.ffUid || '', ffName: user.ffName || '', bio: user.bio || '', location: user.location || '', website: user.website || '' })); } catch (err) {}
         try { localStorage.setItem('andos_user', JSON.stringify(user)); } catch (err) {}
         try { localStorage.setItem('andos_onboarded', '1'); } catch (err) {}
         try { applyLiveAvatars(); } catch (err) {}
         try { window.ANDOS_FB && ANDOS_FB.saveUser && ANDOS_FB.saveUser(); } catch (err) {}
-        try { if (window.notifyAct) window.notifyAct('PROFILE UPDATED', (user.name || '') + ' | ' + (user.mobile || '') + (user.ffUid ? ' | FF ' + user.ffUid : '')); } catch (err) {}
+        if (typeof window.andosSyncProfileToServer === 'function') {
+            window.andosSyncProfileToServer(user.name, user.username).then(function () {
+                try { if (currentPage === 'account' && typeof render === 'function') render(); } catch (e2) {}
+            }).catch(function () {});
+        }
+        try { if (window.notifyAct) window.notifyAct('PROFILE UPDATED', (user.name || '') + (user.username ? ' (@' + user.username + ')' : '') + ' | ' + (user.mobile || '') + (user.ffUid ? ' | FF ' + user.ffUid : '')); } catch (err) {}
         showToast('Profile updated', 'success');
-        if (currentPage === 'editprofile') navigate('account', { force: true });
+        if (currentPage === 'editprofile' || currentPage === 'account') navigate('account', { force: true });
     };
     function ProfilePage() {
         try {
@@ -22992,6 +23144,7 @@ function renderFreeFireGraphics() {
                         <h3 class="font-bold text-gray-900 mb-4">Edit Profile</h3>
                         <div class="space-y-4">
                             <div><label class="font-bold text-gray-700 mb-2 block">Full Name</label><input type="text" id="profileName" value="${escapeHtml(user.name || '')}" placeholder="Your name" class="input-field w-full px-4 py-3.5 rounded-2xl font-semibold"></div>
+                            <div><label class="font-bold text-gray-700 mb-2 block">Username (@)</label><input type="text" id="profileUsername" value="${escapeHtml(user.username || '')}" placeholder="your_username" maxlength="28" autocomplete="off" spellcheck="false" class="input-field w-full px-4 py-3.5 rounded-2xl font-semibold"></div>
                             <div><label class="font-bold text-gray-700 mb-2 block">Mobile Number</label><input type="tel" id="profileMobile" value="${escapeHtml(user.mobile || '')}" placeholder="10 digit number" maxlength="10" class="input-field w-full px-4 py-3.5 rounded-2xl font-semibold"></div>
                             <div><label class="font-bold text-gray-700 mb-2 block">Email</label><input type="email" id="profileEmail" value="${email}" placeholder="your@email.com" class="input-field w-full px-4 py-3.5 rounded-2xl font-semibold"></div>
                         </div>
@@ -23055,9 +23208,10 @@ function renderFreeFireGraphics() {
                     <div class="pf-loy-meter" aria-hidden="true"><i style="width:${Math.min(100, Math.round((pts%1000)/10))}%"></i></div>
                 </section>
                 <div class="pf-form">
-                    <label>Name<input id="pfName" type="text" value="${name}" maxlength="40"></label>
-                    <label>Mobile<input id="pfMobile" type="tel" value="${mobile}" maxlength="10" inputmode="numeric"></label>
-                    <label>Email<input id="pfEmail" type="email" value="${email}" maxlength="80"></label>
+                    <label>Name<input id="pfName" type="text" value="${name}" maxlength="40" autocomplete="off" spellcheck="false"></label>
+                    <label>Username (@)<input id="pfUsername" type="text" value="${escapeHtml(user.username || '')}" maxlength="28" placeholder="username" autocomplete="off" spellcheck="false"></label>
+                    <label>Mobile<input id="pfMobile" type="tel" value="${mobile}" maxlength="10" inputmode="numeric" autocomplete="off"></label>
+                    <label>Email<input id="pfEmail" type="email" value="${email}" maxlength="80" autocomplete="off"></label>
                     <button type="button" class="pf-save" onclick="saveProfileDetails()">Save profile</button>
                     ${photo ? '<button type="button" class="pf-remove" onclick="removeProfileAvatar()">Remove photo</button>' : ''}
                 </div>
@@ -26480,11 +26634,22 @@ function renderFreeFireGraphics() {
     }
 
     window.saveProfile = () => {
-        const name = document.getElementById('profileName')?.value;
+        const name = String(document.getElementById('profileName')?.value || user.name || '').replace(/[<>]/g, '').trim().slice(0, 40) || user.name;
+        const rawHandle = String(document.getElementById('profileUsername')?.value || '').trim().replace(/^@+/, '').toLowerCase().replace(/[^a-z0-9_]/g, '').slice(0, 28);
+        if (rawHandle && rawHandle.length < 3) {
+            showToast('Username must be at least 3 characters', 'warning');
+            return;
+        }
+        const username = rawHandle || user.username || '';
         const mobile = document.getElementById('profileMobile')?.value;
         const email = document.getElementById('profileEmail')?.value;
-        user = { ...user, name, mobile, email, photoURL: localStorage.getItem('andos_profile_avatar') || user.photoURL || DEFAULT_AVATAR_URL, loggedIn: true };
+        user = { ...user, name, username, mobile, email, photoURL: localStorage.getItem('andos_profile_avatar') || user.photoURL || DEFAULT_AVATAR_URL, loggedIn: true };
+        try { if (username) localStorage.setItem('andos_handle', username); } catch (e) {}
         localStorage.setItem('andos_user', JSON.stringify(user));
+        try { window.ANDOS_FB && ANDOS_FB.saveUser && ANDOS_FB.saveUser(); } catch (e) {}
+        if (typeof window.andosSyncProfileToServer === 'function') {
+            window.andosSyncProfileToServer(name, username).then(() => { try { render(); } catch (e) {} }).catch(() => {});
+        }
         showToast('Profile saved!', 'success');
         render();
     };
