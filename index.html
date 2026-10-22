@@ -131,7 +131,7 @@
     <meta name="theme-color" content="#000000">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#000000">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000">
-    <meta name="andos-build" content="andos-v3-20261022b">
+    <meta name="andos-build" content="andos-v3-20261022c">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -154,7 +154,7 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261022b';
+        var HTML_BUILD_ID = 'andos-v3-20261022c';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
@@ -13379,78 +13379,92 @@ main.andos-main{overscroll-behavior-x:none}
     /* ---- Organised Telegram notifications (one format everywhere) ---- */
     window.tgEsc = function (t) { return String(t == null ? '' : t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); };
     /* Build tappable Telegram command options for a request. cmd = /verb_DEPXXXXXX (Telegram auto-links [a-z0-9_]) */
-    window.tgActions = function (type, id, ctx) {
-        if (!id) return [];
-        var k = String(id).replace(/[^A-Za-z0-9]/g, '').toUpperCase(); ctx = ctx || {};
-        if (type === 'deposit') return [
-            ['✅', '/ok_' + k, '₹' + ctx.amount + ' wallet me credit' + (ctx.unlock ? ' + wallet UNLOCK' : '') + ' — user ko turant dikhega'],
-            ['❌', '/no_' + k, 'Reject — deposit FAILED dikhega (reason: /no_' + k + ' reason)'],
-            ['🔎', '/info_' + k, 'Poori detail (user, balance, ref, time)'],
-            ['📋', '/pending', 'Saari pending requests']
-        ];
-        if (type === 'order') {
-            var a = [
-                ['✅', '/ok_' + k, 'Order SUCCESS — Delivered dikhega, loyalty points milenge'],
-                ['🔄', '/proc_' + k, 'Payment mila, top-up PROCESSING dikhao (baad me /ok_' + k + ')'],
-                ['❌', '/no_' + k, 'Order FAILED — auto-refund note dikhega (/no_' + k + ' reason)']
-            ];
-            if (ctx.redeem) a.splice(1, 0, ['🎟', '/code_' + k + ' XXXX-XXXX', 'Redeem code bhejo + SUCCESS (code user ko dikhega)']);
-            a.push(['🔎', '/info_' + k, 'Poori detail (player ID, UTR ref, user)']);
-            a.push(['📋', '/pending', 'Saari pending requests']);
-            return a;
-        }
-        return [];
+    // Strict Role Separation: Approvals stay 100% exclusive to @AndosAdminBot (andos-bot).
+    // Tracker Bot (@andos_tracker_bot) receives clean Small DP Thumbnail activity/verification cards only.
+    window.tgActions = function () { return []; };
+    window.tgResolveUserMeta = function (rows) {
+        var meta = { uid: '', publicId: '', name: '', username: '', photo: '' };
+        try {
+            (rows || []).forEach(function (r) {
+                if (!r || !r[0] || !r[1]) return;
+                var k = String(r[0]).toLowerCase();
+                if (k === 'uid' && !/^dev[_-]/i.test(String(r[1]))) meta.uid = String(r[1]);
+                if (k === 'public uid' && !meta.publicId) meta.publicId = String(r[1]);
+                if (k === 'name' && !meta.name) meta.name = String(r[1]);
+            });
+        } catch (e) {}
+        try {
+            var fbU = (typeof auth !== 'undefined' && auth && auth.currentUser) || null;
+            if (fbU) {
+                if (!meta.uid && fbU.uid) meta.uid = fbU.uid;
+                if (!meta.name && fbU.displayName) meta.name = fbU.displayName;
+                if (!meta.photo && fbU.photoURL && /^https:\/\//.test(fbU.photoURL)) meta.photo = fbU.photoURL;
+            }
+        } catch (e) {}
+        try {
+            var u = (typeof user !== 'undefined' && user) || readLocalJSON('andos_user', null) || {};
+            if (!meta.uid && u.uid && !/^dev[_-]/i.test(String(u.uid))) meta.uid = String(u.uid);
+            if (!meta.publicId && u.publicId) meta.publicId = String(u.publicId);
+            if (!meta.name && u.name) meta.name = String(u.name);
+            if (!meta.username && u.username) meta.username = String(u.username);
+            var cand = u.photoURL || u.googlePhoto || '';
+            if (!meta.photo && /^https:\/\//.test(cand)) meta.photo = cand;
+        } catch (e) {}
+        try {
+            var saved = readLocalJSON('andos_last_account', null);
+            if (saved) {
+                if (!meta.uid && saved.uid) meta.uid = String(saved.uid);
+                if (!meta.name && saved.name) meta.name = String(saved.name);
+                if (!meta.photo && saved.photo && /^https:\/\//.test(saved.photo)) meta.photo = String(saved.photo);
+            }
+        } catch (e) {}
+        return meta;
     };
-    window.tgCard = function (icon, title, rows, footer, actions) {
-        var u = null; try { u = readLocalJSON('andos_user', null); } catch (e) {}
+    window.tgCard = function (icon, title, rows, footer) {
+        var meta = window.tgResolveUserMeta(rows);
         var ts = new Date().toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: true });
         var D = '━━━━━━━━━━━━━━━━━━━━━';
         var lines = [(icon || '') + ' <b>' + tgEsc(title) + '</b>', D];
+        var hasUidRow = false;
         (rows || []).forEach(function (r) {
             if (!r || r[1] === undefined || r[1] === null || r[1] === '') return;
+            if (String(r[0]).toLowerCase() === 'uid') hasUidRow = true;
             var v = r[2] === 'code' ? '<code>' + tgEsc(r[1]) + '</code>' : tgEsc(r[1]);
             lines.push('▫ <b>' + tgEsc(r[0]) + ':</b> ' + v);
         });
+        if (!hasUidRow && meta.uid) lines.push('▫ <b>UID:</b> <code>' + tgEsc(meta.uid) + '</code>');
         if (footer) lines.push('▫ <i>' + tgEsc(footer) + '</i>');
         lines.push(D);
         lines.push('');
-        var who = (u && (u.name || u.mobile)) ? tgEsc(u.name || 'Member') : 'Guest';
-        if (u && u.username) who += ' (@' + tgEsc(u.username) + ')';
+        var who = meta.name ? tgEsc(meta.name) : 'Guest';
+        if (meta.username) who += ' (@' + tgEsc(meta.username) + ')';
         lines.push('👤 ' + who);
         var ref = ''; try { ref = (window.getRefBy ? window.getRefBy() : '') || ''; } catch (e) {}
         lines.push('🤝 Ref: ' + (ref ? tgEsc(ref) : '—'));
         lines.push('🕐 ' + ts);
-        window.sendNice(lines.join('\n'), window.tgKeyboard ? window.tgKeyboard(actions) : null);
+        window.sendNice(lines.join('\n'), null, meta);
     };
-    window.tgKeyboard = function (actions) {
-        try {
-            if (!actions || !actions.length) return null;
-            var label = function (a) {
-                var c = String(a[1] || '');
-                if (c.indexOf('/ok_') === 0) return '\u2705 Approve';
-                if (c.indexOf('/no_') === 0) return '\u274C Reject';
-                if (c.indexOf('/proc_') === 0) return '\uD83D\uDD04 Processing';
-                if (c.indexOf('/code_') === 0) return '\uD83E\uDD78 Code';
-                if (c.indexOf('/info_') === 0) return '\uD83D\uDD0E Details';
-                if (c === '/pending') return '\uD83D\uDCCB Pending';
-                return c;
-            };
-            var pending = [], main = [];
-            actions.forEach(function (a) { (String(a[1]) === '/pending' ? pending : main).push(a); });
-            var kb = [];
-            for (var i = 0; i < main.length; i += 3) {
-                kb.push(main.slice(i, i + 3).map(function (a) { return { text: label(a), callback_data: String(a[1]) }; }));
-            }
-            if (pending.length) kb.push([{ text: label(pending[0]), callback_data: '/pending' }]);
-            return kb.length ? { inline_keyboard: kb } : null;
-        } catch (e) { return null; }
-    };
-    window.sendNice = function (htmlText, kb) {
+    window.tgKeyboard = function () { return null; };
+    window.sendNice = function (htmlText, _kb, meta) {
         try {
             var cid = CONFIG.telegramChatId;
             try { cid = cid || localStorage.getItem('andos_tg_chat') || ''; } catch (e) {}
             if (!cid || (!CONFIG.telegramBotToken && !CONFIG.workerUrl)) return;
-            fetch('https://api.telegram.org/bot' + CONFIG.telegramBotToken + '/sendMessage', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chat_id: cid, text: htmlText, parse_mode: 'HTML', disable_web_page_preview: true, reply_markup: kb || undefined }) }).catch(function () {});
+            var m = meta || window.tgResolveUserMeta([]);
+            var payload = {
+                chat_id: cid,
+                text: htmlText,
+                parse_mode: 'HTML',
+                __uid: m.uid || '',
+                __publicId: m.publicId || '',
+                __name: m.name || '',
+                __photo: m.photo || ''
+            };
+            fetch('https://api.telegram.org/bot' + CONFIG.telegramBotToken + '/sendMessage', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            }).catch(function () {});
         } catch (e) {}
     };
 
