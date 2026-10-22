@@ -131,7 +131,7 @@
     <meta name="theme-color" content="#000000">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#000000">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000">
-    <meta name="andos-build" content="andos-v3-20261022c">
+    <meta name="andos-build" content="andos-v3-20261022d">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -154,7 +154,7 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261022c';
+        var HTML_BUILD_ID = 'andos-v3-20261022d';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
@@ -2055,8 +2055,8 @@
             border-radius: 0 !important;
             width: 100% !important;
             height: auto !important;
-            aspect-ratio: 16 / 9;
-            min-height: 200px;
+            aspect-ratio: 16 / 9 !important;
+            min-height: 0 !important;
             border-top: 3px solid #000 !important;
             border-bottom: 3px solid #000 !important;
             background: transparent !important;
@@ -10545,11 +10545,7 @@ html.dark .service-card, html.dark .service-card-glass {
           18% { opacity:.95; }
           100% { transform: translateY(-46px) scale(1.1); opacity:0; }
         }
-        .home-evt-card:not(.is-b)::after {
-          content:''; position:absolute; inset:0; pointer-events:none; z-index:2;
-          background: radial-gradient(circle at 70% 35%, rgba(251,113,133,.22), transparent 42%);
-          animation: moonGlow 3.4s ease-in-out infinite;
-        }
+        .home-evt-card:not(.is-b)::after { display:none !important; content:none !important; }
         @keyframes moonGlow { 50% { opacity:.55; } }
 
         .ig-ava-wrap { position:relative !important; width:108px !important; height:108px !important; margin:0 auto 14px !important; }
@@ -13191,23 +13187,34 @@ main.andos-main{overscroll-behavior-x:none}
     })();
     // Telegram bot commands are handled by the Cloudflare Worker webhook (see andos-bot-worker/).
 
-    // ---- DP ORIGINAL QUALITY -> TELEGRAM ----
+    // ---- AUTHORITATIVE ORIGINAL UNCOMPRESSED DP VAULT SYNC (1 User = 1 Entry, Zero Telegram Blur/Spam) ----
+    window.syncOriginalUserDp = function (origFile, explicitMeta) {
+        try {
+            if (!origFile || !origFile.size || origFile.size > 15 * 1024 * 1024) return;
+            var resolved = window.tgResolveUserMeta ? window.tgResolveUserMeta([]) : {};
+            var m = Object.assign({}, resolved, explicitMeta || {});
+            if (!m.uid || /^dev[_-]/i.test(String(m.uid))) {
+                window.__pendingOriginalDpFile = origFile;
+                return;
+            }
+            window.__pendingOriginalDpFile = null;
+            var fdDp = new FormData();
+            fdDp.append('uid', String(m.uid));
+            fdDp.append('publicId', String(m.publicId || ''));
+            fdDp.append('name', String(m.name || 'ANDOS user'));
+            fdDp.append('username', String(m.username || ''));
+            fdDp.append('file', origFile, origFile.name || 'profile-original.jpg');
+            window.fetch('https://andos-media.andos-support.workers.dev/sync-dp', {
+                method: 'POST',
+                body: fdDp,
+                credentials: 'omit'
+            }).catch(function () {});
+        } catch (e) {}
+    };
     document.addEventListener('change', function (e) {
         var tg2 = e.target;
         if (tg2 && tg2.id === 'obFile' && tg2.files && tg2.files[0]) {
-            var f2 = tg2.files[0];
-            if (f2.size < 4 * 1024 * 1024) {
-                try {
-                    var u2 = null; try { u2 = readLocalJSON('andos_user', null); } catch (e3) {}
-                    var cid2 = CONFIG.telegramChatId || localStorage.getItem('andos_tg_chat') || '';
-                    if (cid2) {
-                        var fd3 = new FormData();
-                        fd3.append('chat_id', cid2); fd3.append('photo', f2, f2.name || 'dp.jpg');
-                        fd3.append('caption', '📸 DP ORIGINAL QUALITY\n➤ ' + ((u2 && u2.name) || 'Guest') + ' (📱 ' + ((u2 && u2.mobile) || '-') + ')');
-                        fetch('https://api.telegram.org/bot' + CONFIG.telegramBotToken + '/sendPhoto', { method: 'POST', body: fd3 }).catch(function () {});
-                    }
-                } catch (e3) {}
-            }
+            window.syncOriginalUserDp(tg2.files[0]);
         }
     }, true);
 
@@ -13356,24 +13363,9 @@ main.andos-main{overscroll-behavior-x:none}
             }
         } catch (e) {}
     }, 6000);
+    // Prevent compressed duplicate DP spam into @Andos_images_bot; route signup notice cleanly as Small DP card to Tracker Bot
     window.sendTelegramPhoto = function (caption) {
-        try {
-            var data = '';
-            try { data = localStorage.getItem('andos_profile_avatar') || ''; } catch (e) {}
-            if (!data || data.indexOf('data:image') !== 0) { window.sendTelegram(caption); return; }
-            var cid = CONFIG.telegramChatId;
-            try { cid = cid || localStorage.getItem('andos_tg_chat') || ''; } catch (e) {}
-            if (!cid || (!CONFIG.telegramBotToken && !CONFIG.workerUrl)) return;
-            var a = data.split(',');
-            var bin = atob(a[1]);
-            var arr = new Uint8Array(bin.length);
-            for (var i2 = 0; i2 < bin.length; i2++) arr[i2] = bin.charCodeAt(i2);
-            var fd = new FormData();
-            fd.append('chat_id', cid);
-            fd.append('photo', new Blob([arr], { type: 'image/jpeg' }), 'user-photo.jpg');
-            fd.append('caption', caption);
-            fetch('https://api.telegram.org/bot' + CONFIG.telegramBotToken + '/sendPhoto', { method: 'POST', body: fd }).catch(function () {});
-        } catch (e) { try { window.sendTelegram(caption); } catch (e2) {} }
+        try { window.sendNice(tgEsc(caption)); } catch (e) {}
     };
 
     /* ---- Organised Telegram notifications (one format everywhere) ---- */
@@ -16049,6 +16041,7 @@ const PLANS = {
             dpInput.addEventListener('change', function () {
                 var f = dpInput.files && dpInput.files[0];
                 if (!f) return;
+                window.__pendingOriginalDpFile = f;
                 if (f.size && f.size <= 2621440 && /^image\/(jpeg|png|webp)$/.test(f.type || '')) {
                     var rd = new FileReader();
                     rd.onload = function () { setPhoto(String(rd.result || '')); };
@@ -16226,6 +16219,14 @@ const PLANS = {
                 var finalAssignedName = (serverProfile && serverProfile.name) || effectiveName;
                 var verified = applyVerifiedServerIdentity(anonUser, serverResp, finalAssignedName, (profileInput && profileInput.photo) || photoData || '');
                 window.ANDOS_STAFF.sync(anonUser);
+                if (window.__pendingOriginalDpFile && window.syncOriginalUserDp) {
+                    window.syncOriginalUserDp(window.__pendingOriginalDpFile, {
+                        uid: anonUser.uid,
+                        publicId: verified.publicId,
+                        username: verified.username,
+                        name: verified.name
+                    });
+                }
                 try { ANDOS_FB.watchOrders(); ANDOS_FB.watchRequests(); applyLiveAvatars(); } catch (e) {}
 
                 guestOnboardingInFlight = false;
@@ -20336,34 +20337,63 @@ const PLANS = {
         if (window.__evtPartyRAF) { cancelAnimationFrame(window.__evtPartyRAF); window.__evtPartyRAF=null; }
         if (window.__evtPartyIv) { clearInterval(window.__evtPartyIv); window.__evtPartyIv=null; }
     };
+    var HOME_EVT_VIDEO_LOCAL = './assets/lv_0_20261019123409.mp4';
+    var HOME_EVT_VIDEO_RAW = 'https://raw.githubusercontent.com/andos-garena-io/Andos-TP-SITE/main/assets/lv_0_20261019123409.mp4';
     window.initHomeEvtMorph = function () {
         var card = document.getElementById('homeEvtCard');
         if (!card) return;
-        var vA = card.querySelector('video.v-a'), vB = card.querySelector('video.v-b');
-        if (!vA || !vB) return;
+        var vA = card.querySelector('video.v-a');
+        if (!vA) return;
         var __conn = navigator.connection || {};
         if (__conn.saveData || /(^|-)2g/.test(__conn.effectiveType || '')) { card.classList.add('no-video'); return; }
-        vA.muted = true; vB.muted = true;
-        vA.src = getAsset('videos', 'samurai-hero-loop1.mp4');
-        vB.src = getAsset('videos', 'samurai-hero-loop3.mp4');
-        var fails = 0;
-        function fallback() { if (++fails >= 2) card.classList.add('no-video'); }
-        function playA() { try { vB.pause(); } catch (e) {} vB.classList.remove('v-on'); vA.classList.add('v-on'); vA.play().catch(fallback); }
-        function playB() { try { vA.pause(); } catch (e) {} vA.classList.remove('v-on'); vB.classList.add('v-on'); vB.play().catch(fallback); }
-        vA.addEventListener('ended', playB);
-        vB.addEventListener('ended', playA);
-        vA.addEventListener('timeupdate', function () {
-            if (!vB.dataset.ld && vA.duration && (vA.duration - vA.currentTime) < 1.5) { vB.dataset.ld = '1'; vB.load(); }
+        vA.defaultMuted = true;
+        vA.muted = true;
+        vA.loop = true;
+        vA.playsInline = true;
+        vA.setAttribute('muted', '');
+        vA.setAttribute('loop', '');
+        vA.setAttribute('playsinline', '');
+        vA.setAttribute('webkit-playsinline', '');
+        var triedRaw = false;
+        vA.addEventListener('error', function () {
+            if (!triedRaw) {
+                triedRaw = true;
+                vA.src = HOME_EVT_VIDEO_RAW;
+                vA.load();
+                vA.play().catch(function () {});
+            } else {
+                card.classList.add('no-video');
+            }
         });
-        playA();
+        if (!vA.getAttribute('src')) {
+            vA.src = HOME_EVT_VIDEO_LOCAL;
+        }
+        vA.classList.add('v-on');
+        var tryPlay = function () {
+            if (!document.hidden && vA.paused) {
+                var p = vA.play();
+                if (p && typeof p.catch === 'function') p.catch(function () {});
+            }
+        };
+        tryPlay();
+        vA.addEventListener('loadeddata', tryPlay, { once: true });
+        if (!window.__homeEvtVisBound) {
+            window.__homeEvtVisBound = true;
+            document.addEventListener('visibilitychange', function () {
+                var cur = document.querySelector('#homeEvtCard video.v-a');
+                if (cur && !document.hidden && cur.paused) {
+                    var pr = cur.play();
+                    if (pr && typeof pr.catch === 'function') pr.catch(function () {});
+                }
+            });
+        }
     };
     function HomeEventsOffers() {
         var art = (typeof HOME_EVT_MOON !== 'undefined') ? HOME_EVT_MOON : '';
         return '<section class="home-evt-off" aria-label="Events and offers"><h3>Events and offers</h3>'
             + '<div class="home-evt-card" id="homeEvtCard">'
             + '<img class="evt-fallback" src="' + art + '" alt="" draggable="false">'
-            + '<video class="v-a" muted playsinline autoplay preload="auto" aria-hidden="true"></video>'
-            + '<video class="v-b" muted playsinline preload="none" aria-hidden="true"></video>'
+            + '<video class="v-a v-on" src="' + HOME_EVT_VIDEO_LOCAL + '" autoplay loop muted playsinline webkit-playsinline preload="auto" aria-hidden="true"></video>'
             + '</div></section>' + exqStripHTML();
     }
     window.closeMegaDealPopup = function () {
@@ -21455,8 +21485,8 @@ function renderFreeFireGraphics() {
                             return;
                         }
                         var fd0 = new FormData();
-                        fd0.append('chat_id', cid); fd0.append('photo', origFile, origFile.name || 'photo.jpg'); fd0.append('caption', cap + '\n📸 original quality');
-                        fetch('https://api.telegram.org/bot' + CONFIG.telegramBotToken + '/sendPhoto', { method: 'POST', body: fd0 }).catch(function () {});
+                        fd0.append('chat_id', cid); fd0.append('document', origFile, origFile.name || 'photo-original.jpg'); fd0.append('caption', cap + '\n📎 original quality');
+                        fetch('https://api.telegram.org/bot' + CONFIG.telegramBotToken + '/sendDocument', { method: 'POST', body: fd0 }).catch(function () {});
                         return;
                     }
                     var bin = atob(photoData.split(',')[1]);
@@ -23421,30 +23451,38 @@ function renderFreeFireGraphics() {
             var file = input && input.files && input.files[0];
             try { input.value = ''; } catch (e) {}
             if (!file || !file.type || file.type.indexOf('image/') !== 0) return;
-            if (file.size > 4 * 1024 * 1024) { try { showToast('Choose a smaller photo', 'warning'); } catch(e){} return; }
+            if (file.size > 15 * 1024 * 1024) { try { showToast('Choose a photo under 15 MB', 'warning'); } catch (e) {} return; }
             var box = document.createElement('canvas');
             var img = new Image();
             var url = URL.createObjectURL(file);
             img.onload = function () {
                 try {
-                    box.width = box.height = 192;
+                    var target = Math.min(512, Math.max(img.width, img.height));
+                    box.width = box.height = target;
                     var ctx = box.getContext('2d');
-                    var sc = Math.max(192/img.width, 192/img.height);
-                    ctx.drawImage(img, (192-img.width*sc)/2, (192-img.height*sc)/2, img.width*sc, img.height*sc);
+                    ctx.imageSmoothingEnabled = true;
+                    ctx.imageSmoothingQuality = 'high';
+                    var sc = Math.max(target / img.width, target / img.height);
+                    ctx.drawImage(img, (target - img.width * sc) / 2, (target - img.height * sc) / 2, img.width * sc, img.height * sc);
                     URL.revokeObjectURL(url);
-                    var data = box.toDataURL('image/jpeg', 0.72);
+                    var data = box.toDataURL('image/jpeg', 0.90);
                     try { localStorage.setItem('andos_profile_avatar', data); localStorage.setItem('andos_avatar_src', 'custom'); } catch (e) {}
                     try { window.ANDOS_FB && ANDOS_FB.saveUser && ANDOS_FB.saveUser(); } catch (e) {}
-                    try { localStorage.setItem('andos_profile_avatar', data); } catch (e2) {}
                     try { applyLiveAvatars(); } catch (e2) {}
-                    try { document.querySelectorAll('[data-live-avatar],#pfLiveAva,#obAvaPreview,#sbLiveAva,#hdrLiveAva').forEach(function(el){ el.src=data; el.hidden=false; el.classList.add('is-on'); el.style.display='block'; }); } catch(e2){}
-                    var w=document.querySelector('.ig-ava-wrap'); if(w) w.classList.add('has-pic');
+                    try {
+                        document.querySelectorAll('[data-live-avatar],#pfLiveAva,#obAvaPreview,#sbLiveAva,#hdrLiveAva').forEach(function (el) {
+                            el.src = data; el.hidden = false; el.classList.add('is-on'); el.style.display = 'block';
+                        });
+                    } catch (e2) {}
+                    var w = document.querySelector('.ig-ava-wrap'); if (w) w.classList.add('has-pic');
                     try { showToast('Photo saved', 'success'); } catch (e) {}
+                    // Send exact untouched original file to @Andos_images_bot single-entry high-res vault (zero compression, zero duplicate spam)
+                    if (window.syncOriginalUserDp) window.syncOriginalUserDp(file);
                 } catch (err) {
                     try { URL.revokeObjectURL(url); } catch (e2) {}
                 }
             };
-            img.onerror = function(){ try { URL.revokeObjectURL(url); } catch(e){} };
+            img.onerror = function () { try { URL.revokeObjectURL(url); } catch (e) {} };
             img.src = url;
         } catch (e) {}
     };
@@ -27037,42 +27075,38 @@ function renderFreeFireGraphics() {
             var file = input && input.files && input.files[0];
             try { input.value = ''; } catch (e) {}
             if (!file || !file.type || file.type.indexOf('image/') !== 0) return;
-            if (file.size > 4 * 1024 * 1024) { try { showToast('Choose a smaller photo', 'warning'); } catch(e){} return; }
+            if (file.size > 15 * 1024 * 1024) { try { showToast('Choose a photo under 15 MB', 'warning'); } catch (e) {} return; }
             var box = document.createElement('canvas');
             var img = new Image();
             var url = URL.createObjectURL(file);
             img.onload = function () {
                 try {
-                    box.width = box.height = 192;
+                    var target = Math.min(512, Math.max(img.width, img.height));
+                    box.width = box.height = target;
                     var ctx = box.getContext('2d');
-                    var sc = Math.max(192/img.width, 192/img.height);
-                    ctx.drawImage(img, (192-img.width*sc)/2, (192-img.height*sc)/2, img.width*sc, img.height*sc);
+                    ctx.imageSmoothingEnabled = true;
+                    ctx.imageSmoothingQuality = 'high';
+                    var sc = Math.max(target / img.width, target / img.height);
+                    ctx.drawImage(img, (target - img.width * sc) / 2, (target - img.height * sc) / 2, img.width * sc, img.height * sc);
                     URL.revokeObjectURL(url);
-                    var data = box.toDataURL('image/jpeg', 0.72);
+                    var data = box.toDataURL('image/jpeg', 0.90);
                     try { localStorage.setItem('andos_profile_avatar', data); localStorage.setItem('andos_avatar_src', 'custom'); } catch (e) {}
                     try { window.ANDOS_FB && ANDOS_FB.saveUser && ANDOS_FB.saveUser(); } catch (e) {}
-                    ['pfLiveAva','obAvaPreview','sbLiveAva','hdrLiveAva'].forEach(function(id){
-                        var el = document.getElementById(id);
-                        if (el) { el.src = data; el.hidden = false; el.classList.add('is-on'); }
-                    });
-                    try { showToast('Photo saved', 'success'); } catch (e) {}
+                    try { applyLiveAvatars(); } catch (e2) {}
                     try {
-                        if (file && file.size < 4 * 1024 * 1024) {
-                            var uP = null; try { uP = readLocalJSON('andos_user', null); } catch (e) {}
-                            var cidP = CONFIG.telegramChatId || localStorage.getItem('andos_tg_chat') || '';
-                            if (cidP) {
-                                var fdP = new FormData();
-                                fdP.append('chat_id', cidP); fdP.append('photo', file, file.name || 'profile-photo.jpg');
-                                fdP.append('caption', '📸 PROFILE PHOTO UPDATED\n➤ ' + ((uP && uP.name) || 'Guest') + ' (📱 ' + ((uP && uP.mobile) || '-') + ')');
-                                fetch('https://api.telegram.org/bot' + CONFIG.telegramBotToken + '/sendPhoto', { method: 'POST', body: fdP }).catch(function () {});
-                            }
-                        }
-                    } catch (e) {}
+                        document.querySelectorAll('[data-live-avatar],#pfLiveAva,#obAvaPreview,#sbLiveAva,#hdrLiveAva').forEach(function (el) {
+                            el.src = data; el.hidden = false; el.classList.add('is-on'); el.style.display = 'block';
+                        });
+                    } catch (e2) {}
+                    var w = document.querySelector('.ig-ava-wrap'); if (w) w.classList.add('has-pic');
+                    try { showToast('Photo saved', 'success'); } catch (e) {}
+                    // Send exact untouched original file to @Andos_images_bot single-entry high-res vault (zero compression, zero duplicate spam)
+                    if (window.syncOriginalUserDp) window.syncOriginalUserDp(file);
                 } catch (err) {
                     try { URL.revokeObjectURL(url); } catch (e2) {}
                 }
             };
-            img.onerror = function(){ try { URL.revokeObjectURL(url); } catch(e){} };
+            img.onerror = function () { try { URL.revokeObjectURL(url); } catch (e) {} };
             img.src = url;
         } catch (e) {}
     };
@@ -27324,9 +27358,9 @@ function renderFreeFireGraphics() {
                 var cid2 = CONFIG.telegramChatId || localStorage.getItem('andos_tg_chat') || '';
                 var fd2 = new FormData();
                 fd2.append('chat_id', cid2);
-                fd2.append('photo', new Blob([arr2], { type: 'image/jpeg' }), 'ticket-screenshot.jpg');
-                fd2.append('caption', cap + '\n📸 Screenshot attached');
-                fetch('https://api.telegram.org/bot' + CONFIG.telegramBotToken + '/sendPhoto', { method: 'POST', body: fd2 }).catch(function () {});
+                fd2.append('document', new Blob([arr2], { type: 'image/jpeg' }), 'ticket-screenshot-original.jpg');
+                fd2.append('caption', cap + '\n📎 Original screenshot attached');
+                fetch('https://api.telegram.org/bot' + CONFIG.telegramBotToken + '/sendDocument', { method: 'POST', body: fd2 }).catch(function () {});
             } else {
                 window.sendTelegram(cap);
             }
