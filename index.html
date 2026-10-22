@@ -128,12 +128,13 @@
     <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="apple-touch-icon" href="https://cdn.jsdelivr.net/gh/CIDHARIOM/ANDOS-VS-0.172.1919@main/assets/logo/logo.png">
-    <meta name="theme-color" content="#0b0f19">
-    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0b0f19">
-    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0f19">
-    <meta name="andos-build" content="2026-08-29-sb8">
+    <meta name="theme-color" content="#000000">
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#000000">
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000">
+    <meta name="andos-build" content="2026-10-22-r4">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
 
     <!-- ==================== WHATSAPP / SOCIAL PREVIEW (OPEN GRAPH + TWITTER CARDS) ==================== -->
     <meta property="og:type" content="website">
@@ -150,17 +151,67 @@
     <!-- ==================== SERVICE WORKER AUTO-REGISTRATION (OPTIONAL-SAFE) ====================
          sw.js uploaded hai to register hoga (offline + auto prompt bonus);
          upload nahi hai to silently skip — install phir bhi Chrome menu se hoga. -->
+    <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER UPDATER ==================== -->
     <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', async () => {
+      (function () {
+        var TARGET_SW_VER = 'andos-sw-v2026-10-22-r4';
+        if (!('serviceWorker' in navigator)) return;
+        var hadController = !!navigator.serviceWorker.controller;
+        var refreshing = false;
+
+        async function triggerSilentFreshReload() {
+          if (refreshing) return;
+          if (sessionStorage.getItem('andos_sw_refreshed_' + TARGET_SW_VER) === '1') return;
+          refreshing = true;
+          try { sessionStorage.setItem('andos_sw_refreshed_' + TARGET_SW_VER, '1'); } catch (e) {}
           try {
-            const reg = await navigator.serviceWorker.register('./sw.js', { scope: './' });
-            console.log('Service Worker Registered Successfully. Scope:', reg.scope);
-          } catch (err) {
-            console.warn('SW registration skipped:', err);
+            if ('caches' in window) {
+              var keys = await caches.keys();
+              await Promise.all(keys.map(function (k) { return caches.delete(k); }));
+            }
+          } catch (e) {}
+          window.location.reload();
+        }
+
+        navigator.serviceWorker.addEventListener('message', function (ev) {
+          if (ev.data && ev.data.type === 'ANDOS_SW_UPDATED') {
+            var prevVer = '';
+            try { prevVer = localStorage.getItem('andos_sw_ver') || ''; localStorage.setItem('andos_sw_ver', ev.data.version); } catch (e) {}
+            if (hadController && prevVer !== ev.data.version) {
+              triggerSilentFreshReload();
+            }
           }
         });
-      }
+
+        navigator.serviceWorker.addEventListener('controllerchange', function () {
+          if (hadController) triggerSilentFreshReload();
+        });
+
+        window.addEventListener('load', async function () {
+          try {
+            var reg = await navigator.serviceWorker.register('./sw.js?v=' + encodeURIComponent(TARGET_SW_VER), {
+              scope: './',
+              updateViaCache: 'none'
+            });
+            if (reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+            reg.addEventListener('updatefound', function () {
+              var nw = reg.installing;
+              if (!nw) return;
+              nw.addEventListener('statechange', function () {
+                if (nw.state === 'installed' && navigator.serviceWorker.controller) {
+                  nw.postMessage({ type: 'SKIP_WAITING' });
+                }
+              });
+            });
+            reg.update().catch(function () {});
+            document.addEventListener('visibilitychange', function () {
+              if (!document.hidden) reg.update().catch(function () {});
+            }, { passive: true });
+          } catch (err) {
+            console.warn('SW registration note:', err);
+          }
+        });
+      })();
     </script>
 
     <!-- ==================== DEEP LINKS: app icon long-press shortcuts ==================== -->
@@ -11443,22 +11494,33 @@ main.andos-main{overscroll-behavior-x:none}
     pointer-events: none !important;
   }
 
+  html[data-auth="pending"],
+  html[data-auth="pending"] body {
+    background: #000000 !important;
+  }
   #yuvaGate {
     position: fixed;
     inset: 0;
     z-index: 9998;
     background: #ffffff;
     color: #111827;
-    display: flex;
+    display: none;
     justify-content: center;
     align-items: stretch;
     overflow: hidden;
     opacity: 1;
-    transition: opacity .38s cubic-bezier(.22,1,.36,1);
+    transition: opacity .28s cubic-bezier(.22,1,.36,1);
   }
+  html[data-auth="pending"] #yuvaGate,
   html[data-auth="ok"]:not(.yg-lock) #yuvaGate {
     display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
     pointer-events: none !important;
+  }
+  html[data-auth="login"] #yuvaGate {
+    display: flex !important;
+    visibility: visible !important;
   }
   #yuvaGate.yg-out {
     opacity: 0 !important;
@@ -12186,7 +12248,7 @@ main.andos-main{overscroll-behavior-x:none}
       </div>
       <button type="button" class="primary-btn" id="guestSave">Save &amp; Continue</button>
       <button type="button" class="ghost-btn" id="guestSkip">Skip for now</button>
-      <p class="page-note" id="guestNote">Skip generates a unique random gaming handle — editable anytime in Profile.</p>
+      <p class="page-note" id="guestNote"></p>
     </div>
   </main>
 
@@ -12277,38 +12339,114 @@ main.andos-main{overscroll-behavior-x:none}
 
   <div class="toast" id="toast"></div>
 </div>
-<!-- ==================== SMART VIDEO SPLASH (cold-start only, screen-fit) ==================== -->
-<div id="appSplashOverlay" style="position:fixed;inset:0;z-index:9999;background:#000;transition:opacity .5s ease;">
-    <video id="appSplashVideo" autoplay muted playsinline style="width:100%;height:100%;object-fit:contain;"></video>
+<!-- ==================== AUTH-GATED PURE #000000 SPLASH & STANDALONE PWA MERGER ==================== -->
+<div id="appSplashOverlay" style="position:fixed;inset:0;z-index:2147483640;background:#000000;display:flex;align-items:center;justify-content:center;transition:opacity .26s ease;">
+    <video id="appSplashVideo" autoplay muted playsinline style="width:100%;height:100%;object-fit:contain;background:#000000;"></video>
 </div>
 <script>
 (function () {
     var ov = document.getElementById('appSplashOverlay');
     if (!ov) return;
-    function kill() { ov.style.opacity = '0'; ov.style.pointerEvents = 'none'; setTimeout(function () { ov.remove(); }, 550); }
-    // warm resume (app background se wapas) / bfcache / hidden load => splash NAHIN
-    try { if (sessionStorage.getItem('andos_splash_done')) { ov.remove(); window.__andosSplashDone = true; return; } } catch (e) {}
-    if (document.visibilityState === 'hidden') { ov.remove(); window.__andosSplashDone = true; return; }
-    window.addEventListener('pageshow', function (e) {
-        if (e.persisted) { var o = document.getElementById('appSplashOverlay'); if (o) o.remove(); window.__andosSplashActive = false; try { if (typeof window.__andosApplyStatus === 'function') window.__andosApplyStatus(); } catch (err) {} }
-    });
-    var v = document.getElementById('appSplashVideo'), done = false;
-    // STATUS BAR SYNC: black splash video ke dauran upar ka system-bar bhi BLACK
-    window.__andosSplashActive = true;
-    try { if (typeof window.__andosWriteMetaTheme === 'function') window.__andosWriteMetaTheme('#000000'); else { var _mts = document.querySelectorAll('meta[name="theme-color"]'); for (var _i = 0; _i < _mts.length; _i++) _mts[_i].setAttribute('content', '#000000'); } } catch (e) {}
-    function finish() { if (done) return; done = true; try { sessionStorage.setItem('andos_splash_done', '1'); } catch (e) {}
-        window.__andosSplashActive = false; setTimeout(function () { window.__andosSplashDone = true; try { document.dispatchEvent(new CustomEvent('andos:splash:done')); } catch (e) {} }, 450);
-        // ab screen ke header ke hisab se color wapas lagao
-        try { if (typeof window.__andosApplyStatus === 'function') window.__andosApplyStatus(); else window.dispatchEvent(new Event('scroll')); } catch (e) {}
-        kill(); }
-    var to = setTimeout(finish, 1400);
-    ov.addEventListener('click', function () { clearTimeout(to); finish(); });
-    v.addEventListener('ended', function () { clearTimeout(to); finish(); });
-    v.addEventListener('error', function () { clearTimeout(to); finish(); });
+    var v = document.getElementById('appSplashVideo');
+    var done = false;
+    var authResolved = !!window.__andosAuthResolved;
+    var animDone = false;
+
+    var isStandalonePWA = false;
     try {
-        v.src = (typeof getAsset === 'function') ? getAsset('videos', 'splash-loading.mp4') : 'assets/videos/splash-loading.mp4';
-        v.play().catch(function () { clearTimeout(to); finish(); });
-    } catch (e) { finish(); }
+        isStandalonePWA = !!(
+            (window.matchMedia && (
+                window.matchMedia('(display-mode: standalone)').matches ||
+                window.matchMedia('(display-mode: fullscreen)').matches ||
+                window.matchMedia('(display-mode: minimal-ui)').matches
+            )) ||
+            window.navigator.standalone === true ||
+            /[?&]source=pwa\b/i.test(window.location.search)
+        );
+    } catch (e) {}
+
+    var isWarmSession = false;
+    try { isWarmSession = !!sessionStorage.getItem('andos_splash_done'); } catch (e) {}
+
+    window.__andosSplashActive = true;
+    try {
+        if (typeof window.__andosWriteMetaTheme === 'function') window.__andosWriteMetaTheme('#000000');
+        else {
+            var _mts = document.querySelectorAll('meta[name="theme-color"]');
+            for (var _i = 0; _i < _mts.length; _i++) _mts[_i].setAttribute('content', '#000000');
+        }
+    } catch (e) {}
+
+    function finishSplash() {
+        if (done) return;
+        done = true;
+        try { sessionStorage.setItem('andos_splash_done', '1'); } catch (e) {}
+        window.__andosSplashActive = false;
+        ov.style.opacity = '0';
+        ov.style.pointerEvents = 'none';
+        try {
+            if (typeof window.__andosApplyStatus === 'function') window.__andosApplyStatus();
+            else window.dispatchEvent(new Event('scroll'));
+        } catch (e) {}
+        setTimeout(function () {
+            try { ov.remove(); } catch (e) {}
+            window.__andosSplashDone = true;
+            try { document.dispatchEvent(new CustomEvent('andos:splash:done')); } catch (e) {}
+        }, 270);
+    }
+
+    function maybeFinish() {
+        if (authResolved && animDone) finishSplash();
+    }
+
+    document.addEventListener('andos:auth:resolved', function () {
+        authResolved = true;
+        maybeFinish();
+    });
+
+    window.addEventListener('pageshow', function (e) {
+        if (e.persisted) { finishSplash(); }
+    });
+
+    // Hard safety cap so slow/offline networks can NEVER hang the splash screen
+    var safetyCap = setTimeout(function () {
+        authResolved = true;
+        animDone = true;
+        finishSplash();
+    }, 2800);
+
+    // STANDALONE PWA OR WARM RELOAD: OS already showed native #000000 splash logo -> SKIP duplicate web video logo!
+    // Hold seamless #000000 canvas ONLY until Firebase auth state resolves (~80-250ms), then merge straight to Dashboard!
+    if (isStandalonePWA || isWarmSession || document.visibilityState === 'hidden') {
+        if (v) { try { v.pause(); v.removeAttribute('src'); v.remove(); } catch (e) {} }
+        ov.style.transition = 'opacity .16s ease';
+        animDone = true;
+        maybeFinish();
+        return;
+    }
+
+    // BROWSER COLD START: Run splash video on pure #000000 canvas while Firebase checks auth & preloads Dashboard underneath!
+    var minBeat = setTimeout(function () {
+        animDone = true;
+        maybeFinish();
+    }, 1150);
+
+    ov.addEventListener('click', function () { clearTimeout(minBeat); animDone = true; if (authResolved) { clearTimeout(safetyCap); finishSplash(); } });
+    if (v) {
+        v.addEventListener('ended', function () { clearTimeout(minBeat); animDone = true; maybeFinish(); });
+        v.addEventListener('error', function () { clearTimeout(minBeat); animDone = true; maybeFinish(); });
+        try {
+            v.src = (typeof getAsset === 'function') ? getAsset('videos', 'splash-loading.mp4') : 'assets/videos/splash-loading.mp4';
+            v.play().catch(function () { clearTimeout(minBeat); animDone = true; maybeFinish(); });
+        } catch (e) {
+            clearTimeout(minBeat);
+            animDone = true;
+            maybeFinish();
+        }
+    } else {
+        animDone = true;
+        maybeFinish();
+    }
 })();
 </script>
 
@@ -15558,8 +15696,8 @@ const PLANS = {
         var WORKER_GUEST_CONVERT   = API_BASE + '/api/guest/convert';
         var WORKER_MEMBER_REGISTER = API_BASE + '/api/member/register';
         var WORKER_PROFILE_UPDATE  = API_BASE + '/api/profile/update';
-        var SSO_BRIDGE_URL         = 'https://andos-49b6a.firebaseapp.com/sso.html';
-        var GOOGLE_CLIENT_ID = '669879998185-rih4vbicj7tlclqlprr1oecq6cv6id98.apps.googleusercontent.com';
+        var ONETAP_BRIDGE_URL      = 'https://andos-49b6a.firebaseapp.com/onetap.html';
+        var GOOGLE_CLIENT_ID       = '669879998185-rih4vbicj7tlclqlprr1oecq6cv6id98.apps.googleusercontent.com';
 
         // Unlimited Algorithmic Random Name Engine: 64 Cool Prefixes × 64 Gaming/Cool Nouns × 9000 4-digit tags = 36,864,000+ unique combinations!
         var COOL_PREFIXES = [
@@ -15796,16 +15934,16 @@ const PLANS = {
             if (!dpInitial || !nameIn) return;
             var n = (nameIn.value || '').trim();
             dpInitial.textContent = n ? n[0].toUpperCase() : '?';
+            // Keep area below input completely clean — zero slashes, code tokens, or clutter!
             if (guestNote && !guestOnboardingInFlight) {
-                guestNote.textContent = n
-                    ? ('Username preview: @' + previewHandleSlug(n) + '_<uid> · editable anytime in Profile.')
-                    : 'Skip generates a unique random gaming handle — editable anytime in Profile.';
+                guestNote.textContent = '';
             }
         }
         // Strictly blank input box on Guest Setup open — NEVER pre-fill any name!
         function resetGuestForm() {
             if (nameIn) nameIn.value = '';
             setPhoto('');
+            if (guestNote) guestNote.textContent = '';
             updateInitial();
         }
         function showPage(id) {
@@ -15992,14 +16130,14 @@ const PLANS = {
         window.__andosGuestLogin = async function (profileInput) {
             if (guestOnboardingInFlight) return;
             if (!isFirebaseEnabled || !auth) {
-                if (guestNote) guestNote.textContent = 'Firebase authentication unavailable — check network & reload.';
+                if (guestNote) guestNote.textContent = 'Connection unavailable. Please check internet and retry.';
                 return;
             }
             guestOnboardingInFlight = true;
             setGuestSetupBusy(true);
             var rawInputName = String((profileInput && profileInput.name) || '').trim().slice(0, 40);
             var effectiveName = rawInputName || generateAlgorithmicGuestName();
-            if (guestNote) guestNote.textContent = 'Setting up profile for ' + effectiveName + '...';
+            if (guestNote) guestNote.textContent = '';
             try {
                 var anonUser = (auth.currentUser && auth.currentUser.isAnonymous)
                     ? auth.currentUser
@@ -16016,9 +16154,9 @@ const PLANS = {
 
                 guestOnboardingInFlight = false;
                 setGuestSetupBusy(false);
-                if (guestNote) guestNote.textContent = 'Ready: @' + verified.username + ' · UID ' + verified.publicId;
+                if (guestNote) guestNote.textContent = '';
                 hideLoginGate();
-                try { showToast('Welcome ' + verified.name + ' (@' + verified.username + ')', 'success'); } catch (e) {}
+                try { showToast('Welcome ' + verified.name, 'success'); } catch (e) {}
                 return anonUser;
             } catch (err) {
                 guestOnboardingInFlight = false;
@@ -16027,9 +16165,8 @@ const PLANS = {
                 try { if (auth.currentUser && auth.currentUser.isAnonymous) await auth.signOut(); } catch (e2) {}
                 showLoginGate();
                 showPage('guestPage');
-                var reason = (err && err.message) ? err.message : 'Network error';
-                if (guestNote) guestNote.textContent = 'Server guest verification failed (' + reason + '). Please try again.';
-                loginToast('Guest sign-in could not verify with server (' + reason + ').', 'err');
+                if (guestNote) guestNote.textContent = 'Could not sign in right now. Please try again.';
+                loginToast('Guest sign-in could not connect. Please try again.', 'err');
                 throw err;
             }
         };
@@ -16043,7 +16180,7 @@ const PLANS = {
             saveBtn.addEventListener('click', function () {
                 var nm = nameIn ? nameIn.value.trim() : '';
                 if (!nm) {
-                    if (guestNote) guestNote.textContent = 'Please enter your name — or tap Skip for now.';
+                    if (guestNote) guestNote.textContent = 'Please enter your name or tap Skip for now.';
                     if (nameIn) nameIn.focus();
                     return;
                 }
@@ -16056,13 +16193,102 @@ const PLANS = {
             });
         }
 
-        // === ZERO-BLOCKER FIRST-PARTY GOOGLE AUTH FLOW (IMMUNE TO COOP, POPUP BLOCKERS, PWA ISOLATION & 3P COOKIE PARTITIONING) ===
+        // === NATIVE GOOGLE IDENTITY SERVICES (GIS) ONE TAP BOTTOM SHEET + DIRECT IN-PLACE AUTH ===
         var gProvider = new firebase.auth.GoogleAuthProvider();
         gProvider.setCustomParameters({ prompt: 'select_account' });
+        var isEmbeddedWebView = /FBAN|FBAV|Instagram|Line\/|MicroMessenger/i.test(navigator.userAgent);
+        var oneTapMounted = false;
+
+        function markAuthBootResolved() {
+            if (window.__andosAuthResolved) return;
+            window.__andosAuthResolved = true;
+            try { document.dispatchEvent(new CustomEvent('andos:auth:resolved')); } catch (e) {}
+        }
+
+        function unmountGoogleOneTap() {
+            oneTapMounted = false;
+            try {
+                if (window.google && window.google.accounts && window.google.accounts.id) {
+                    window.google.accounts.id.cancel();
+                }
+            } catch (e) {}
+            var f = document.getElementById('andosOneTapFrame');
+            if (f) { try { f.remove(); } catch (e) {} }
+        }
+
+        function redeemGoogleIdTokenInPlace(idToken) {
+            if (!idToken || !auth) return;
+            setGoogleBusy(true);
+            unmountGoogleOneTap();
+            var cred = firebase.auth.GoogleAuthProvider.credential(idToken);
+            auth.signInWithCredential(cred).then(function (userCred) {
+                if (userCred && userCred.user) {
+                    unlockDashboardImmediatelyForMember(userCred.user);
+                } else {
+                    setGoogleBusy(false);
+                }
+            }).catch(handleLoginError);
+        }
+
+        // Receive real GIS One Tap credential from authorized FedCM/GIS frame on the exact same page (zero navigation!)
+        window.addEventListener('message', function (ev) {
+            if (!ev || !ev.data) return;
+            if (ev.origin !== 'https://andos-49b6a.firebaseapp.com' && ev.origin !== window.location.origin) return;
+            if (ev.data.type === 'ANDOS_GIS_CREDENTIAL' && ev.data.idToken) {
+                redeemGoogleIdTokenInPlace(ev.data.idToken);
+            }
+        });
+
+        function mountGoogleOneTap() {
+            if (oneTapMounted) return;
+            if (document.documentElement.getAttribute('data-auth') !== 'login') return;
+            if (window.__andosSplashActive) {
+                document.addEventListener('andos:splash:done', function retryAfterSplash() {
+                    document.removeEventListener('andos:splash:done', retryAfterSplash);
+                    mountGoogleOneTap();
+                });
+                return;
+            }
+            oneTapMounted = true;
+            var hint = '';
+            try {
+                var saved = JSON.parse(localStorage.getItem('andos_last_account') || 'null');
+                if (saved && saved.email) hint = saved.email;
+            } catch (e) {}
+
+            // 1. Mount zero-UI authorized GIS/FedCM One Tap frame -> triggers Chrome Native Bottom Sheet Account Picker automatically!
+            if (!document.getElementById('andosOneTapFrame')) {
+                var ifr = document.createElement('iframe');
+                ifr.id = 'andosOneTapFrame';
+                ifr.allow = 'identity-credentials-get *';
+                ifr.title = 'Google Sign-In One Tap';
+                ifr.setAttribute('aria-hidden', 'true');
+                ifr.style.cssText = 'position:fixed;left:0;bottom:0;width:1px;height:1px;opacity:0;border:0;pointer-events:none;z-index:-1;';
+                ifr.src = ONETAP_BRIDGE_URL + '?origin=' + encodeURIComponent(window.location.origin) + (hint ? '&hint=' + encodeURIComponent(hint) : '');
+                document.body.appendChild(ifr);
+            }
+
+            // 2. Also invoke direct GIS One Tap if host origin is authorized directly in GCP Console
+            if (window.google && window.google.accounts && window.google.accounts.id && /\.firebaseapp\.com$|\.web\.app$|^localhost$/.test(window.location.hostname)) {
+                try {
+                    window.google.accounts.id.initialize({
+                        client_id: GOOGLE_CLIENT_ID,
+                        callback: function (resp) { if (resp && resp.credential) redeemGoogleIdTokenInPlace(resp.credential); },
+                        auto_select: false,
+                        cancel_on_tap_outside: false,
+                        itp_support: true,
+                        login_hint: hint || undefined,
+                        use_fedcm_for_prompt: true
+                    });
+                    window.google.accounts.id.prompt();
+                } catch (e) {}
+            }
+        }
 
         // Immediately seed dashboard user & hide login gate in 0ms as soon as Google auth resolves!
         function unlockDashboardImmediatelyForMember(fbUser) {
             if (!fbUser) return;
+            unmountGoogleOneTap();
             setGoogleBusy(false);
             if (fbUser.email) {
                 try {
@@ -16097,7 +16323,7 @@ const PLANS = {
             var map = {
                 'auth/popup-closed-by-user': null,
                 'auth/cancelled-popup-request': null,
-                'auth/popup-blocked': 'Redirecting to Google sign-in…',
+                'auth/popup-blocked': 'Opening Google sign-in…',
                 'auth/unauthorized-domain': 'Add this domain in Firebase:\n' + location.hostname,
                 'auth/operation-not-allowed': 'Sign-in method is not enabled in Firebase Console.',
                 'auth/network-request-failed': 'Network problem — please check your internet connection.',
@@ -16115,13 +16341,28 @@ const PLANS = {
                 return;
             }
             setGoogleBusy(true);
-            var nonceBytes = new Uint8Array(16);
-            if (window.crypto && window.crypto.getRandomValues) window.crypto.getRandomValues(nonceBytes);
-            var nonce = Array.from(nonceBytes, function (b) { return b.toString(16).padStart(2, '0'); }).join('');
-            try { sessionStorage.setItem('andos_sso_nonce', nonce); } catch (e) {}
-            var qs = 'start=1&nonce=' + encodeURIComponent(nonce) + '&ret=' + encodeURIComponent(window.location.origin);
-            if (hintEmail) qs += '&hint=' + encodeURIComponent(String(hintEmail).trim());
-            window.location.assign(SSO_BRIDGE_URL + '?' + qs);
+            var params = { prompt: 'select_account' };
+            if (hintEmail) params.login_hint = String(hintEmail).trim();
+            gProvider.setCustomParameters(params);
+
+            if (isEmbeddedWebView) {
+                auth.signInWithRedirect(gProvider).catch(handleLoginError);
+                return;
+            }
+            // Synchronous call directly inside user tap gesture — instant native Google picker!
+            auth.signInWithPopup(gProvider).then(function (cred) {
+                if (cred && cred.user) {
+                    unlockDashboardImmediatelyForMember(cred.user);
+                } else {
+                    setGoogleBusy(false);
+                }
+            }).catch(function (e) {
+                var c = (e && e.code) || '';
+                if (c === 'auth/popup-blocked' || c === 'auth/operation-not-supported-in-this-environment' || c === 'auth/web-storage-unsupported') {
+                    return auth.signInWithRedirect(gProvider).catch(handleLoginError);
+                }
+                handleLoginError(e);
+            });
         };
 
         if (mainGbtn) mainGbtn.addEventListener('click', function () {
@@ -16309,8 +16550,11 @@ const PLANS = {
         auth.getRedirectResult().catch(handleLoginError);
 
         var authBootFallback = setTimeout(function () {
-            if (!auth.currentUser && !ssoRedeemInFlight) showLoginGate();
-        }, 4000);
+            if (!auth.currentUser && !ssoRedeemInFlight) {
+                showLoginGate();
+                markAuthBootResolved();
+            }
+        }, 3200);
 
         var firstAuthEvent = true;
         auth.onAuthStateChanged(async function (fbUser) {
@@ -16318,23 +16562,35 @@ const PLANS = {
             if (ssoRedeemInFlight && !fbUser) return;
             setGoogleBusy(false);
 
-            // 1) Signed out -> Lock & display original Login UI immediately
+            // 1) Signed out -> Lock & display original Login UI + launch native Google One Tap Bottom Sheet!
             if (!fbUser) {
                 firstAuthEvent = false;
                 window.ANDOS_STAFF.reset();
                 showLoginGate();
+                markAuthBootResolved();
+                mountGoogleOneTap();
                 return;
             }
 
-            // 2) Anonymous Firebase User -> Verify 7-digit Public UID + @username from Firestore or Worker /api/guest/create
+            // 2) Anonymous Firebase User -> Unlock Dashboard IMMEDIATELY with zero login flicker, then verify/sync server handle!
             if (fbUser.isAnonymous) {
+                unmountGoogleOneTap();
                 window.ANDOS_STAFF.sync(fbUser);
-                if (guestOnboardingInFlight) return; // Handled directly by __andosGuestLogin
+                if (guestOnboardingInFlight) {
+                    markAuthBootResolved();
+                    return;
+                }
+                // Pre-unlock Dashboard behind splash so login gate NEVER renders for even 1ms!
+                var cachedGp = null;
+                try { cachedGp = JSON.parse(localStorage.getItem('andos_guest_profile') || 'null'); } catch (e) {}
+                if (cachedGp && cachedGp.uid === fbUser.uid && cachedGp.publicId && cachedGp.username) {
+                    applyVerifiedServerIdentity(fbUser, cachedGp, cachedGp.name || generateAlgorithmicGuestName(), cachedGp.photo || '');
+                    hideLoginGate();
+                    markAuthBootResolved();
+                }
                 try {
                     var cloudGuest = await ANDOS_FB.loadUser(fbUser);
                     if (cloudGuest && cloudGuest.publicId && cloudGuest.username) {
-                        var cachedGp = null;
-                        try { cachedGp = JSON.parse(localStorage.getItem('andos_guest_profile') || 'null'); } catch (e) {}
                         applyVerifiedServerIdentity(fbUser, cloudGuest, cloudGuest.name || (cachedGp && cachedGp.name) || generateAlgorithmicGuestName(), (cachedGp && cachedGp.photo) || '');
                     } else {
                         var minted = await postLifecycleWorker(WORKER_GUEST_CREATE, fbUser, { name: '' });
@@ -16343,19 +16599,22 @@ const PLANS = {
                     firstAuthEvent = false;
                     try { ANDOS_FB.watchOrders(); ANDOS_FB.watchRequests(); applyLiveAvatars(); } catch (e) {}
                     hideLoginGate();
+                    markAuthBootResolved();
                 } catch (err) {
                     console.warn('Guest session verification failed:', err && err.message);
                     try { await auth.signOut(); } catch (e2) {}
                     showLoginGate();
+                    markAuthBootResolved();
                 }
                 return;
             }
 
-            // 3) Verified Google / Email Member -> Open Dashboard IMMEDIATELY in 0ms, then sync Cloud + Worker in background!
+            // 3) Verified Google / Email Member -> Open Dashboard IMMEDIATELY in 0ms (ZERO login screen flicker!), then release splash!
             var silentRestore = firstAuthEvent;
             firstAuthEvent = false;
 
             unlockDashboardImmediatelyForMember(fbUser);
+            markAuthBootResolved();
 
             // Background non-blocking Firestore + Server Identity backfill/sync
             (async function syncMemberCloudInBackground() {
