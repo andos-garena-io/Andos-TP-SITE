@@ -131,7 +131,7 @@
     <meta name="theme-color" content="#000000">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#000000">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000">
-    <meta name="andos-build" content="andos-v3-20261022e">
+    <meta name="andos-build" content="andos-v3-20261022f">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -12061,6 +12061,33 @@ main.andos-main{overscroll-behavior-x:none}
 .ig-ep-submit:disabled {
   opacity: 0.6;
   cursor: wait;
+}
+
+.ig-pf-stat-lbl { font-size: 10.5px !important; }
+.ig-float-toast {
+    position: fixed;
+    left: 50%;
+    bottom: calc(88px + env(safe-area-inset-bottom, 0px));
+    transform: translateX(-50%) translateY(14px);
+    z-index: 10050;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 18px;
+    border-radius: 999px;
+    background: rgba(15, 23, 42, .94);
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: -.01em;
+    box-shadow: 0 10px 26px rgba(15, 23, 42, .25);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .18s ease, transform .2s cubic-bezier(.16,1,.3,1);
+}
+.ig-float-toast.visible {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
 }
 </style>
 
@@ -24154,10 +24181,29 @@ function renderFreeFireGraphics() {
         showToast('Profile updated', 'success');
         if (currentPage === 'editprofile' || currentPage === 'account') navigate('account', { force: true });
     };
+    var __igToastTimer = null;
+    window.showIgToast = function (msg) {
+        var el = document.getElementById('igFloatToast');
+        if (!el) {
+            el = document.createElement('div');
+            el.id = 'igFloatToast';
+            el.className = 'ig-float-toast';
+            el.setAttribute('role', 'status');
+            el.setAttribute('aria-live', 'polite');
+            document.body.appendChild(el);
+        }
+        el.innerHTML = '<i class="fa-solid fa-circle-check" style="color:#34d399;font-size:13px"></i><span></span>';
+        el.querySelector('span').textContent = String(msg || 'Copied!');
+        clearTimeout(__igToastTimer);
+        requestAnimationFrame(function () { el.classList.add('visible'); });
+        __igToastTimer = setTimeout(function () { el.classList.remove('visible'); }, 1850);
+    };
+
     window.copyIgPublicUid = function (btnEl, uidVal) {
         var clean = String(uidVal || (user && user.publicId) || '').trim();
         if (!clean) return;
         var finish = function () {
+            if (window.showIgToast) window.showIgToast('Copied!');
             try { showToast('Copied!', 'success'); } catch (e) {}
             if (btnEl) {
                 btnEl.classList.add('copied');
@@ -24188,7 +24234,7 @@ function renderFreeFireGraphics() {
             return;
         }
         if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(link).then(function () { showToast('Profile link copied!', 'success'); }).catch(function () { fallbackCopy(link); });
+            navigator.clipboard.writeText(link).then(function () { if (window.showIgToast) window.showIgToast('Profile link copied!'); showToast('Profile link copied!', 'success'); }).catch(function () { fallbackCopy(link); });
         } else {
             fallbackCopy(link);
         }
