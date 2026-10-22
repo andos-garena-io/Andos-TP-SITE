@@ -8,7 +8,6 @@ const PRECACHE_MEDIA = [
   './assets/app-icon/logo-512.png'
 ];
 
-// Track clients that confirm running the latest APP_BUILD_ID
 const ackedClients = new Set();
 
 self.addEventListener('install', (event) => {
@@ -28,6 +27,36 @@ self.addEventListener('install', (event) => {
   })());
 });
 
+async function notifyAndUpgradeClients() {
+  try {
+    const windows = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    for (const client of windows) {
+      try {
+        client.postMessage({
+          type: 'ANDOS_SW_UPDATED',
+          version: CACHE_VERSION,
+          cacheName: STATIC_MEDIA_CACHE,
+          buildId: APP_BUILD_ID
+        });
+      } catch (e) {}
+    }
+
+    // Wait briefly for modern clients to ACK; auto-navigate any ancient client still stuck on pre-v3 cached HTML!
+    if (windows.length > 0) {
+      await new Promise((resolve) => setTimeout(resolve, 400));
+      for (const client of windows) {
+        if (!ackedClients.has(client.id)) {
+          try {
+            if (typeof client.navigate === 'function' && client.url && client.url.startsWith(self.location.origin)) {
+              client.navigate(client.url).catch(() => {});
+            }
+          } catch (e) {}
+        }
+      }
+    }
+  } catch (e) {}
+}
+
 self.addEventListener('activate', (event) => {
   event.waitUntil((async () => {
     // 1. Delete EVERY old Cache Storage entry from previous versions (anything !== 'andos-media-v3')
@@ -42,34 +71,10 @@ self.addEventListener('activate', (event) => {
 
     // 2. Immediately claim control of all open tabs & installed standalone PWA windows
     await self.clients.claim();
-
-    // 3. Notify all windows & auto-upgrade any legacy installed PWA still running stale HTML
-    const windows = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
-    for (const client of windows) {
-      try {
-        client.postMessage({
-          type: 'ANDOS_SW_UPDATED',
-          version: CACHE_VERSION,
-          cacheName: STATIC_MEDIA_CACHE,
-          buildId: APP_BUILD_ID
-        });
-      } catch (e) {}
-    }
-
-    // If an older pre-v3 installed PWA window has no message listener to ACK, force-navigate it to fresh network HTML!
-    if (windows.length > 0) {
-      await new Promise((resolve) => setTimeout(resolve, 450));
-      for (const client of windows) {
-        if (!ackedClients.has(client.id)) {
-          try {
-            if (typeof client.navigate === 'function' && client.url && client.url.startsWith(self.location.origin)) {
-              await client.navigate(client.url);
-            }
-          } catch (e) {}
-        }
-      }
-    }
-  })());
+  })().then(() => {
+    // 3. Fire AFTER `activate` resolves to `'activated'` so `fetch` event dispatch NEVER deadlocks!
+    setTimeout(notifyAndUpgradeClients, 60);
+  }));
 });
 
 self.addEventListener('message', (event) => {
@@ -126,7 +131,6 @@ self.addEventListener('fetch', (event) => {
   ) {
     event.respondWith(
       caches.open(STATIC_MEDIA_CACHE).then(async (cache) => {
-        // Range-safe direct pass-through if byte range requested by mobile hardware video decoder
         if (req.headers.has('range')) {
           return fetch(req);
         }
