@@ -131,7 +131,7 @@
     <meta name="theme-color" content="#000000">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#000000">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000">
-    <meta name="andos-build" content="andos-v3-20261022f">
+    <meta name="andos-build" content="andos-v3-20261022g">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -154,7 +154,7 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261022e';
+        var HTML_BUILD_ID = 'andos-v3-20261022g';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
@@ -11490,607 +11490,6 @@ main.andos-main{overscroll-behavior-x:none}
 </style>
 
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
-
-<style id="andos-ig-profile-styles">
-/* ==================== INSTAGRAM-INSPIRED PROFILE REDESIGN (CAT-PROFILE-SEC-01..04) ==================== */
-.ig-pf-shell {
-  background: #ffffff;
-  color: #0f172a;
-  min-height: calc(100vh - 76px);
-  padding: 0 0 96px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif;
-}
-.ig-pf-topbar {
-  position: sticky;
-  top: 0;
-  z-index: 25;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 16px;
-  background: rgba(255, 255, 255, 0.94);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid #f1f5f9;
-}
-.ig-pf-topbar-left {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-width: 0;
-}
-.ig-pf-back {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  border: 0;
-  background: #f8fafc;
-  color: #0f172a;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  cursor: pointer;
-  flex-shrink: 0;
-}
-.ig-pf-top-handle {
-  font-size: 17px;
-  font-weight: 800;
-  letter-spacing: -0.025em;
-  color: #0f172a;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.ig-pf-topbar-right {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.ig-pf-icon-btn {
-  height: 34px;
-  padding: 0 11px;
-  border-radius: 999px;
-  border: 1px solid #e2e8f0;
-  background: #ffffff;
-  color: #0f172a;
-  font-size: 12px;
-  font-weight: 700;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
-}
-
-/* CAT-PROFILE-SEC-01: Avatar + 3 Live Stats Hero */
-.ig-pf-hero {
-  padding: 18px 16px 8px;
-}
-.ig-pf-hero-row {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-}
-.ig-pf-ava-ring {
-  position: relative;
-  width: 88px;
-  height: 88px;
-  border-radius: 50%;
-  padding: 3px;
-  background: linear-gradient(45deg, #f9ce34 0%, #ee2a7b 52%, #6228d7 100%);
-  flex-shrink: 0;
-  cursor: pointer;
-  box-shadow: 0 10px 24px -12px rgba(238, 42, 123, 0.45);
-  transition: transform .16s ease;
-}
-.ig-pf-ava-ring:active {
-  transform: scale(0.96);
-}
-.ig-pf-ava-core {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  background: #f8fafc;
-  border: 3px solid #ffffff;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-}
-.ig-pf-ava-core img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 50%;
-  display: block;
-}
-.ig-pf-ava-fallback {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #eef2ff, #e0e7ff);
-  color: #4f46e5;
-  font-size: 28px;
-  font-weight: 800;
-}
-.ig-pf-cam {
-  position: absolute;
-  right: -1px;
-  bottom: -1px;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: #0095f6;
-  color: #ffffff;
-  border: 2.5px solid #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 11.5px;
-  box-shadow: 0 4px 10px rgba(0, 149, 246, 0.38);
-  cursor: pointer;
-  z-index: 4;
-}
-.ig-pf-stats {
-  flex: 1;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 6px;
-  background: #f8fafc;
-  border: 1px solid #eef2f6;
-  border-radius: 16px;
-  padding: 12px 6px;
-}
-.ig-pf-stat {
-  border: 0;
-  background: transparent;
-  padding: 2px 4px;
-  text-align: center;
-  cursor: pointer;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  transition: transform .14s ease;
-}
-.ig-pf-stat:active {
-  transform: scale(0.95);
-}
-.ig-pf-stat + .ig-pf-stat::before {
-  content: '';
-  position: absolute;
-  left: -3px;
-  top: 18%;
-  bottom: 18%;
-  width: 1px;
-  background: #e2e8f0;
-}
-.ig-pf-stat b {
-  font-size: 16.5px;
-  line-height: 1.2;
-  font-weight: 800;
-  color: #0f172a;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -0.02em;
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.ig-pf-stat span {
-  margin-top: 3px;
-  font-size: 11px;
-  font-weight: 600;
-  color: #64748b;
-  white-space: nowrap;
-}
-
-/* CAT-PROFILE-SEC-02: 5-Pillar Identity & Bio Block */
-.ig-pf-identity {
-  padding: 8px 16px 6px;
-  text-align: left;
-}
-.ig-pf-name-row {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-.ig-pf-fullname {
-  margin: 0;
-  font-size: 18.5px;
-  line-height: 1.25;
-  font-weight: 800;
-  color: #0f172a;
-  letter-spacing: -0.025em;
-}
-.ig-pf-verified {
-  color: #0095f6;
-  font-size: 15px;
-  display: inline-flex;
-  align-items: center;
-}
-.ig-pf-username {
-  margin: 2px 0 0;
-  font-size: 13.5px;
-  font-weight: 600;
-  color: #4f46e5;
-}
-.ig-pf-pills {
-  margin-top: 10px;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
-}
-.ig-uid-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 5.5px 12px;
-  border-radius: 999px;
-  background: #ffffff;
-  border: 1px solid #cbd5e1;
-  box-shadow: 0 4px 12px -4px rgba(15, 23, 42, 0.10);
-  color: #0f172a;
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.01em;
-  font-variant-numeric: tabular-nums;
-  cursor: pointer;
-  transition: transform .14s ease, border-color .16s ease, background .16s ease;
-}
-.ig-uid-pill:active {
-  transform: scale(0.96);
-}
-.ig-uid-pill .uid-copy-ic {
-  color: #0095f6;
-  font-size: 11.5px;
-}
-.ig-uid-pill.copied {
-  border-color: #10b981;
-  background: #ecfdf5;
-  color: #065f46;
-}
-.ig-email-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 5.5px 11px;
-  border-radius: 999px;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  color: #334155;
-  font-size: 11.5px;
-  font-weight: 600;
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.ig-email-pill .g-linked-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #10b981;
-  flex-shrink: 0;
-}
-.ig-pf-bio {
-  margin: 10px 0 0;
-  font-size: 13.5px;
-  line-height: 1.48;
-  color: #1e293b;
-  white-space: pre-line;
-  word-break: break-word;
-}
-.ig-pf-bio-empty {
-  margin: 10px 0 0;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 0;
-  border: 0;
-  background: none;
-  font-size: 13px;
-  font-weight: 500;
-  color: #94a3b8;
-  cursor: pointer;
-}
-
-/* CAT-PROFILE-SEC-03: [ Edit Profile ] + [ Share Profile ] & Guest Google Link CTA */
-.ig-pf-actions-bar {
-  padding: 12px 16px 14px;
-}
-.ig-pf-btn-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-.ig-pf-btn {
-  height: 38px;
-  border-radius: 10px;
-  border: 1px solid #e2e8f0;
-  background: #f1f5f9;
-  color: #0f172a;
-  font-size: 13.5px;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  cursor: pointer;
-  transition: background .15s ease, transform .14s ease;
-}
-.ig-pf-btn:active {
-  transform: scale(0.98);
-  background: #e2e8f0;
-}
-.ig-pf-btn.primary {
-  background: #0f172a;
-  border-color: #0f172a;
-  color: #ffffff;
-}
-.ig-pf-btn.primary:active {
-  background: #1e293b;
-}
-.ig-pf-google-cta {
-  margin-top: 10px;
-  width: 100%;
-  min-height: 44px;
-  padding: 10px 14px;
-  border-radius: 12px;
-  border: 1.5px solid #c7d2fe;
-  background: linear-gradient(135deg, #eef2ff 0%, #f8fafc 100%);
-  color: #1e1b4b;
-  font-size: 13px;
-  font-weight: 800;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  cursor: pointer;
-  box-shadow: 0 6px 16px -8px rgba(79, 70, 229, 0.35);
-  transition: transform .14s ease;
-}
-.ig-pf-google-cta:active {
-  transform: scale(0.985);
-}
-
-/* CAT-PROFILE-SEC-04: Account Vault Cards + Loyalty Redemption + Sign-Out */
-.ig-pf-vault {
-  padding: 14px 16px 0;
-  border-top: 1px solid #f1f5f9;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-.ig-pf-shortcuts {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-}
-.ig-pf-sc {
-  border: 1px solid #f1f5f9;
-  background: #f8fafc;
-  border-radius: 14px;
-  padding: 11px 8px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 5px;
-  cursor: pointer;
-}
-.ig-pf-sc i {
-  font-size: 15px;
-  color: #0f172a;
-}
-.ig-pf-sc span {
-  font-size: 11.5px;
-  font-weight: 700;
-  color: #334155;
-}
-
-/* Instagram Clean Bottom-Sheet Modal (#igEditProfileSheet) */
-.ig-ep-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 9850;
-  background: rgba(15, 23, 42, 0.48);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  opacity: 0;
-  transition: opacity .22s ease;
-}
-.ig-ep-backdrop.open {
-  opacity: 1;
-}
-.ig-ep-sheet {
-  width: 100%;
-  max-width: 480px;
-  background: #ffffff;
-  border-radius: 22px 22px 0 0;
-  padding: 10px 0 calc(22px + env(safe-area-inset-bottom, 0px));
-  box-shadow: 0 -16px 40px rgba(15, 23, 42, 0.22);
-  transform: translateY(100%);
-  transition: transform .26s cubic-bezier(.22, 1, .36, 1);
-  max-height: 90vh;
-  overflow-y: auto;
-}
-.ig-ep-backdrop.open .ig-ep-sheet {
-  transform: translateY(0);
-}
-.ig-ep-grab {
-  width: 40px;
-  height: 4px;
-  border-radius: 999px;
-  background: #cbd5e1;
-  margin: 0 auto 10px;
-}
-.ig-ep-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 6px 16px 12px;
-  border-bottom: 1px solid #f1f5f9;
-}
-.ig-ep-head button {
-  border: 0;
-  background: none;
-  font-size: 14.5px;
-  font-weight: 600;
-  color: #64748b;
-  cursor: pointer;
-  padding: 4px 2px;
-}
-.ig-ep-head button.save {
-  color: #0095f6;
-  font-weight: 800;
-}
-.ig-ep-head h3 {
-  margin: 0;
-  font-size: 15.5px;
-  font-weight: 800;
-  color: #0f172a;
-}
-.ig-ep-ava-edit {
-  padding: 16px 16px 12px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  border-bottom: 1px solid #f8fafc;
-}
-.ig-ep-ava-edit img, .ig-ep-ava-edit .ig-ep-ava-ph {
-  width: 68px;
-  height: 68px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #e2e8f0;
-}
-.ig-ep-ava-edit .ig-ep-ava-ph {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #f1f5f9;
-  color: #4f46e5;
-  font-size: 24px;
-}
-.ig-ep-ava-link {
-  border: 0;
-  background: none;
-  color: #0095f6;
-  font-size: 13px;
-  font-weight: 700;
-  cursor: pointer;
-}
-.ig-ep-fields {
-  padding: 8px 16px 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-.ig-ep-field {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  border-bottom: 1px solid #e2e8f0;
-  padding-bottom: 8px;
-}
-.ig-ep-field:focus-within {
-  border-bottom-color: #0f172a;
-}
-.ig-ep-label-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.ig-ep-field label {
-  font-size: 11.5px;
-  font-weight: 700;
-  color: #64748b;
-  letter-spacing: 0.01em;
-}
-.ig-ep-count {
-  font-size: 11px;
-  font-weight: 600;
-  color: #94a3b8;
-}
-.ig-ep-input-wrap {
-  display: flex;
-  align-items: center;
-  gap: 3px;
-}
-.ig-ep-at {
-  font-size: 15px;
-  font-weight: 700;
-  color: #64748b;
-}
-.ig-ep-field input,
-.ig-ep-field textarea {
-  width: 100%;
-  border: 0;
-  outline: none;
-  background: transparent;
-  font-family: inherit;
-  font-size: 15px;
-  font-weight: 600;
-  color: #0f172a;
-  padding: 2px 0;
-  resize: none;
-}
-.ig-ep-submit {
-  margin: 4px 16px 0;
-  width: calc(100% - 32px);
-  height: 44px;
-  border-radius: 12px;
-  border: 0;
-  background: #0095f6;
-  color: #ffffff;
-  font-size: 14px;
-  font-weight: 800;
-  cursor: pointer;
-}
-.ig-ep-submit:disabled {
-  opacity: 0.6;
-  cursor: wait;
-}
-
-.ig-pf-stat-lbl { font-size: 10.5px !important; }
-.ig-float-toast {
-    position: fixed;
-    left: 50%;
-    bottom: calc(88px + env(safe-area-inset-bottom, 0px));
-    transform: translateX(-50%) translateY(14px);
-    z-index: 10050;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 9px 18px;
-    border-radius: 999px;
-    background: rgba(15, 23, 42, .94);
-    color: #ffffff;
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: -.01em;
-    box-shadow: 0 10px 26px rgba(15, 23, 42, .25);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity .18s ease, transform .2s cubic-bezier(.16,1,.3,1);
-}
-.ig-float-toast.visible {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-}
-</style>
-
 </head>
 <!--YG-->
 <style id="andosOriginalLoginScopedStyles">
@@ -16718,7 +16117,6 @@ const PLANS = {
             user.name = finalName;
             user.username = uname;
             user.publicId = pubId;
-            if (payload && typeof payload.bio === 'string' && payload.bio) user.bio = payload.bio;
             user.email = fbUser.email || '';
             user.isGuest = !!fbUser.isAnonymous;
             user.provider = fbUser.isAnonymous ? 'guest' : 'google';
@@ -16754,7 +16152,6 @@ const PLANS = {
                         username: uname,
                         publicId: pubId,
                         photo: chosenPhoto || '',
-                        bio: user.bio || '',
                         guest_expires_at: (payload && payload.guest_expires_at) || 0,
                         verifiedAt: Date.now()
                     }));
@@ -16764,23 +16161,18 @@ const PLANS = {
             return { publicId: pubId, username: uname, name: finalName };
         }
 
-        // Live Profile Name + @Username + Bio Sync to Server Worker (POST /api/profile/update)
-        window.andosSyncProfileToServer = async function (nextName, nextUsername, nextBio) {
+        // Live Profile Name + @Username Sync to Server Worker (POST /api/profile/update)
+        window.andosSyncProfileToServer = async function (nextName, nextUsername) {
             if (!auth || !auth.currentUser) return null;
             try {
-                var cleanBio = typeof nextBio === 'string'
-                    ? String(nextBio).replace(/[<>]/g, '').replace(/\r/g, '').trim().slice(0, 150)
-                    : String(user.bio || '').slice(0, 150);
                 var resp = await postLifecycleWorker(WORKER_PROFILE_UPDATE, auth.currentUser, {
                     name: String(nextName || '').trim().slice(0, 40),
-                    username: String(nextUsername || '').replace(/^@+/, '').trim().toLowerCase().replace(/[^a-z0-9_]/g, '').slice(0, 28),
-                    bio: cleanBio
+                    username: String(nextUsername || '').replace(/^@+/, '').trim().toLowerCase().slice(0, 28)
                 });
                 var prof = (resp && resp.profile) ? resp.profile : resp;
                 if (prof && prof.username) {
                     user.name = prof.name || user.name;
                     user.username = prof.username;
-                    user.bio = typeof prof.bio === 'string' ? prof.bio : cleanBio;
                     if (prof.publicId) user.publicId = String(prof.publicId);
                     try {
                         localStorage.setItem('andos_handle', user.username);
@@ -16789,7 +16181,6 @@ const PLANS = {
                             var gpPrev = JSON.parse(localStorage.getItem('andos_guest_profile') || '{}') || {};
                             gpPrev.name = user.name;
                             gpPrev.username = user.username;
-                            gpPrev.bio = user.bio || '';
                             if (user.publicId) gpPrev.publicId = user.publicId;
                             localStorage.setItem('andos_guest_profile', JSON.stringify(gpPrev));
                         }
@@ -24181,189 +23572,107 @@ function renderFreeFireGraphics() {
         showToast('Profile updated', 'success');
         if (currentPage === 'editprofile' || currentPage === 'account') navigate('account', { force: true });
     };
-    var __igToastTimer = null;
-    window.showIgToast = function (msg) {
-        var el = document.getElementById('igFloatToast');
-        if (!el) {
-            el = document.createElement('div');
-            el.id = 'igFloatToast';
-            el.className = 'ig-float-toast';
-            el.setAttribute('role', 'status');
-            el.setAttribute('aria-live', 'polite');
-            document.body.appendChild(el);
-        }
-        el.innerHTML = '<i class="fa-solid fa-circle-check" style="color:#34d399;font-size:13px"></i><span></span>';
-        el.querySelector('span').textContent = String(msg || 'Copied!');
-        clearTimeout(__igToastTimer);
-        requestAnimationFrame(function () { el.classList.add('visible'); });
-        __igToastTimer = setTimeout(function () { el.classList.remove('visible'); }, 1850);
-    };
-
-    window.copyIgPublicUid = function (btnEl, uidVal) {
-        var clean = String(uidVal || (user && user.publicId) || '').trim();
-        if (!clean) return;
-        var finish = function () {
-            if (window.showIgToast) window.showIgToast('Copied!');
-            try { showToast('Copied!', 'success'); } catch (e) {}
-            if (btnEl) {
-                btnEl.classList.add('copied');
-                var ic = btnEl.querySelector('.uid-copy-ic');
-                if (ic) ic.className = 'fa-solid fa-check uid-copy-ic';
-                setTimeout(function () {
-                    btnEl.classList.remove('copied');
-                    if (ic) ic.className = 'fa-regular fa-copy uid-copy-ic';
-                }, 1400);
-            }
-        };
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(clean).then(finish).catch(function () { fallbackCopy(clean); finish(); });
-        } else {
-            fallbackCopy(clean);
-            finish();
-        }
-    };
-
-    window.shareIgProfile = function () {
-        var handle = user && user.username ? '@' + user.username : (user && user.name) || 'ANDOS Member';
-        var pubUid = user && user.publicId ? ' · UID: ' + user.publicId : '';
-        var link = (window.buildRefLink ? window.buildRefLink() : 'https://andostosites.vercel.app/');
-        var shareTitle = (user && user.name ? user.name : 'ANDOS') + ' (' + handle + ')';
-        var shareText = shareTitle + pubUid + ' on ANDOS';
-        if (navigator.share) {
-            navigator.share({ title: shareTitle, text: shareText, url: link }).catch(function () {});
-            return;
-        }
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(link).then(function () { if (window.showIgToast) window.showIgToast('Profile link copied!'); showToast('Profile link copied!', 'success'); }).catch(function () { fallbackCopy(link); });
-        } else {
-            fallbackCopy(link);
-        }
-    };
-
-    window.closeIgEditProfileSheet = function () {
-        var el = document.getElementById('igEditProfileSheet');
-        if (!el) return;
-        el.classList.remove('open');
-        setTimeout(function () { if (el && el.parentNode) el.parentNode.removeChild(el); }, 240);
-    };
-
-    window.openIgEditProfileSheet = function (focusBio) {
-        var existing = document.getElementById('igEditProfileSheet');
-        if (existing) existing.remove();
-        var avaSrc = '';
-        try { avaSrc = (window.getAvatarSrc ? window.getAvatarSrc() : '') || getProfileAvatar() || ''; } catch (e) {}
-        var curName = String((user && user.name) || '');
-        var curUser = String((user && user.username) || '');
-        var curBio = String((user && user.bio) || '');
-
-        var wrap = document.createElement('div');
-        wrap.id = 'igEditProfileSheet';
-        wrap.className = 'ig-ep-backdrop';
-        wrap.onclick = function (ev) { if (ev.target === wrap) window.closeIgEditProfileSheet(); };
-        wrap.innerHTML = ''
-            + '<div class="ig-ep-sheet" role="dialog" aria-modal="true" aria-labelledby="igEpHeading">'
-            + '  <div class="ig-ep-grab"></div>'
-            + '  <div class="ig-ep-head">'
-            + '    <button type="button" onclick="closeIgEditProfileSheet()">Cancel</button>'
-            + '    <h3 id="igEpHeading">Edit profile</h3>'
-            + '    <button type="button" class="save" id="igEpTopSave" onclick="saveIgProfileSheet()">Done</button>'
-            + '  </div>'
-            + '  <div class="ig-ep-ava-edit">'
-            + (avaSrc
-                ? '<img src="' + escapeHtml(avaSrc) + '" alt="Profile photo" onclick="var f=document.getElementById(\'pfAvaFile\');if(f)f.click();">'
-                : '<div class="ig-ep-ava-ph" onclick="var f=document.getElementById(\'pfAvaFile\');if(f)f.click();"><i class="fa-solid fa-user"></i></div>')
-            + '    <button type="button" class="ig-ep-ava-link" onclick="var f=document.getElementById(\'pfAvaFile\');if(f)f.click();">Change profile photo</button>'
-            + '  </div>'
-            + '  <div class="ig-ep-fields">'
-            + '    <div class="ig-ep-field">'
-            + '      <div class="ig-ep-label-row"><label for="igEpName">Name</label><span class="ig-ep-count" id="igEpNameCnt">' + curName.length + '/40</span></div>'
-            + '      <input id="igEpName" type="text" maxlength="40" value="' + escapeHtml(curName) + '" placeholder="Your full name" autocomplete="name">'
-            + '    </div>'
-            + '    <div class="ig-ep-field">'
-            + '      <div class="ig-ep-label-row"><label for="igEpUsername">Username</label><span class="ig-ep-count" id="igEpUserCnt">' + curUser.length + '/28</span></div>'
-            + '      <div class="ig-ep-input-wrap"><span class="ig-ep-at">@</span><input id="igEpUsername" type="text" maxlength="28" value="' + escapeHtml(curUser) + '" placeholder="username" autocomplete="off" autocapitalize="none" spellcheck="false"></div>'
-            + '    </div>'
-            + '    <div class="ig-ep-field">'
-            + '      <div class="ig-ep-label-row"><label for="igEpBio">Bio</label><span class="ig-ep-count" id="igEpBioCnt">' + curBio.length + '/150</span></div>'
-            + '      <textarea id="igEpBio" rows="3" maxlength="150" placeholder="Write a short bio about yourself...">' + escapeHtml(curBio) + '</textarea>'
-            + '    </div>'
-            + '  </div>'
-            + '  <button type="button" class="ig-ep-submit" id="igEpBottomSave" onclick="saveIgProfileSheet()">Save &amp; Sync to Server</button>'
-            + '</div>';
-        document.body.appendChild(wrap);
-
-        var nEl = document.getElementById('igEpName');
-        var uEl = document.getElementById('igEpUsername');
-        var bEl = document.getElementById('igEpBio');
-        if (nEl) nEl.addEventListener('input', function () { var c = document.getElementById('igEpNameCnt'); if (c) c.textContent = nEl.value.length + '/40'; });
-        if (uEl) uEl.addEventListener('input', function () {
-            uEl.value = uEl.value.replace(/^@+/, '').toLowerCase().replace(/[^a-z0-9_]/g, '').slice(0, 28);
-            var c = document.getElementById('igEpUserCnt'); if (c) c.textContent = uEl.value.length + '/28';
-        });
-        if (bEl) bEl.addEventListener('input', function () { var c = document.getElementById('igEpBioCnt'); if (c) c.textContent = bEl.value.length + '/150'; });
-
-        requestAnimationFrame(function () {
-            wrap.classList.add('open');
-            if (focusBio && bEl) bEl.focus();
-        });
-    };
-
-    window.saveIgProfileSheet = async function () {
-        var nEl = document.getElementById('igEpName');
-        var uEl = document.getElementById('igEpUsername');
-        var bEl = document.getElementById('igEpBio');
-        var topBtn = document.getElementById('igEpTopSave');
-        var botBtn = document.getElementById('igEpBottomSave');
-
-        var nextName = String((nEl && nEl.value) || '').replace(/[<>]/g, '').trim().slice(0, 40);
-        var nextUser = String((uEl && uEl.value) || '').replace(/^@+/, '').toLowerCase().replace(/[^a-z0-9_]/g, '').slice(0, 28);
-        var nextBio = String((bEl && bEl.value) || '').replace(/[<>]/g, '').replace(/\r/g, '').trim().slice(0, 150);
-
-        if (!nextName) { showToast('Please enter your display name', 'warning'); if (nEl) nEl.focus(); return; }
-        if (nextUser.length < 3) { showToast('Username must be at least 3 characters', 'warning'); if (uEl) uEl.focus(); return; }
-
-        if (topBtn) { topBtn.disabled = true; topBtn.textContent = 'Saving...'; }
-        if (botBtn) { botBtn.disabled = true; botBtn.textContent = 'Syncing to server...'; }
-
+    function ProfilePage() {
         try {
-            if (typeof window.andosSyncProfileToServer === 'function' && typeof auth !== 'undefined' && auth && auth.currentUser) {
-                await window.andosSyncProfileToServer(nextName, nextUser, nextBio);
-            }
-            if (!user) user = {};
-            user.name = nextName;
-            user.username = nextUser;
-            user.bio = nextBio;
-            try {
-                localStorage.setItem('andos_handle', user.username);
-                localStorage.setItem('andos_user', JSON.stringify(user));
-                localStorage.setItem('andos_user_profile', JSON.stringify({
-                    uid: user.uid || '',
-                    publicId: user.publicId || '',
-                    name: user.name,
-                    username: user.username,
-                    mobile: user.mobile || '',
-                    email: user.email || '',
-                    dob: user.dob || '',
-                    ffUid: user.ffUid || '',
-                    ffName: user.ffName || '',
-                    bio: user.bio || '',
-                    location: user.location || '',
-                    website: user.website || ''
-                }));
-            } catch (e) {}
-            try { window.ANDOS_FB && ANDOS_FB.saveUser && ANDOS_FB.saveUser(); } catch (e) {}
-            try { if (window.notifyAct) window.notifyAct('PROFILE UPDATED', user.name + ' (@' + user.username + ')'); } catch (e) {}
-            window.closeIgEditProfileSheet();
-            showToast('Profile synced ✓', 'success');
-            if (currentPage === 'account' || currentPage === 'profile') render();
-        } catch (err) {
-            if (topBtn) { topBtn.disabled = false; topBtn.textContent = 'Done'; }
-            if (botBtn) { botBtn.disabled = false; botBtn.textContent = 'Save & Sync to Server'; }
-            if (!err || Number(err.status) !== 409) {
-                showToast('Could not sync profile right now. Try again.', 'error');
-            }
+            const orderCount = Array.isArray(orders) ? orders.length : 0;
+            const pts = Number(loyaltyPoints || 0);
+            const walletBalance = Number(wallet || 0);
+            const avatarSrc = String(user.photoURL || localStorage.getItem('andos_profile_avatar') || DEFAULT_AVATAR_URL || '').replace(/"/g,'%22').replace(/</g,'').replace(/>/g,'');
+            const displayName = escapeHtml(user.name || 'ANDOS Member');
+            const mobile = user.mobile ? '+91 ' + escapeHtml(user.mobile) : 'Link your mobile number';
+            const email = escapeHtml(user.email || '');
+            const providerBadge = user.provider
+                ? `<span class="andos-badge andos-badge--info mt-3">
+                    <i class="fa-solid ${user.provider === 'google.com' || user.provider === 'google' ? 'fa-brands fa-google' : user.provider === 'phone' ? 'fa-solid fa-phone' : 'fa-solid fa-envelope'}"></i>
+                    Verified via ${user.provider === 'google.com' || user.provider === 'google' ? 'Google' : user.provider === 'phone' ? 'Mobile OTP' : 'Email'}
+                   </span>` : '';
+            return `
+            <div class="page-enter profile-page">
+                <div class="px-5 pt-6 pb-2">
+                    <button onclick="hardCloseChrome();navigate('home')" class="back-btn bg-gray-100 text-gray-700 px-4 py-2 rounded-xl font-bold text-sm mb-4 flex items-center gap-2"><i class="fa-solid fa-arrow-left"></i> Back</button>
+                    <h1 class="text-3xl font-black text-gray-900 tracking-tight">Profile</h1>
+                </div>
+
+                <div class="px-5 pb-12 space-y-5">
+                    <!-- Neon Ring Avatar + Identity - Improved with camera icon -->
+                    <div class="text-center pt-4">
+                        <div class="profile-neon-avatar-wrap" style="position:relative;cursor:pointer;" onclick="var src=(window.getAvatarSrc?window.getAvatarSrc():''); if(src){ if(window.openProfilePhotoViewer) window.openProfilePhotoViewer(); } else { var f=document.getElementById('profileNeonFile'); if(f) f.click(); }">
+                            <div class="profile-neon-avatar-ring"></div>
+                            <div class="profile-neon-avatar-inner">
+                                <img data-live-avatar alt="Profile">
+                                <i data-avatar-fallback class="fa-solid fa-circle-user default-icon" aria-label="Default account avatar"></i>
+                            </div>
+                            <button type="button" class="pf-cam" style="position:absolute;bottom:0;right:6px;width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;border:3px solid #fff;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,0.2);cursor:pointer;" aria-label="Change photo" onclick="event.stopPropagation(); var f=document.getElementById('profileNeonFile'); if(f) f.click();"><i class="fa-solid fa-camera" style="font-size:13px;"></i></button>
+                            <input id="profileNeonFile" type="file" accept="image/png,image/jpeg,image/webp,image/*" class="hidden" onchange="handleProfileAvatarUpload(this)">
+                        </div>
+                        <h2 class="text-2xl font-black text-gray-900 mt-4" style="margin-top:16px;">${displayName}</h2>
+                        <p class="text-gray-500 mt-1">${mobile}</p>
+                        <div class="avatar-upload-actions flex items-center justify-center gap-2 mt-3">
+                            <label class="avatar-upload-btn" style="cursor:pointer;"><input type="file" accept="image/png,image/jpeg,image/webp,image/*" class="hidden" onchange="handleProfileAvatarUpload(this)"><i class="fa-solid fa-camera"></i> Change Photo</label>
+                            ${localStorage.getItem('andos_profile_avatar') ? `<button type="button" class="avatar-remove-btn" onclick="removeProfileAvatar()"><i class="fa-solid fa-trash-can mr-1"></i>Remove</button>` : ''}
+                        </div>
+                        ${providerBadge}
+                    </div>
+
+                    <!-- Twin glassmorphic stat blocks: Wallet + Loyalty -->
+                    <div class="profile-glass-grid">
+                        <div class="profile-glass-card wallet" role="link" tabindex="0" onclick="navigate('wallet')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();navigate('wallet')}" aria-label="Open Wallet Summary">
+                            <div class="card-icon"><i class="fa-solid fa-wallet"></i></div>
+                            <p class="card-label">Wallet Summary</p>
+                            <p class="card-value" aria-label="Wallet balance">${formatPrice(walletBalance)}</p>
+                            <p class="card-sub"><i class="fa-solid fa-arrow-trend-up" style="color:#10b981"></i> Available balance</p>
+                        </div>
+                        <div class="profile-glass-card loyalty" role="link" tabindex="0" onclick="navigate('loyalty')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();navigate('loyalty')}" aria-label="Open Loyalty Network">
+                            <div class="card-icon"><i class="fa-solid fa-star"></i></div>
+                            <p class="card-label">Loyalty Network</p>
+                            <p class="card-value" aria-label="Loyalty points">${pts.toLocaleString('en-IN')}</p>
+                            <p class="card-sub"><span class="star-token"><i class="fa-solid fa-star"></i></span> Active Reward Points</p>
+                        </div>
+                    </div>
+
+                    <!-- Quick action strip -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <button type="button" onclick="navigate('wallet')" class="premium-btn rounded-2xl py-4 text-white flex items-center justify-center gap-2"><i class="fa-solid fa-plus-circle"></i> Add Money</button>
+                        <button type="button" onclick="redeemLoyaltyToWallet()" class="premium-btn withdraw rounded-2xl py-4 text-white flex items-center justify-center gap-2" ${pts < 100 ? 'disabled' : ''}><i class="fa-solid fa-arrow-right-arrow-left"></i> Convert Points</button>
+                    </div>
+
+                    <!-- Referral QR -->
+                    <section class="profile-qr-card luxury-qr">
+                        <div>
+                            <p class="text-indigo-500 font-black uppercase tracking-[.15em]">Referral QR Code</p>
+                            <h2 class="mt-2 text-lg font-black text-slate-950">Invite with one scan</h2>
+                            <p class="mt-2 font-semibold leading-relaxed text-slate-500">Share your luxury framed QR to earn referral credits on every first purchase.</p>
+                            <div class="mt-3 inline-flex items-center gap-2 rounded-full bg-indigo-50 px-3 py-1.5 text-indigo-600 font-black"><i class="fa-solid fa-ticket"></i>${CONFIG.referralCode}</div>
+                        </div>
+                        <div id="profileReferralQr" class="profile-qr-box" aria-label="Referral QR code"></div>
+                        <div class="mt-3 flex gap-2">
+                            <button type="button" onclick="event.stopPropagation();try{var l=(window.buildRefLink?buildRefLink():'');if(navigator.clipboard)navigator.clipboard.writeText(l);showToast('🔗 Link copy ho gaya!','success');}catch(e){}" class="flex-1 py-2.5 rounded-xl bg-indigo-600 text-white text-[10px] font-black">📋 COPY LINK</button>
+                            <button type="button" onclick="event.stopPropagation();shareReferralHome(event)" class="flex-1 py-2.5 rounded-xl bg-white border border-indigo-200 text-indigo-600 text-[10px] font-black">🚀 SHARE PAGE</button>
+                        </div>
+                    </section>
+
+                    <!-- Edit Form -->
+                    <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+                        <h3 class="font-bold text-gray-900 mb-4">Edit Profile</h3>
+                        <div class="space-y-4">
+                            <div><label class="font-bold text-gray-700 mb-2 block">Full Name</label><input type="text" id="profileName" value="${escapeHtml(user.name || '')}" placeholder="Your name" class="input-field w-full px-4 py-3.5 rounded-2xl font-semibold"></div>
+                            <div><label class="font-bold text-gray-700 mb-2 block">Username (@)</label><input type="text" id="profileUsername" value="${escapeHtml(user.username || '')}" placeholder="your_username" maxlength="28" autocomplete="off" spellcheck="false" class="input-field w-full px-4 py-3.5 rounded-2xl font-semibold"></div>
+                            <div><label class="font-bold text-gray-700 mb-2 block">Mobile Number</label><input type="tel" id="profileMobile" value="${escapeHtml(user.mobile || '')}" placeholder="10 digit number" maxlength="10" class="input-field w-full px-4 py-3.5 rounded-2xl font-semibold"></div>
+                            <div><label class="font-bold text-gray-700 mb-2 block">Email</label><input type="email" id="profileEmail" value="${email}" placeholder="your@email.com" class="input-field w-full px-4 py-3.5 rounded-2xl font-semibold"></div>
+                        </div>
+                        <button onclick="saveProfile()" class="mt-5 w-full btn-3d text-white py-4 rounded-2xl font-bold text-sm flex items-center justify-center gap-2"><i class="fa-solid fa-save"></i> Save Changes</button>
+                    </div>
+
+                    <button onclick="logoutUser()" class="w-full bg-red-50 border border-red-100 rounded-2xl p-4 flex items-center justify-center gap-2 font-bold text-sm text-red-600">
+                        <i class="fa-solid fa-right-from-bracket"></i> Logout
+                    </button>
+                </div>
+            </div>`;
+        } catch (e) {
+            console.error('ProfilePage render error', e);
+            return `<div class="page-enter px-6 py-16 text-center"><div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-rose-50 text-rose-500 flex items-center justify-center"><i class="fa-solid fa-shield-halved text-2xl"></i></div><h2 class="text-xl font-black text-gray-900">Profile temporarily unavailable</h2><p class="text-sm text-gray-500 mt-2">A rendering fault was blocked to keep the platform stable.</p><button type="button" onclick="currentPage='home';render();" class="mt-6 btn-3d text-white px-5 py-3 rounded-2xl text-sm font-bold">Return Home</button></div>`;
         }
-    };
+    }
 
     const REFERRAL_LEADERBOARD = Object.freeze([
         { name:'Aarav M.', points:4280 }, { name:'Ishita R.', points:3610 },
@@ -24372,132 +23681,58 @@ function renderFreeFireGraphics() {
     ]);
 
     function AccountPage() {
-        const orderCount = Array.isArray(orders) ? orders.length : 0;
+        const photo = getProfileAvatar();
+        const name = escapeHtml(user.name || 'ANDOS Member');
+        const mobile = escapeHtml(user.mobile || '');
+        const email = escapeHtml(user.email || '');
         const pts = Number(loyaltyPoints || 0);
-        const walletBalance = Number(wallet || 0);
-        const name = escapeHtml((user && user.name) || 'ANDOS Member');
-        const rawHandle = String((user && user.username) || 'andos_member').replace(/^@+/, '');
-        const handle = escapeHtml(rawHandle);
-        const pubId = String((user && user.publicId) || '').trim();
-        const emailRaw = String((user && user.email) || '').trim();
-        const isGuestAccount = !!(user && user.isGuest);
-        const bioRaw = String((user && user.bio) || '').trim();
-        const initialChar = escapeHtml(String((user && user.name) || 'A').trim().charAt(0).toUpperCase() || 'A');
-        const isSuperAdmin = !!(window.ANDOS_STAFF && window.ANDOS_STAFF.isSuperAdmin && window.ANDOS_STAFF.isSuperAdmin());
-
-        const googleSvg = '<svg width="13" height="13" viewBox="0 0 48 48" aria-hidden="true" style="flex-shrink:0"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 8 3l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 8 3l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.7-.4-3.5z"/></svg>';
-
-        const emailOrGoogleBadge = !isGuestAccount
-            ? '<span class="ig-email-pill" title="Google Verified Email">' + googleSvg + '<span>' + escapeHtml(emailRaw || 'Google Linked') + '</span><span class="g-linked-dot"></span></span>'
-            : '<span class="ig-email-pill"><i class="fa-regular fa-user" style="font-size:11px;color:#64748b;"></i><span>Guest Account · Unlinked</span></span>';
-
+        const link = String((window.buildRefLink ? window.buildRefLink() : (CONFIG.referralLink || CONFIG.siteUrl || 'https://tinyurl.com/Andos-i'))).replace(/"/g,'');
+        const av = '<img id="pfLiveAva" data-live-avatar alt="Profile"><span data-avatar-fallback class="pf-fallback"><i class="fa-solid fa-user"></i></span>';
         return `
-            <div class="page-enter pf-page ig-pf-shell">
-                <!-- Top Instagram Bar -->
-                <header class="ig-pf-topbar">
-                    <div class="ig-pf-topbar-left">
-                        <button type="button" class="ig-pf-back" aria-label="Back to Home" onclick="hardCloseChrome();navigate('home')"><i class="fa-solid fa-arrow-left"></i></button>
-                        <span class="ig-pf-top-handle">@${handle}</span>
+            <div class="page-enter pf-page">
+                <div class="pf-title"><h1>Profile</h1></div>
+                <div class="pf-hero">
+                    <div class="pf-ava" role="button" onclick="var src=(window.getAvatarSrc?window.getAvatarSrc():''); if(src){ if(window.openProfilePhotoViewer) window.openProfilePhotoViewer(); } else { var f=document.getElementById('pfAvaFile'); if(f) f.click(); }">
+                        ${av}
+                        <input id="pfAvaFile" type="file" accept="image/png,image/jpeg,image/webp,image/*" class="hidden" onchange="handleProfileAvatarUpload(this)">
+                        <button type="button" class="pf-cam" aria-label="Change photo" onclick="event.stopPropagation(); var f=document.getElementById('pfAvaFile'); if(f) f.click();"><i class="fa-solid fa-camera"></i></button>
                     </div>
-                    <div class="ig-pf-topbar-right">
-                        ${isSuperAdmin ? '<button type="button" class="ig-pf-icon-btn" onclick="openAdminOS()"><i class="fa-solid fa-shield-halved" style="color:#4f46e5;"></i><span>Admin Panel</span></button>' : ''}
-                        <button type="button" class="ig-pf-icon-btn" onclick="openIgEditProfileSheet()" aria-label="Edit Profile"><i class="fa-solid fa-sliders"></i></button>
-                    </div>
-                </header>
-
-                <!-- CAT-PROFILE-SEC-01: Circular Avatar + Camera Badge + 3 Instagram Stats -->
-                <section class="ig-pf-hero" id="catProfileSec01">
-                    <div class="ig-pf-hero-row">
-                        <div class="ig-pf-ava-ring" role="button" tabindex="0" aria-label="Upload profile photo" onclick="var f=document.getElementById('pfAvaFile'); if(f) f.click();" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();var f=document.getElementById('pfAvaFile');if(f)f.click();}">
-                            <div class="ig-pf-ava-core">
-                                <img id="pfLiveAva" data-live-avatar alt="Profile photo">
-                                <span data-avatar-fallback class="ig-pf-ava-fallback">${initialChar}</span>
-                            </div>
-                            <input id="pfAvaFile" type="file" accept="image/png,image/jpeg,image/webp,image/*" class="hidden" onchange="handleProfileAvatarUpload(this)">
-                            <button type="button" class="ig-pf-cam" aria-label="Change profile photo" onclick="event.stopPropagation(); var f=document.getElementById('pfAvaFile'); if(f) f.click();"><i class="fa-solid fa-camera"></i></button>
-                        </div>
-
-                        <div class="ig-pf-stats" role="group" aria-label="Account Statistics">
-                            <button type="button" class="ig-pf-stat" onclick="navigate('orders')">
-                                <b>${orderCount.toLocaleString('en-IN')}</b>
-                                <span>Total Orders</span>
-                            </button>
-                            <button type="button" class="ig-pf-stat" onclick="navigate('loyalty')">
-                                <b>${pts.toLocaleString('en-IN')}</b>
-                                <span>Loyalty Pts</span>
-                            </button>
-                            <button type="button" class="ig-pf-stat" onclick="navigate('wallet')">
-                                <b>${formatPrice(walletBalance)}</b>
-                                <span>Wallet Balance</span>
-                            </button>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- CAT-PROFILE-SEC-02: 5 Visual Identity Pillars + Bio Block -->
-                <section class="ig-pf-identity" id="catProfileSec02">
-                    <div class="ig-pf-name-row">
-                        <h2 class="ig-pf-fullname">${name}</h2>
-                        ${!isGuestAccount ? '<span class="ig-pf-verified" title="Google Linked Account"><i class="fa-solid fa-circle-check"></i></span>' : ''}
-                    </div>
-                    <p class="ig-pf-username">@${handle}</p>
-
-                    <div class="ig-pf-pills">
-                        ${pubId ? '<button type="button" class="ig-uid-pill" onclick="copyIgPublicUid(this, \'' + escapeHtml(pubId) + '\')" aria-label="Copy 7-digit Public UID"><i class="fa-solid fa-fingerprint" style="color:#4f46e5;"></i><span>UID: ' + escapeHtml(pubId) + '</span><i class="fa-regular fa-copy uid-copy-ic"></i></button>' : ''}
-                        ${emailOrGoogleBadge}
-                    </div>
-
-                    ${bioRaw
-                        ? '<p class="ig-pf-bio">' + escapeHtml(bioRaw) + '</p>'
-                        : '<button type="button" class="ig-pf-bio-empty" onclick="openIgEditProfileSheet(true)"><i class="fa-solid fa-pen-to-square"></i><span>Add a bio to personalize your profile...</span></button>'}
-                </section>
-
-                <!-- CAT-PROFILE-SEC-03: Instagram Dual Buttons [ Edit Profile ] + [ Share Profile ] & Guest Link CTA -->
-                <section class="ig-pf-actions-bar" id="catProfileSec03">
-                    <div class="ig-pf-btn-row">
-                        <button type="button" class="ig-pf-btn primary" onclick="openIgEditProfileSheet()">Edit Profile</button>
-                        <button type="button" class="ig-pf-btn" onclick="shareIgProfile()">Share Profile</button>
-                    </div>
-                    ${isGuestAccount ? '<button type="button" class="ig-pf-google-cta" onclick="andosLinkGoogle()">' + googleSvg + '<span>🔗 Link with Google (Keep Same UID' + (pubId ? ': ' + escapeHtml(pubId) : '') + ')</span></button>' : ''}
-                </section>
-
-                <!-- CAT-PROFILE-SEC-04 & SEC-05: Quick Vault Strip, Loyalty Ledger & Sign Out -->
-                <section class="ig-pf-vault" id="catProfileSec04">
-                    <div class="ig-pf-shortcuts">
-                        <button type="button" class="ig-pf-sc" onclick="navigate('activity')"><i class="fa-solid fa-bolt"></i><span>Activity</span></button>
-                        <button type="button" class="ig-pf-sc" onclick="navigate('loyalty')"><i class="fa-solid fa-star"></i><span>Rewards</span></button>
-                        <button type="button" class="ig-pf-sc" onclick="navigate('wallet')"><i class="fa-solid fa-wallet"></i><span>Wallet</span></button>
-                    </div>
-
-                    <section class="pf-loyal" onclick="navigate('loyalty')" style="margin:0;">
-                        <div class="row">
-                            <div>
-                                <em>LOYALTY LEDGER</em>
-                                <b class="pts">${pts.toLocaleString('en-IN')}</b>
-                                <div class="pf-loyal-sub">100 pts = ₹100 · open candle history</div>
-                            </div>
-                            <button type="button" onclick="event.stopPropagation();redeemLoyaltyToWallet()" ${pts<100?'disabled':''}>Redeem</button>
-                        </div>
-                        <div class="pf-loy-meter" aria-hidden="true"><i style="width:${Math.min(100, Math.round((pts%1000)/10))}%"></i></div>
-                    </section>
-
-                    <button type="button" class="pf-signout" id="catProfileSec05" style="margin:0;" onclick="confirmSignOut()">
-                        <span><i class="fa-solid fa-arrow-right-from-bracket"></i></span>
+                    <h2 class="pf-name">${name}</h2>
+                    ${user.username ? '<p class="pf-mob" style="margin-top:2px;font-weight:700;opacity:.92">@' + escapeHtml(user.username) + '</p>' : ''}
+                    ${user.publicId ? '<div style="margin-top:6px;display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:999px;background:rgba(15,23,42,.06);border:1px solid rgba(15,23,42,.1);font-size:11.5px;font-weight:800;color:#0f172a;cursor:pointer;" onclick="navigator.clipboard&&navigator.clipboard.writeText(\'' + escapeHtml(String(user.publicId)) + '\');showToast(\'Copied UID ' + escapeHtml(String(user.publicId)) + '\',\'success\')"><i class="fa-solid fa-id-badge" style="color:#4f46e5;"></i><span>UID: ' + escapeHtml(String(user.publicId)) + '</span><i class="fa-regular fa-copy" style="font-size:10px;opacity:.6;"></i></div>' : ''}
+                    <p class="pf-mob" style="margin-top:6px;">${mobile ? '+91 '+mobile : (email || (user.isGuest ? 'Server-Verified Guest Account' : 'Add mobile'))}</p>
+                    ${user.isGuest ? '<div style="margin-top:10px;"><button type="button" onclick="andosLinkGoogle()" style="padding:8px 16px;border-radius:999px;border:1px solid #0f172a;background:#0f172a;color:#fff;font-size:11.5px;font-weight:800;cursor:pointer;"><i class="fa-brands fa-google" style="margin-right:6px;"></i>Link with Google (Keep Same UID)</button></div>' : ''}
+                </div>
+                <div class="pf-actions">
+                    <button type="button" class="pf-act" onclick="navigate('activity')"><i class="fa-solid fa-bolt"></i><b>Activity</b><small>Orders & logs</small></button>
+                    <button type="button" class="pf-act" onclick="navigate('loyalty')"><i class="fa-solid fa-star"></i><b>Loyalty</b><small>${pts.toLocaleString('en-IN')} pts</small></button>
+                    <button type="button" class="pf-act" onclick="navigate('wallet')"><i class="fa-solid fa-wallet"></i><b>Wallet</b><small>Balance</small></button>
+                </div>
+                <section class="pf-loyal" onclick="navigate('loyalty')">
+                    <div class="row">
                         <div>
-                            <b>Sign out</b>
-                            <small>${escapeHtml(emailRaw || ('@' + rawHandle + (pubId ? ' · UID ' + pubId : '')))}</small>
+                            <em>LOYALTY LEDGER</em>
+                            <b class="pts">${pts.toLocaleString('en-IN')}</b>
+                            <div class="pf-loyal-sub">100 pts = ₹100 · open candle history</div>
                         </div>
-                        <i class="fa-solid fa-chevron-right"></i>
-                    </button>
-                    <p class="pf-ver">ANDOS · ${isGuestAccount ? ('Verified Guest' + (pubId ? ' · UID ' + escapeHtml(pubId) : '')) : ('Google Verified' + (pubId ? ' · UID ' + escapeHtml(pubId) : ''))}</p>
+                        <button type="button" onclick="event.stopPropagation();redeemLoyaltyToWallet()" ${pts<100?'disabled':''}>Redeem</button>
+                    </div>
+                    <div class="pf-loy-meter" aria-hidden="true"><i style="width:${Math.min(100, Math.round((pts%1000)/10))}%"></i></div>
                 </section>
+                <div class="pf-form">
+                    <label>Name<input id="pfName" type="text" value="${name}" maxlength="40" autocomplete="off" spellcheck="false"></label>
+                    <label>Username (@)<input id="pfUsername" type="text" value="${escapeHtml(user.username || '')}" maxlength="28" placeholder="username" autocomplete="off" spellcheck="false"></label>
+                    <label>Mobile<input id="pfMobile" type="tel" value="${mobile}" maxlength="10" inputmode="numeric" autocomplete="off"></label>
+                    <label>Email<input id="pfEmail" type="email" value="${email}" maxlength="80" autocomplete="off"></label>
+                    <button type="button" class="pf-save" onclick="saveProfileDetails()">Save profile</button>
+                    ${photo ? '<button type="button" class="pf-remove" onclick="removeProfileAvatar()">Remove photo</button>' : ''}
+                </div>
+                <button type="button" class="pf-signout" onclick="confirmSignOut()"><span><i class="fa-solid fa-arrow-right-from-bracket"></i></span><div><b>Sign out</b><small>${escapeHtml(user.email || (user.username ? '@' + user.username + (user.publicId ? ' · UID ' + user.publicId : '') : 'Active session'))}</small></div><i class="fa-solid fa-chevron-right"></i></button>
+                <p class="pf-ver">ANDOS · ${user.isGuest ? ('Verified Guest' + (user.publicId ? ' · UID ' + escapeHtml(String(user.publicId)) : '')) : 'Signed in with Google'}</p>
             </div>
         `;
     }
 
-    function ProfilePage() {
-        return AccountPage();
-    }
 
     function ActivityPage() {
         const txs = (readLocalJSON('andos_transactions', []) || []).slice(0, 20);
