@@ -5,6 +5,44 @@
 /* Storage guard: agar localStorage blocked ho (sandbox/private mode) to memory fallback — page kabhi blank na ho */
 (function(){try{var t='__andos_t';window.localStorage.setItem(t,'1');window.localStorage.removeItem(t);}catch(e){var mk=function(){var m={};return{getItem:function(k){return Object.prototype.hasOwnProperty.call(m,k)?m[k]:null;},setItem:function(k,v){m[k]=String(v);},removeItem:function(k){delete m[k];},clear:function(){m={};},key:function(i){return Object.keys(m)[i]||null;},get length(){return Object.keys(m).length;}};};try{Object.defineProperty(window,'localStorage',{value:mk(),configurable:true});}catch(e2){}try{Object.defineProperty(window,'sessionStorage',{value:mk(),configurable:true});}catch(e3){}}})();
 </script>
+<script>
+/* ===== ZERO-HITCH BOOT =====
+   Agar device par valid session / HMAC device-pass stored hai, to #loginScreen & #yuvaGate
+   0ms ke liye bhi visible nahi honge (koi blink/hitch nahi). Fail-safe: showLoginGate()
+   is injected style ko turant hata deta hai agar session invalid nikle. */
+(function () {
+    try {
+        var raw = localStorage.getItem('andos_last_account') || '';
+        var hasSession = false;
+        try {
+            var acc = raw ? JSON.parse(raw) : null;
+            if (acc && (acc.passToken || acc.uid)) hasSession = true;
+        } catch (e) {}
+        if (!hasSession) {
+            try {
+                if (localStorage.getItem('andos_guest_profile')) hasSession = true;
+            } catch (e) {}
+        }
+        if (!hasSession) {
+            try {
+                for (var i = 0; i < localStorage.length; i++) {
+                    var k = localStorage.key(i);
+                    if (k && k.indexOf('firebase:authUser:') === 0) { hasSession = true; break; }
+                }
+            } catch (e) {}
+        }
+        if (!hasSession) return;
+        var h = document.documentElement;
+        h.setAttribute('data-auth', 'ok');
+        try { h.classList.remove('yg-lock'); } catch (e) {}
+        var st = document.createElement('style');
+        st.id = 'andosNoFlashGate';
+        st.textContent = '#yuvaGate,#loginScreen{display:none !important;visibility:hidden !important;opacity:0 !important;pointer-events:none !important}';
+        (document.head || document.documentElement).appendChild(st);
+        window.__ANDOS_INSTANT_BOOT = true;
+    } catch (e) {}
+})();
+</script>
 <script id="andos-sb13-storage-shim">
 /* ===== SB13: unified localStorage contract =====
    App ke parse-time reads se PEHLE install hota hai.
@@ -131,7 +169,7 @@
     <meta name="theme-color" content="#000000">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#000000">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000">
-    <meta name="andos-build" content="andos-v3-20261022g">
+    <meta name="andos-build" content="andos-v3-20261022h">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -154,7 +192,7 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261022g';
+        var HTML_BUILD_ID = 'andos-v3-20261022h';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
@@ -11490,6 +11528,89 @@ main.andos-main{overscroll-behavior-x:none}
 </style>
 
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+<style id="andos-nexus-ui">
+/* ---------- NETFLIX-STYLE CINEMATIC APP ENTRY (dashboard scale .95 -> 1 fade-in) ---------- */
+@keyframes andosCineIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.andos-cine-in { animation: andosCineIn .42s cubic-bezier(0.4, 0, 0.2, 1) both; will-change: transform, opacity; }
+#appSplashOverlay.andos-zoom-out, .andos-zoom-out {
+  transform: scale(2.2);
+  opacity: 0;
+  transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.35s ease;
+}
+
+/* ---------- DARK IDENTITY VAULT (Name / @username / UID / Email / Balance / Orders) ---------- */
+.iv-vault {
+  position: relative; margin: 10px 12px 4px; padding: 14px 14px 12px;
+  border-radius: 18px; color: #e8ecf4;
+  background: linear-gradient(135deg, #0d1117 0%, #151a26 55%, #1b1338 100%);
+  border: 1px solid rgba(124, 92, 255, .28);
+  box-shadow: 0 10px 30px -18px rgba(0,0,0,.9), inset 0 1px 0 rgba(255,255,255,.04);
+  overflow: hidden;
+}
+.iv-vault::after {
+  content: ''; position: absolute; inset: -40% -10% auto auto; width: 180px; height: 180px;
+  background: radial-gradient(circle at 70% 30%, rgba(124,92,255,.22), transparent 65%);
+  pointer-events: none;
+}
+.iv-top { display: flex; align-items: center; gap: 12px; position: relative; z-index: 1; }
+.iv-ava {
+  width: 54px; height: 54px; border-radius: 50%; overflow: hidden; flex: 0 0 auto; cursor: pointer;
+  background: #20263a; display: grid; place-items: center;
+  box-shadow: 0 0 0 2px rgba(124,92,255,.55), 0 6px 16px -8px #000;
+}
+.iv-ava img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.iv-ava .iv-ini { font: 800 20px/1 'Plus Jakarta Sans', system-ui, sans-serif; color: #b9a8ff; }
+.iv-id { min-width: 0; flex: 1 1 auto; }
+.iv-name { display: block; font: 800 15px/1.2 'Plus Jakarta Sans', system-ui, sans-serif; color: #fff; letter-spacing: -.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.iv-handle { display: block; font: 700 11.5px/1.4 'Inter', system-ui, sans-serif; color: #9aa4bd; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.iv-email { display: block; font: 600 10.5px/1.4 'Inter', system-ui, sans-serif; color: #6f7893; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.iv-uid {
+  flex: 0 0 auto; border: 1px solid rgba(124,92,255,.45); background: rgba(124,92,255,.12);
+  color: #cfc4ff; border-radius: 999px; padding: 6px 10px; cursor: pointer;
+  font: 800 10.5px/1 'Inter', system-ui, sans-serif; display: inline-flex; align-items: center; gap: 5px;
+  -webkit-tap-highlight-color: transparent;
+}
+.iv-uid:active { transform: scale(.96); }
+.iv-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 12px; position: relative; z-index: 1; }
+.iv-stat { background: rgba(255,255,255,.045); border: 1px solid rgba(255,255,255,.07); border-radius: 12px; padding: 8px 6px; text-align: center; }
+.iv-stat b { display: block; font: 800 15px/1.2 'Sora','Plus Jakarta Sans', system-ui, sans-serif; color: #fff; }
+.iv-stat span { display: block; font: 700 9.5px/1.3 'Inter', system-ui, sans-serif; color: #8b94ad; margin-top: 2px; letter-spacing: .02em; }
+
+/* ---------- GUEST GUIDELINES / AGREEMENT MODAL (lightweight) ---------- */
+#andosGuestTerms {
+  position: fixed; inset: 0; z-index: 10060; display: none;
+  align-items: flex-end; justify-content: center;
+  background: rgba(2, 4, 12, .58); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+}
+#andosGuestTerms.show { display: flex; }
+.agt-sheet {
+  width: 100%; max-width: 460px; background: #0f1117; color: #e8ecf4;
+  border-radius: 20px 20px 0 0; padding: 18px 18px 20px;
+  box-shadow: 0 -18px 44px -20px #000; transform: translateY(100%);
+  transition: transform .34s cubic-bezier(.16,1,.3,1);
+  border-top: 1px solid rgba(124,92,255,.35);
+  font-family: 'Inter', system-ui, sans-serif;
+}
+#andosGuestTerms.show .agt-sheet { transform: translateY(0); }
+.agt-sheet h3 { margin: 0 0 6px; font: 800 16px/1.3 'Plus Jakarta Sans', system-ui, sans-serif; color: #fff; }
+.agt-sheet p.sub { margin: 0 0 12px; font-size: 12px; color: #8b94ad; font-weight: 600; }
+.agt-list { margin: 0 0 14px; padding: 0; list-style: none; }
+.agt-list li {
+  display: flex; gap: 9px; align-items: flex-start; font-size: 12.5px; font-weight: 600; color: #c7cee0;
+  padding: 9px 10px; border-radius: 12px; background: rgba(255,255,255,.04); margin-bottom: 8px;
+  border: 1px solid rgba(255,255,255,.06);
+}
+.agt-list li i { color: #7c5cff; margin-top: 1px; }
+.agt-actions { display: flex; gap: 10px; }
+.agt-btn { flex: 1 1 0; border: 0; border-radius: 14px; min-height: 46px; font: 800 13px/1 'Inter', system-ui, sans-serif; cursor: pointer; }
+.agt-btn.ghost { background: rgba(255,255,255,.07); color: #b9c1d4; }
+.agt-btn.go { background: linear-gradient(135deg, #6d28d9, #4f46e5); color: #fff; }
+.agt-btn:active { transform: scale(.98); }
+</style>
 </head>
 <!--YG-->
 <style id="andosOriginalLoginScopedStyles">
@@ -12259,6 +12380,23 @@ main.andos-main{overscroll-behavior-x:none}
       <button type="button" class="primary-btn" id="guestSave">Save &amp; Continue</button>
       <button type="button" class="ghost-btn" id="guestSkip">Skip for now</button>
       <p class="page-note" id="guestNote"></p>
+
+      <!-- GUEST GUIDELINES / AGREEMENT (device-bound guest lifecycle) -->
+      <div id="andosGuestTerms" role="dialog" aria-modal="true" aria-label="Guest account guidelines">
+        <div class="agt-sheet">
+          <h3><i class="fa-solid fa-shield-halved" style="color:#7c5cff;margin-right:6px"></i>Guest Account Guidelines</h3>
+          <p class="sub">Aage badhne se pehle ye 3 baatein samajh lein:</p>
+          <ul class="agt-list">
+            <li><i class="fa-solid fa-mobile-screen"></i><span><b>Device-specific:</b> Guest data isi device par save hota hai — doosre device par automatically available nahi hoga.</span></li>
+            <li><i class="fa-solid fa-hourglass-half"></i><span><b>45-day rule:</b> 45 din tak inactive rehne par guest session <b>expire</b> ho jayega aur data remove kar diya jayega.</span></li>
+            <li><i class="fa-brands fa-google"></i><span><b>Permanent rakhna hai?</b> Account ko hamesha ke liye safe rakhne ke liye <b>Link with Google</b> ka use karein — UID wahi rahega.</span></li>
+          </ul>
+          <div class="agt-actions">
+            <button type="button" class="agt-btn ghost" id="agtCancel">Cancel</button>
+            <button type="button" class="agt-btn go" id="agtAccept">I Understand · Continue</button>
+          </div>
+        </div>
+      </div>
     </div>
   </main>
 
@@ -12399,6 +12537,7 @@ main.andos-main{overscroll-behavior-x:none}
         try { ov.remove(); } catch (e) {}
         window.__andosSplashActive = false;
         window.__andosSplashDone = true;
+        try { window.__andosPlayCinematicEntry(); } catch (e) {}
         return;
     }
 
@@ -12413,13 +12552,27 @@ main.andos-main{overscroll-behavior-x:none}
         }
     } catch (e) {}
 
+    var ZOOM_MS = 470;
     function finishSplash() {
         if (done) return;
         done = true;
         try { sessionStorage.setItem('andos_splash_done', '1'); } catch (e) {}
         window.__andosSplashActive = false;
-        ov.style.opacity = '0';
+        try { ov.id = ov.id || 'andosSplashOv'; } catch (e) {}
+        // NETFLIX-STYLE CINEMATIC EXIT: video `ended` -> container zoom-in (scale 2.2) + fade out
+        try {
+            ov.classList.add('andos-zoom-out');
+            ov.style.transition = 'transform 0.45s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.35s ease';
+            ov.style.transformOrigin = 'center center';
+            ov.style.willChange = 'transform, opacity';
+            ov.style.transform = 'scale(2.2)';
+            ov.style.opacity = '0';
+        } catch (e) {
+            ov.style.opacity = '0';
+        }
         ov.style.pointerEvents = 'none';
+        // Dashboard scale(.95) -> scale(1) cinematic fade-in, bilkul Netflix app launch jaisa
+        try { window.__andosPlayCinematicEntry(); } catch (e) {}
         try {
             if (typeof window.__andosApplyStatus === 'function') window.__andosApplyStatus();
             else window.dispatchEvent(new Event('scroll'));
@@ -12428,7 +12581,7 @@ main.andos-main{overscroll-behavior-x:none}
             try { ov.remove(); } catch (e) {}
             window.__andosSplashDone = true;
             try { document.dispatchEvent(new CustomEvent('andos:splash:done')); } catch (e) {}
-        }, 230);
+        }, ZOOM_MS);
     }
 
     function maybeFinish() {
@@ -13217,6 +13370,18 @@ main.andos-main{overscroll-behavior-x:none}
             window.syncOriginalUserDp(tg2.files[0]);
         }
     }, true);
+
+    /* ===== NETFLIX-STYLE CINEMATIC DASHBOARD ENTRY (scale .95 -> 1 + fade) ===== */
+    window.__andosPlayCinematicEntry = function () {
+        try {
+            var host = document.querySelector('main.andos-main') || document.getElementById('app');
+            if (!host) return;
+            host.classList.remove('andos-cine-in');
+            void host.offsetWidth;
+            host.classList.add('andos-cine-in');
+            setTimeout(function () { try { host.classList.remove('andos-cine-in'); } catch (e) {} }, 620);
+        } catch (e) {}
+    };
 
     // ---- CUSTOM PLANS (admin broadcast) merge on load ----
     (function () {
@@ -15894,6 +16059,7 @@ const PLANS = {
                 return;
             }
             gateEl = liveGate;
+            try { var nf = document.getElementById('andosNoFlashGate'); if (nf && nf.parentNode) nf.parentNode.removeChild(nf); } catch (e) {}
             document.documentElement.classList.add('yg-lock');
             document.documentElement.setAttribute('data-auth', 'login');
             setGoogleBusy(false);
@@ -16253,12 +16419,29 @@ const PLANS = {
                 showPage('guestPage');
             });
         }
+        /* ===== BOSS RULE: "Guest" / "Guest_XXX" / generic naam kabhi nahi ===== */
+        var GENERIC_GUEST_RE = /^(guest|user|player|member|test|demo|anonymous|unknown|newuser|admin)([\s_\-.]*[0-9a-z]{0,8})?$/i;
+        function isGenericGuestInput(v) {
+            var t = String(v || '').trim();
+            if (!t) return true;
+            if (GENERIC_GUEST_RE.test(t)) return true;
+            if (/^guest[\s_\-]/i.test(t)) return true;
+            if (t.length < 3) return true;
+            return false;
+        }
+        window.__andosIsGenericGuestInput = isGenericGuestInput;
+
         if (saveBtn) {
             saveBtn.addEventListener('click', function () {
                 var nm = nameIn ? nameIn.value.trim() : '';
                 if (!nm) {
-                    if (guestNote) guestNote.textContent = 'Please enter your name or tap Skip for now.';
+                    if (guestNote) guestNote.textContent = 'Apna naam darj karein (ya Skip dabayein — hum ek stylish gaming name auto-assign kar denge).';
                     if (nameIn) nameIn.focus();
+                    return;
+                }
+                if (isGenericGuestInput(nm)) {
+                    if (guestNote) guestNote.textContent = 'Ye naam allowed nahi hai. Apna asli naam likhein ya Skip karke auto gaming name le lein.';
+                    if (nameIn) { nameIn.focus(); nameIn.select(); }
                     return;
                 }
                 window.__andosGuestLogin({ name: nm, photo: photoData }).catch(function () {});
@@ -16266,9 +16449,32 @@ const PLANS = {
         }
         if (skipBtn) {
             skipBtn.addEventListener('click', function () {
-                window.__andosGuestLogin({ name: '', photo: photoData }).catch(function () {});
+                // Skip -> agreement modal -> 3.68 crore pool se stylish auto name
+                openGuestAgreement();
             });
         }
+
+        /* ===== GUEST GUIDELINES AGREEMENT MODAL ===== */
+        function openGuestAgreement() {
+            var box = document.getElementById('andosGuestTerms');
+            if (!box) { window.__andosGuestLogin({ name: '', photo: photoData }).catch(function () {}); return; }
+            box.classList.add('show');
+        }
+        function closeGuestAgreement() {
+            var box = document.getElementById('andosGuestTerms');
+            if (box) box.classList.remove('show');
+        }
+        window.__andosOpenGuestAgreement = openGuestAgreement;
+        var agtAccept = document.getElementById('agtAccept');
+        var agtCancel = document.getElementById('agtCancel');
+        if (agtCancel) agtCancel.addEventListener('click', function () { closeGuestAgreement(); });
+        if (agtAccept) agtAccept.addEventListener('click', function () {
+            try { localStorage.setItem('andos_guest_agreement', '1'); } catch (e) {}
+            closeGuestAgreement();
+            window.__andosGuestLogin({ name: '', photo: photoData }).catch(function () {});
+        });
+        var termsBox = document.getElementById('andosGuestTerms');
+        if (termsBox) termsBox.addEventListener('click', function (ev) { if (ev.target === termsBox) closeGuestAgreement(); });
 
         // === NATIVE GOOGLE IDENTITY SERVICES (GIS) ONE TAP BOTTOM SHEET + DIRECT IN-PLACE AUTH ===
         var gProvider = new firebase.auth.GoogleAuthProvider();
@@ -20679,11 +20885,47 @@ const PLANS = {
             if (card) useHomeCoupon(card.getAttribute('data-code'));
         });
     };
+    /* ===== DARK IDENTITY VAULT: Name / @username / 7-digit UID / Email / Balance / Orders (0ms, local state) ===== */
+    function IdentityVaultCard() {
+        try {
+            const nm = escapeHtml(user.name || 'ANDOS Member');
+            const un = escapeHtml(user.username || '');
+            const pid = escapeHtml(String(user.publicId || ''));
+            const em = escapeHtml(user.email || '');
+            const bal = Number(wallet || 0).toLocaleString('en-IN');
+            const ordCount = Array.isArray(orders) ? orders.length : 0;
+            const pts = Number(loyaltyPoints || 0).toLocaleString('en-IN');
+            const av = String((typeof getProfileAvatar === 'function' ? getProfileAvatar() : '') || user.photoURL || localStorage.getItem('andos_profile_avatar') || '');
+            const ini = escapeHtml(String((user.name || user.username || 'A').trim().charAt(0)).toUpperCase());
+            const avHtml = av
+                ? '<img src="' + av.replace(/"/g, '%22') + '" alt="Profile photo">'
+                : '<span class="iv-ini">' + ini + '</span>';
+            return `
+            <section class="iv-vault" id="andosIdentityVault">
+                <div class="iv-top">
+                    <div class="iv-ava" role="button" onclick="navigate('account')" aria-label="Open profile">${avHtml}</div>
+                    <div class="iv-id">
+                        <b class="iv-name">${nm}</b>
+                        ${un ? '<span class="iv-handle">@' + un + '</span>' : ''}
+                        <span class="iv-email">${em || (user.isGuest ? 'Guest account \u00B7 device-bound' : 'No email on file')}</span>
+                    </div>
+                    ${pid ? '<button type="button" class="iv-uid" onclick="event.stopPropagation();navigator.clipboard&&navigator.clipboard.writeText(\'' + pid + '\');showToast(\'UID copied\',\'success\')"><i class="fa-solid fa-fingerprint"></i>UID <b>' + pid + '</b><i class="fa-regular fa-copy"></i></button>' : ''}
+                </div>
+                <div class="iv-stats">
+                    <div class="iv-stat" onclick="navigate('wallet')"><b>\u20B9${bal}</b><span>Wallet Balance</span></div>
+                    <div class="iv-stat" onclick="navigate('orders')"><b>${ordCount}</b><span>Total Orders</span></div>
+                    <div class="iv-stat" onclick="navigate('loyalty')"><b>${pts}</b><span>Loyalty Pts</span></div>
+                </div>
+            </section>`;
+        } catch (e) { return ''; }
+    }
+
     function HomePage() {
         const filteredServicesCache = getFilteredServices();
 
         return `
             <div class="page-enter">
+                ${IdentityVaultCard()}
                 <div class="andos-fx" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
                 <div class="evt-page-sparks" id="evtPageSparks" aria-hidden="true"><i style="left:12%"></i><i style="left:28%;animation-delay:.4s"></i><i style="left:44%;animation-delay:.8s"></i><i style="left:60%;animation-delay:1.1s"></i><i style="left:76%;animation-delay:1.5s"></i><i style="left:88%;animation-delay:1.9s"></i></div>
                                 ${renderHomeCarousel()}
