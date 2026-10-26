@@ -169,7 +169,7 @@
     <meta name="theme-color" content="#000000">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#000000">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000">
-    <meta name="andos-build" content="andos-v3-20261022j">
+    <meta name="andos-build" content="andos-v3-20261022k">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -192,7 +192,7 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261022j';
+        var HTML_BUILD_ID = 'andos-v3-20261022k';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
@@ -3466,13 +3466,51 @@
             padding: 8px 4px calc(8px + env(safe-area-inset-bottom)) 4px;
         }
         html.dark #bottomNav { background: rgba(15,20,34,0.95); border-top-color: rgba(255,255,255,0.06); }
-        .bnav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; flex: 1; cursor: pointer; padding: 6px 0; border-radius: 14px; transition: all 0.25s ease; color: #94a3b8; }
+        .bnav-item { position: relative; z-index: 0; display: flex; flex-direction: column; align-items: center; gap: 3px; flex: 1; cursor: pointer; padding: 6px 0; border-radius: 14px; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); color: #94a3b8; -webkit-tap-highlight-color: transparent; }
         .bnav-item.active { color: #4F46E5; }
         .bnav-item i { font-size: 19px; transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1); }
         .bnav-item.active i { transform: translateY(-3px) scale(1.1); }
         .bnav-item span { font-size: 10px; font-weight: 700; }
         .bnav-item .bnav-dot { width: 4px; height: 4px; border-radius: 50%; background: #4F46E5; opacity: 0; transition: opacity 0.25s ease; margin-top: -2px; }
         .bnav-item.active .bnav-dot { opacity: 1; }
+        .bnav-item.active .bnav-dot { opacity: 1; }
+
+        /* ---- ACTIVE PILL INDICATOR (rounded capsule + soft neon glow, Material-3 style) ---- */
+        #bottomNav .bnav-item::before {
+            content: '';
+            position: absolute; z-index: -1;
+            top: 1px; bottom: 1px; left: 5px; right: 5px;
+            border-radius: 999px;
+            background: #0284c718;
+            box-shadow: 0 6px 16px rgba(2, 132, 199, .16), inset 0 0 0 1px rgba(2, 132, 199, .14);
+            opacity: 0;
+            transform: scale(.82);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+        }
+        #bottomNav .bnav-item.active::before {
+            opacity: 1;
+            transform: scale(1);
+            animation: bnavPillPop 0.34s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        @keyframes bnavPillPop {
+            0%   { transform: scale(.86); }
+            55%  { transform: scale(1.06); }
+            100% { transform: scale(1); }
+        }
+        #bottomNav .bnav-item.active { color: #0284c7; font-weight: 800; }
+        #bottomNav .bnav-item.active i {
+            transform: translateY(-2px) scale(1.14);
+            filter: drop-shadow(0 4px 10px rgba(2, 132, 199, .28));
+        }
+        #bottomNav .bnav-item.active span { font-weight: 800; letter-spacing: .01em; }
+        #bottomNav .bnav-item .bnav-dot { display: none; }
+        #bottomNav .bnav-item:active { transform: scale(.94); }
+        html.dark #bottomNav .bnav-item.active { color: #38bdf8; }
+        html.dark #bottomNav .bnav-item.active::before {
+            background: rgba(56, 189, 248, .16);
+            box-shadow: 0 6px 16px rgba(56, 189, 248, .18), inset 0 0 0 1px rgba(56, 189, 248, .20);
+        }
 
         /* ---- ADMIN ---- */
         .admin-stat { background: white; border-radius: 20px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
