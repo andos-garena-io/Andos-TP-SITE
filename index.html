@@ -169,7 +169,7 @@
     <meta name="theme-color" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0f19">
-    <meta name="andos-build" content="andos-v3-20261022t">
+    <meta name="andos-build" content="andos-v3-20261022u">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -192,7 +192,7 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261022t';
+        var HTML_BUILD_ID = 'andos-v3-20261022u';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
@@ -300,7 +300,7 @@
           var shell = document.querySelector('.andos-shell');
           var page = shell ? shell.getAttribute('data-page') : '';
           if (page === 'home' || !page) return PINK;                 // home pink hero
-          if (page === 'wallet') return '#4f2a67';                   // .wal-hero design blend (gradient+gold glow)
+          if (page === 'wallet') return '#2e1065';                   // FIX-U(5): .wal-hero gradient EXACT top stop — status bar exact purple, alag patti nahi
           if (page === 'leaderboard') return '#f8f5ff';              // shell lavender
           if (page === 'account') return '#eef2ff';                  // .pf-page gradient top
           if (page === 'activity') return '#fff7ed';                 // shell cream
@@ -328,6 +328,16 @@
           for (var i = 0; i < ms.length; i++) { if (ms[i].getAttribute('content') !== c) ms[i].setAttribute('content', c); }
         }
         window.__andosWriteMetaTheme = writeMetaTheme;
+        // FIX-U(1): home glass progress -> status-bar color INTERPOLATE (jump band)
+        window.__andosHomeMetaP = function (p) {
+          if (window.__andosSplashActive) return;
+          var gateU = document.getElementById('yuvaGate');
+          if (gateU && !gateU.classList.contains('yg-out')) { writeMetaTheme('#ffffff'); return; }
+          if (!(p > 0)) { writeMetaTheme(baseColor()); return; }
+          if (p >= 1) { writeMetaTheme(WHITE); return; }
+          var rr = Math.round(249 + 6 * p), gg = Math.round(168 + 87 * p), bb = Math.round(212 + 43 * p);
+          writeMetaTheme('rgb(' + rr + ',' + gg + ',' + bb + ')');
+        };
         function setTheme(c) {
           if (window.__andosSplashActive) return; // splash chal raha hai -> status bar BLACK rahega
           var m = document.querySelector('meta[name="theme-color"]');
@@ -381,9 +391,14 @@
           var isHome = (pg === 'home' || !pg);
           // FIX-T: pull par WHITE theme nahi — page ka original header color bana rahe
           if (isHome) {
+            // FIX-U(1): threshold-based setState HATAO — hi progress (y/80) se --hdr-p + meta interpolate
             var nav = document.querySelector('nav.glass-nav');
-            var scrolled = nav ? nav.classList.contains('is-scrolled') : (window.scrollY > 18);
-            setTheme(scrolled ? WHITE : baseColor());
+            var hsU = document.querySelector('.page-section[data-sec="home"]');
+            var yU = hsU ? (hsU.scrollTop || 0) : (window.scrollY || 0);
+            var pU = yU / 80; if (pU < 0) pU = 0; if (pU > 1) pU = 1;
+            if (nav) nav.style.setProperty('--hdr-p', String(pU));
+            if (typeof window.__andosHomeMetaP === 'function') window.__andosHomeMetaP(pU);
+            else setTheme(baseColor());
           } else {
             var sc = sampledColor();
             setTheme(sc || baseColor()); // real header color; map only as fallback
@@ -397,6 +412,8 @@
         document.addEventListener('andos:splash:done', function () { setTimeout(onScroll, 50); });
         document.addEventListener('touchstart', function (e) { startY = e.touches[0].clientY; }, { passive: true });
         document.addEventListener('touchmove', function (e) {
+          // FIX-U(2): [data-hswipe] strip touch par ye global handler RETURN kare — strip apna swipe khud khaye
+          if (e.target && e.target.closest && e.target.closest('[data-hswipe]')) return;
           var __psTop = 0;
           if (document.getElementById('pageSlider')) {
             var __pg = document.querySelector('.andos-shell');
@@ -413,6 +430,21 @@
             try { onScroll(); } catch (e) {} // resync — theme color page par wapas
           }
         }, { passive: true });
+        // FIX-U(2): TAB-SWIPE BLOCKER — touch [data-hswipe] par shuru hui ho to strip/chain ka horizontal
+        // scroll wahi ruk jaye: strip scrollable ho to strip chale (edge par chain block), warna pura block.
+        // Isse #pageSlider tak chain kabhi nahi pahunchti — tab kabhi swipe se nahi badalta.
+        document.addEventListener('touchmove', function (e) {
+          var sU = e.target && e.target.closest && e.target.closest('[data-hswipe]');
+          if (!sU) return;
+          var nU = e.target, canU = false;
+          while (nU) {
+            if (nU.scrollWidth && nU.scrollWidth > nU.clientWidth + 4 &&
+                nU.scrollLeft < nU.scrollWidth - nU.clientWidth - 1) { canU = true; break; }
+            if (nU === sU) break;
+            nU = nU.parentElement;
+          }
+          if (!canU && e.cancelable) e.preventDefault();
+        }, { passive: false, capture: true });
         window.addEventListener('scroll', onScroll, { passive: true });
         // FIX-T: capture-phase scroll router — section/main scrolling (window fixed) ke liye hero+status sync
         if (!window.__andosFixtScrollRouter) {
@@ -2608,20 +2640,13 @@
         }
 
         .andos-shell[data-page="home"] nav.glass-nav.enterprise-nav.hero-over-image {
-            /* PINK MERGE: toolbar ka pink niche content se seamlessly blend ho (white strip khatam) */
-            background: transparent !important;
-            border-bottom-color: transparent !important;
-            box-shadow: none !important;
-            backdrop-filter: none !important;
-            -webkit-backdrop-filter: none !important;
-            transition: background .28s ease, box-shadow .28s ease, border-color .28s ease, backdrop-filter .28s ease;
-        }
-        .andos-shell[data-page="home"] nav.glass-nav.enterprise-nav.hero-over-image.is-scrolled {
-            background: rgba(255,255,255,.58) !important;
-            border-bottom-color: rgba(15, 23, 42, 0.06) !important;
-            box-shadow: 0 1px 0 rgba(255,255,255,.35) inset, 0 10px 28px rgba(15,23,42,.06) !important;
-            backdrop-filter: blur(16px) saturate(160%) !important;
-            -webkit-backdrop-filter: blur(16px) saturate(160%) !important;
+            /* FIX-U(1): SCROLL-LINKED glass — bg alpha + blur + border sab --hdr-p (0..1 = y/80) se continuous.
+               p=0 se p=1 tak koi jump nahi; threshold rule/transition dono HATA diye. safe-area status-bar ke neeche glass. */
+            background: rgba(255, 255, 255, calc(var(--hdr-p, 0) * .58)) !important;
+            border-bottom-color: rgba(15, 23, 42, calc(var(--hdr-p, 0) * .06)) !important;
+            box-shadow: 0 1px 0 rgba(255, 255, 255, calc(var(--hdr-p, 0) * .35)) inset, 0 10px 28px rgba(15, 23, 42, calc(var(--hdr-p, 0) * .06)) !important;
+            backdrop-filter: blur(calc(var(--hdr-p, 0) * 16px)) saturate(160%) !important;
+            -webkit-backdrop-filter: blur(calc(var(--hdr-p, 0) * 16px)) saturate(160%) !important;
         }
         .home-topbar {
             box-sizing: border-box !important;
@@ -2791,7 +2816,7 @@
             padding: 8px 4px calc(8px + env(safe-area-inset-bottom)) 4px;
         }
         html.dark #bottomNav { background: rgba(15,20,34,0.95); border-top-color: rgba(255,255,255,0.06); }
-        .bnav-item { position: relative; z-index: 0; display: flex; flex-direction: column; align-items: center; gap: 3px; flex: 1; cursor: pointer; height: 48px; padding: 0; justify-content: center; border-radius: 14px; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); color: #7C8BA1; -webkit-tap-highlight-color: transparent; }
+        .bnav-item { position: relative; z-index: 0; display: flex; flex-direction: column; align-items: center; gap: 3px; flex: 1; cursor: pointer; height: 48px; padding: 0; justify-content: center; border-radius: 14px; color: #7C8BA1; -webkit-tap-highlight-color: transparent; overflow: visible; touch-action: manipulation; /* FIX-U(3): tap transition HATAO + instant tap */ }
         .bnav-item.active { color: #4F46E5; }
         .bnav-item i { font-size: 22px; }
         /* boss directive: icon lift/grow HATAO — icon sirf outline->fill swap kare, size/position static */
@@ -2804,24 +2829,19 @@
         #bottomNav .bnav-item::before {
             content: '';
             position: absolute; z-index: -1;
-            inset: -2px 2px; /* FIX-T(6): vertical grow — icon ke upar kaafi + saman jagah, katta nahi */
+            inset: 2px; /* FIX-U(3): ORIGINAL reference capsule wapas (item ke andar, h44) — upar se katta nahi, poora gol */
             border-radius: 999px;
             background: rgba(79, 70, 229, 0.10);
             border: none;
             box-shadow: none;
             opacity: 0;
             transform: scale(.94);
-            transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1), transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             pointer-events: none;
         }
         #bottomNav .bnav-item.active::before {
             opacity: 1;
             transform: scale(1);
-            animation: bnavPillIn 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        @keyframes bnavPillIn {
-            from { opacity: 0; transform: scale(.94); }
-            to   { opacity: 1; transform: scale(1); }
+            /* FIX-U(3): bnavPillIn tap animation HATAO — pill instant on/off */
         }
         #bottomNav .bnav-item.active { color: #4F46E5; font-weight: 700; }
         /* FIX-R: ALL icons solid/filled (22px) — inactive slate, active indigo */
@@ -2829,7 +2849,7 @@
         #bottomNav .bnav-item.active i { color: #4F46E5; -webkit-text-stroke-width: 0; }
         #bottomNav .bnav-item.active span { font-weight: 700; }
         #bottomNav .bnav-item .bnav-dot { display: none; }
-        #bottomNav .bnav-item:active { transform: scale(.96); }
+        /* FIX-U(3): :active scale(.96) tap animation HATAO — tap turant chale */
         html.dark #bottomNav .bnav-item.active { color: #a5b4fc; }
         html.dark #bottomNav .bnav-item i:not(.active) { color: #94a3b8; -webkit-text-stroke-width: 0; }
         /* ---- INSTAGRAM-STYLE DP on Profile tab: 24x24 circle (layout box 22 via -1px margins), active ring, initials fallback ---- */
@@ -4085,6 +4105,7 @@ html, body {
   width: min(100%,430px);
   max-height: min(92vh,760px);
   overflow: auto;
+  overscroll-behavior: contain; /* FIX-U(6) */
   border: 1px solid rgba(255,255,255,.78);
   border-radius: 34px;
   padding: 24px 22px 22px;
@@ -4978,6 +4999,7 @@ html, body {
 .upcoming-names-scroll {
   max-height: 320px;
   overflow: auto;
+  overscroll-behavior: contain; /* FIX-U(6) */
   padding: 6px 12px 16px;
   -webkit-overflow-scrolling: touch;
 }
@@ -7779,7 +7801,7 @@ main.andos-main{overscroll-behavior-x:none}
 .od-page,.wal-page,.pf-page,.txn-page,.sp-page,.catd-page,.odd-page,.os2-page{padding-bottom:110px !important}
 .andos-shell[data-page="home"] footer{padding-bottom:92px}
 /* ===== Unified page headers: same position, same size on every page ===== */
-:root{--hdr-font:'Suez One',Georgia,serif;--hdr-size:30px;--hdr-top:18px;--hdr-x:18px}
+:root{--hdr-font:'Suez One',Georgia,serif;--hdr-size:30px;--hdr-top:calc(18px + env(safe-area-inset-top, 0px));--hdr-x:18px} /* FIX-U(5): safe-area ke niche tak content + bg */
 .xplore-head h1,.od-title,.wal-hero h1,.pf-title h1,.txn-bar h1,.sp-bar h1,.odd-bar h1,.catd-bar h1{
   font-family:var(--hdr-font) !important;font-weight:400 !important;font-size:var(--hdr-size) !important;line-height:1.1 !important;letter-spacing:-.01em !important;margin:0 !important;color:#111 !important;
 }
@@ -14988,7 +15010,7 @@ const PLANS = {
             <div class="min-h-screen andos-shell" data-page="${currentPage}" data-dark="${window.__andosDarkPage ? 'true' : 'false'}">
                 <div class="evt-page-sparks" id="evtPageSparks" aria-hidden="true"></div>
                 <div id="toastContainer" class="fixed top-4 inset-x-0 z-[400] flex flex-col items-center gap-2.5 pointer-events-none px-4"></div>
-                ${__isMain5 ? `<div id="topNavSlot">${Navbar()}</div>` : (showNav ? Navbar() : '')}
+                ${__isMain5 ? (currentPage === 'home' ? `<div id="topNavSlot">${Navbar()}</div>` : /* FIX-U(4): HomeHeader route-level sirf HOME */ '') : (showNav ? Navbar() : '')}
                 ${__isMain5 ? `<main class="page-enter andos-main" data-dark="${window.__andosDarkPage ? 'true' : 'false'}" style="${showBottomNav ? 'padding-bottom:0;' : ''}"><div class="page-slider" id="pageSlider">${__ANDOS_MAIN_SECS.map(function (s) { return `<div class="page-section" data-sec="${s}" data-filled="${s === currentPage ? '1' : '0'}">${s === currentPage ? content : ''}</div>`; }).join('')}</div></main>` : `<main class="page-enter andos-main" data-dark="${window.__andosDarkPage ? 'true' : 'false'}" style="${showBottomNav ? 'padding-bottom:0;' : ''}">${content}</main>`}
                 ${(!__isMain5) && showFooter ? Footer() : ''}
                 ${showBottomNav ? BottomNav() : ''}
@@ -15139,7 +15161,7 @@ const PLANS = {
         }
         var __cHTML = `
             <section class="px-5 mt-5" aria-label="Promotional offers">
-                <div id="homeCarousel" class="home-carousel pixel-carousel" role="region" aria-roledescription="carousel" aria-label="ANDOS offers">
+                <div id="homeCarousel" data-hswipe class="home-carousel pixel-carousel" role="region" aria-roledescription="carousel" aria-label="ANDOS offers">
                     <div id="homeCarouselTrack" class="home-carousel-track" style="scroll-behavior:auto;">
                         ${HOME_BANNERS.map((banner, index) => `
                             <button type="button" class="home-carousel-slide campaign-banner-slide banner-${index + 1} w-full h-full" onclick="handleHomeBannerTap('${banner.action}','${banner.target}')" role="group" aria-roledescription="slide" aria-label="${index + 1} of ${HOME_BANNERS.length}: ${escapeHtml(banner.alt)}" aria-hidden="${index !== _homeCarouselIndex}" style="display: block !important; width: 100% !important; height: 100% !important; aspect-ratio: 16 / 9 !important; overflow: hidden !important;">
@@ -15888,7 +15910,7 @@ const PLANS = {
 
                 <div class="max-w-5xl mx-auto px-5 py-6">
                     <div id="searchSummary" class="mb-5">${renderSearchSummaryHTML(data)}</div>
-                    <div id="searchFilterTabs" class="${searchQuery.trim() ? 'flex' : 'hidden'} gap-2 overflow-x-auto hide-scrollbar mb-6">
+                    <div id="searchFilterTabs" data-hswipe class="${searchQuery.trim() ? 'flex' : 'hidden'} gap-2 overflow-x-auto hide-scrollbar mb-6">
                         ${[['all','All Results'],['services','Services'],['plans','Plans']].map(([id,label]) => `<button type="button" data-search-filter="${id}" onclick="setSearchResultFilter('${id}')" class="search-filter-btn ${searchResultFilter === id ? 'active' : ''} px-4 py-2 rounded-xl border border-gray-200 bg-white text-gray-600 font-bold text-xs whitespace-nowrap">${label}</button>`).join('')}
                     </div>
                     <div id="globalSearchResults">${renderSearchPageResults()}</div>
@@ -16969,7 +16991,7 @@ const PLANS = {
         const items = featured.concat(extra);
         return `
             <section class="home-service-strip" aria-label="Browse services">
-                <div class="home-service-hscroll" id="homeServiceHscroll">
+                <div class="home-service-hscroll" id="homeServiceHscroll" data-hswipe>
                 ${items.map(function(s) {
                     const icon = s.icon || ('<i class="' + (s.faIcon || 'fa-solid fa-store') + ' text-indigo-500 text-lg"></i>');
                     return `<button type="button" class="home-service-chip" onclick="navigate('plans', {service:'${s.id}'})">
@@ -17128,7 +17150,7 @@ const PLANS = {
         const dots = list.map(function(_, i) {
             return '<button type="button" class="promo-dot'+(i===_promoBannerIndex?' on':'')+'" onclick="goPromoBanner('+i+')" aria-label="Banner '+(i+1)+'"></button>';
         }).join('');
-        return '<section class="promo-rail" id="promoRail" aria-label="Offers">'
+        return '<section class="promo-rail" id="promoRail" data-hswipe aria-label="Offers">'
             + '<div class="promo-track" id="promoTrack" style="transform:translateX(-'+(_promoBannerIndex*100)+'%)">'+slides+'</div>'
             + '<div class="promo-dots">'+dots+'</div></section>';
     }
@@ -17182,7 +17204,7 @@ const PLANS = {
             return '<article class="ff-ps-card"><img src="'+src+'" alt="Free Fire" draggable="false"></article>';
         }).join('');
         return '<section class="ff-story-rail" aria-label="Free Fire moments"><div class="ff-story-h"><b>Free Fire Max</b><span>Swipe</span></div>'
-            + '<div class="ff-ps" id="ffPsRail">'+html+'</div></section>';
+            + '<div class="ff-ps" id="ffPsRail" data-hswipe>'+html+'</div></section>';
     }
     window.initFfLoop = function () {
         var box = document.getElementById('ffLoop');
@@ -17611,7 +17633,7 @@ const PLANS = {
 
                 <section class="cpn-block">
                     <h3 class="cpn-head"><i class="fa-solid fa-tags"></i> Active Coupons</h3>
-                    <div class="cpn-rail" id="homeCouponRail">
+                    <div class="cpn-rail" id="homeCouponRail" data-hswipe>
                         ${COUPONS.map(c => {
                             const st = couponGate(c);
                             const lock = st.lock ? ' is-lock' : '';
@@ -18001,7 +18023,7 @@ function renderBgmiCustomBuilder() {
                                 ${locked ? '<i class="fa-solid fa-lock mr-2"></i>Verify First' : '<i class="fa-solid fa-bolt mr-2"></i>Build UC Pack'}
                             </button>
                         </div>
-                        <div class="flex gap-2 overflow-x-auto hide-scrollbar mt-3 pb-1">
+                        <div class="flex gap-2 overflow-x-auto hide-scrollbar mt-3 pb-1" data-hswipe>
                             ${[60,325,660,1800,3850,10000,25000,50000].map(value => `<button type="button" onclick="setCustomBgmiUcAmount(${value})" class="inline-block whitespace-nowrap bg-white/10 hover:bg-white/15 border border-white/10 rounded-xl px-3 py-2 text-[10px] font-black">${value.toLocaleString('en-IN')} UC</button>`).join('')}
                         </div>
                         <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-5" style="font-variant-numeric:tabular-nums">
@@ -18305,7 +18327,7 @@ function renderFreeFireGraphics() {
             + '<div id="scMsgs" style="flex:1;overflow-y:auto;padding:16px 14px 12px;display:flex;flex-direction:column;gap:10px;max-width:720px;width:100%;margin:0 auto;"></div>'
             + '<div id="scPhotoBar" style="display:none;max-width:720px;width:100%;margin:0 auto;padding:0 14px 8px;">'
             + '<div style="display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:14px;padding:6px 10px;"><img id="scPhotoPrev" style="width:40px;height:40px;border-radius:10px;object-fit:cover;" alt=""><span style="font-size:10px;color:#4338ca;font-weight:800;">Photo ready</span><button type="button" id="scPhotoRm" style="border:0;background:rgba(239,68,68,.15);color:#f87171;width:26px;height:26px;border-radius:50%;cursor:pointer;"><i class="fa-solid fa-xmark"></i></button></div></div>'
-            + '<div style="display:flex;gap:6px;overflow-x:auto;max-width:720px;width:100%;margin:0 auto;padding:0 14px 8px;">' + ['Order issue hai', 'Payment kat gayi', 'Referral reward chahiye', 'Membership chalu nahi hui', 'File bhejni hai'].map(function (q) { return '<button type="button" class="sc-chip2" style="flex:0 0 auto;border:1px solid rgba(0,0,0,.08);background:#fff;color:#4338ca;font-size:10px;font-weight:800;padding:7px 12px;border-radius:999px;cursor:pointer;">' + q + '</button>'; }).join('') + '</div>'
+            + '<div data-hswipe style="display:flex;gap:6px;overflow-x:auto;max-width:720px;width:100%;margin:0 auto;padding:0 14px 8px;">' + ['Order issue hai', 'Payment kat gayi', 'Referral reward chahiye', 'Membership chalu nahi hui', 'File bhejni hai'].map(function (q) { return '<button type="button" class="sc-chip2" style="flex:0 0 auto;border:1px solid rgba(0,0,0,.08);background:#fff;color:#4338ca;font-size:10px;font-weight:800;padding:7px 12px;border-radius:999px;cursor:pointer;">' + q + '</button>'; }).join('') + '</div>'
 + '<div style="max-width:720px;width:100%;margin:0 auto;padding:8px 14px calc(12px + env(safe-area-inset-bottom,0px));">'
             + '<div style="display:flex;align-items:flex-end;gap:8px;background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:26px;box-shadow:0 4px 16px -8px rgba(15,23,42,.15);padding:8px 10px;">'
             + '<button type="button" id="scTeacher" title="AI Teacher" style="width:38px;height:38px;border:0;border-radius:50%;background:rgba(0,0,0,.05);color:#b45309;font-size:15px;cursor:pointer;flex:0 0 auto;"><i class="fa-solid fa-graduation-cap"></i></button>'
@@ -19957,10 +19979,10 @@ function renderFreeFireGraphics() {
                         <button type="button" class="od-filterchip" onclick="setOrderFilter(orderFilter === 'all' ? 'pending' : 'all')"><i class="fa-solid fa-sliders"></i> Filter</button>
                     </div>
                 </div>
-                <div class="od-scroller" id="orderCatTabs">
+                <div class="od-scroller" id="orderCatTabs" data-hswipe>
                     ${cats.map(c => `<button type="button" class="od-chip ${orderCatFilter === c.id ? 'on' : ''}" onclick="setOrderCatFilter('${c.id}')"><i class="fa-solid ${c.icon}"></i> ${c.label}</button>`).join('')}
                 </div>
-                <div class="od-scroller od-status" id="orderTabs">
+                <div class="od-scroller od-status" id="orderTabs" data-hswipe>
                     ${statuses.map(c => `<button type="button" class="od-chip ${orderFilter === c.id ? 'on' : ''}" data-filter="${c.id}" onclick="setOrderFilter('${c.id}')">${c.id==='all' ? '<i class="fa-solid fa-layer-group"></i>' : '<i class="fa-solid fa-circle" style="font-size:8px;color:'+c.color+'"></i>'} ${c.label}</button>`).join('')}
                 </div>
                 <div id="ordersList">${renderOrdersList()}</div>
@@ -20583,6 +20605,7 @@ function renderFreeFireGraphics() {
         const name = escapeHtml(user.name || 'ANDOS Member');
         const mobile = escapeHtml(user.mobile || '');
         const email = escapeHtml(user.email || '');
+        const bio = escapeHtml(user.bio || '');
         const pts = Number(loyaltyPoints || 0);
         const link = String((window.buildRefLink ? window.buildRefLink() : (CONFIG.referralLink || CONFIG.siteUrl || 'https://tinyurl.com/Andos-i'))).replace(/"/g,'');
         const av = '<img id="pfLiveAva" data-live-avatar alt="Profile"><span data-avatar-fallback class="pf-fallback"><i class="fa-solid fa-user"></i></span>';
@@ -20598,7 +20621,8 @@ function renderFreeFireGraphics() {
                     <h2 class="pf-name">${name}</h2>
                     ${user.username ? '<p class="pf-mob" style="margin-top:2px;font-weight:700;opacity:.92">@' + escapeHtml(user.username) + '</p>' : ''}
                     ${user.publicId ? '<div style="margin-top:6px;display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:999px;background:rgba(15,23,42,.06);border:1px solid rgba(15,23,42,.1);font-size:11.5px;font-weight:800;color:#0f172a;cursor:pointer;" onclick="navigator.clipboard&&navigator.clipboard.writeText(\'' + escapeHtml(String(user.publicId)) + '\');showToast(\'Copied UID ' + escapeHtml(String(user.publicId)) + '\',\'success\')"><i class="fa-solid fa-id-badge" style="color:#4f46e5;"></i><span>UID: ' + escapeHtml(String(user.publicId)) + '</span><i class="fa-regular fa-copy" style="font-size:10px;opacity:.6;"></i></div>' : ''}
-                    <p class="pf-mob" style="margin-top:6px;">${mobile ? '+91 '+mobile : (email || (user.isGuest ? 'Server-Verified Guest Account' : 'Add mobile'))}</p>
+                    ${bio ? '<p class="pf-mob" style="margin-top:6px;opacity:.88;font-weight:600">' + bio + '</p>' : ''}
+                    ${email ? '<p class="pf-mob" style="margin-top:4px;opacity:.75">' + email + '</p>' : ''}
                     ${user.isGuest ? '<div style="margin-top:10px;"><button type="button" onclick="andosLinkGoogle()" style="padding:8px 16px;border-radius:999px;border:1px solid #0f172a;background:#0f172a;color:#fff;font-size:11.5px;font-weight:800;cursor:pointer;"><i class="fa-brands fa-google" style="margin-right:6px;"></i>Link with Google (Keep Same UID)</button></div>' : ''}
                 </div>
                 <div class="pf-actions">
@@ -20830,7 +20854,7 @@ function renderFreeFireGraphics() {
                         <div class="wait"><i class="fa-solid fa-hourglass-half"></i><div><small>Pending</small><b>${pendCount}</b></div></div>
                     </div>
                 </section>
-                <div class="txn-filters">
+                <div class="txn-filters" data-hswipe>
                     ${filters.map(f => '<button type="button" class="'+(txFilter===f[0]?'on':'')+'" onclick="setTxFilter(\''+f[0]+'\')">'+f[1]+'</button>').join('')}
                 </div>
                 <div class="txn-list">${body}</div>
@@ -21553,7 +21577,7 @@ function renderFreeFireGraphics() {
                         </div>
                     </div>
 
-                    <div class="flex gap-2 overflow-x-auto no-scrollbar mt-5 pb-1">
+                    <div class="flex gap-2 overflow-x-auto no-scrollbar mt-5 pb-1" data-hswipe>
                         ${tabs.map(function (t) {
                             const on = S.tab === t.id;
                             return '<button type="button" onclick="setStaffTab(\'' + t.id + '\')" class="shrink-0 px-3.5 py-2 rounded-xl text-xs font-black flex items-center gap-1.5 transition ' + (on ? 'bg-white text-slate-950 shadow' : 'bg-white/10 text-white/80') + '"><i class="fa-solid ' + t.icon + '"></i><span>' + escapeHtml(t.label) + '</span></button>';
@@ -22236,9 +22260,17 @@ function renderFreeFireGraphics() {
             var hs = document.querySelector('.page-section[data-sec="home"]');
             return (hs && document.getElementById('pageSlider')) ? (hs.scrollTop || 0) : (window.scrollY || document.documentElement.scrollTop || 0);
         })();
-        nav.classList.toggle('is-scrolled', y > 18);
-        // STATUS-BAR SYNC: white blur barrier active -> white; normal (pink hero) -> pink
-        if (typeof window.__andosWriteMetaTheme === 'function') window.__andosWriteMetaTheme(y > 18 ? '#ffffff' : '#F9A8D4');
+        // FIX-U(1): SCROLL-LINKED glass — sirf passive scroll + rAF, progress=clamp(y/80,0,1) -> --hdr-p.
+        // koi threshold visual setState nahi, koi CSS transition nahi (bg/blur/border isi progress se).
+        if (window.__andosHdrRaf) cancelAnimationFrame(window.__andosHdrRaf);
+        window.__andosHdrRaf = requestAnimationFrame(function () {
+            window.__andosHdrRaf = null;
+            var p = y / 80; if (p < 0) p = 0; if (p > 1) p = 1;
+            nav.style.setProperty('--hdr-p', String(p));
+            nav.classList.toggle('is-scrolled', y > 18); // sirf ann-ribbon/hooks — glass bg is par nahi
+            // STATUS-BAR: hi progress se meta interpolate (p=0 pink exact, p=1 white exact, beech me smooth)
+            if (typeof window.__andosHomeMetaP === 'function') window.__andosHomeMetaP(p);
+        });
     }
     if (!window.__andosHeroNavBound) {
         window.__andosHeroNavBound = true;
@@ -24633,6 +24665,8 @@ nav.glass-nav, .xplore-head, .od-title, .wal-hero, .txn-bar, .sp-bar, .odd-bar, 
 #topNavSlot { flex: none; }
 .andos-shell { position: relative; }
 .andos-shell[data-page="home"] #topNavSlot { position: absolute; top: 0; left: 0; right: 0; z-index: 44; }
+/* FIX-U(4): HomeHeader SIRF Home — fast-path (no rebuild) me bhi baaki tabs par slot band */
+.andos-shell:not([data-page="home"]) #topNavSlot { display: none; }
 /* FIX-T(4,5): EXACT viewport boundaries + dark base html/body/#app — pull par WHITE frame impossible,
    scroll content par hi ruke (container stretch nahi) */
 html, body, #app { height: 100%; overscroll-behavior-y: contain !important; }
@@ -24645,7 +24679,10 @@ html, body, #app { background-color: #0b0f19 !important; background-image: none 
 /* home hero stage ka purana -52px (flow-nav era) slider arch me double-count hota — cancel (slot absolute = overlay) */
 .page-section[data-sec="home"] .home-hero-stage { margin-top: 0 !important; }
 /* pull-gap = pink (hero top + status pink se blend); rest par content ke peeche chhupa */
-.page-section[data-sec="home"]::before { content: ''; position: absolute; top: -160px; left: 0; right: 0; height: 160px; background: #F9A8D4; z-index: -1; }
+.page-section[data-sec="home"]::before { content: ''; position: absolute; top: -72px; left: 0; right: 0; height: 72px; background: #F9A8D4; z-index: -1; } /* FIX-U(6): halka bounce */
+/* FIX-U(2): horizontal strips ka swipe strip ke andar reh — tab-switch chain band */
+[data-hswipe] { touch-action: pan-x; overscroll-behavior-x: contain; overscroll-behavior-y: contain; } /* FIX-U(6): strip y-bounce bhi contain */
+.page-enter { overscroll-behavior-y: contain; } /* FIX-U(6): .pf-page overflow-x:hidden -> computed overflow-y auto */
 </style>
 </body>
 </html>
