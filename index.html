@@ -169,7 +169,7 @@
     <meta name="theme-color" content="#000000">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#000000">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000">
-    <meta name="andos-build" content="andos-v3-20261022n">
+    <meta name="andos-build" content="andos-v3-20261022o">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -192,7 +192,7 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261022n';
+        var HTML_BUILD_ID = 'andos-v3-20261022o';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
@@ -3468,20 +3468,20 @@
         html.dark #bottomNav { background: rgba(15,20,34,0.95); border-top-color: rgba(255,255,255,0.06); }
         .bnav-item { position: relative; z-index: 0; display: flex; flex-direction: column; align-items: center; gap: 3px; flex: 1; cursor: pointer; padding: 6px 0; border-radius: 14px; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); color: #7C8BA1; -webkit-tap-highlight-color: transparent; }
         .bnav-item.active { color: #4F46E5; }
-        .bnav-item i { font-size: 18px; transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1); }
-        .bnav-item.active i { transform: translateY(-3px) scale(1.1); }
+        .bnav-item i { font-size: 18px; }
+        /* boss directive: icon lift/grow HATAO — icon sirf outline->fill swap kare, size/position static */
         .bnav-item span { font-size: 10px; font-weight: 700; }
         .bnav-item .bnav-dot { width: 4px; height: 4px; border-radius: 50%; background: #4F46E5; opacity: 0; transition: opacity 0.25s ease; margin-top: -2px; }
         .bnav-item.active .bnav-dot { opacity: 1; }
         .bnav-item.active .bnav-dot { opacity: 1; }
 
-        /* ---- ACTIVE PILL (exact reference: wide soft pastel capsule — flat, no border, no shadow) ---- */
+        /* ---- ACTIVE PILL (soft pastel capsule — flat, no border, no shadow; INDIGO pehle-wala theme; icons OUTLINE inactive -> FILL on touch) ---- */
         #bottomNav .bnav-item::before {
             content: '';
             position: absolute; z-index: -1;
             inset: 4px;
             border-radius: 999px;
-            background: rgba(2, 132, 199, 0.10);
+            background: rgba(79, 70, 229, 0.10);
             border: none;
             box-shadow: none;
             opacity: 0;
@@ -3498,12 +3498,16 @@
             from { opacity: 0; transform: scale(.94); }
             to   { opacity: 1; transform: scale(1); }
         }
-        #bottomNav .bnav-item.active { color: #0284c7; font-weight: 700; }
+        #bottomNav .bnav-item.active { color: #4F46E5; font-weight: 700; }
+        /* OUTLINE -> FILL: same glyph, inactive = outline (text-stroke), active = solid instantly on touch */
+        #bottomNav .bnav-item i { color: transparent; -webkit-text-stroke: 1.3px #7C8BA1; }
+        #bottomNav .bnav-item.active i { color: #4F46E5; -webkit-text-stroke-width: 0; }
         #bottomNav .bnav-item.active span { font-weight: 700; }
         #bottomNav .bnav-item .bnav-dot { display: none; }
         #bottomNav .bnav-item:active { transform: scale(.96); }
-        html.dark #bottomNav .bnav-item.active { color: #38bdf8; }
-        html.dark #bottomNav .bnav-item.active::before { background: rgba(56, 189, 248, 0.12); }
+        html.dark #bottomNav .bnav-item.active { color: #a5b4fc; }
+        html.dark #bottomNav .bnav-item i { -webkit-text-stroke: 1.3px #94a3b8; }
+        html.dark #bottomNav .bnav-item.active::before { background: rgba(165, 180, 252, 0.12); }
 
         /* ---- ADMIN ---- */
         .admin-stat { background: white; border-radius: 20px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
@@ -11561,17 +11565,17 @@ main.andos-main{overscroll-behavior-x:none}
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
 
 <style id="andos-nexus-ui">
-/* ---------- NETFLIX FLY-THROUGH DASHBOARD FOCUS SYNC (scale .94 -> 1 + blur 6px -> 0, splash zoom ke saath) ---------- */
+/* ---------- NETFLIX FLY-THROUGH DASHBOARD FOCUS SYNC SMOOTH v2 (scale .96 -> 1 + blur 5px -> 0, standard curve — halka blur = kam GPU jank) ---------- */
 @keyframes andosCineIn {
-  from { transform: scale(0.94); filter: blur(6px); }
+  from { transform: scale(0.96); filter: blur(5px); }
   to   { transform: scale(1); filter: blur(0px); }
 }
-.andos-cine-in { animation: andosCineIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) both; will-change: transform, filter; }
-main.andos-main.andos-cine-in { animation: andosCineIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) both !important; will-change: transform, filter; }
+.andos-cine-in { animation: andosCineIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) both; will-change: transform, filter; }
+main.andos-main.andos-cine-in { animation: andosCineIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) both !important; will-change: transform, filter; }
 #appSplashOverlay.andos-zoom-out, .andos-zoom-out {
-  transform: scale(3.2);
+  transform: scale(2.6);
   opacity: 0;
-  transition: transform 0.48s cubic-bezier(0.65, 0, 0.15, 1), opacity 0.48s cubic-bezier(0.65, 0, 0.15, 1);
+  transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.36s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 
@@ -12467,7 +12471,7 @@ main.andos-main.andos-cine-in { animation: andosCineIn 0.45s cubic-bezier(0.22, 
   <div class="toast" id="toast"></div>
 </div>
 <!-- ==================== ZERO-JUMP PURE #000000 COLD-START VIDEO & STANDALONE PWA SPLASH ==================== -->
-<div id="appSplashOverlay" style="position:fixed;inset:0;width:100vw;height:100dvh;margin:0;padding:0;z-index:2147483640;background:#000000;display:flex;align-items:center;justify-content:center;overflow:hidden;transform:translate3d(0,0,0);transition:opacity .22s cubic-bezier(.16,1,.3,1);">
+<div id="appSplashOverlay" style="position:fixed;inset:0;width:100vw;height:100dvh;margin:0;padding:0;z-index:2147483640;background:#000000;display:flex;align-items:center;justify-content:center;overflow:hidden;transform:translate3d(0,0,0);transition:opacity .22s cubic-bezier(.16,1,.3,1);will-change:transform,opacity;">
     <video id="appSplashVideo" autoplay muted playsinline preload="auto" style="display:block;width:265.15px;height:149.15px;max-width:76vw;aspect-ratio:16/9;object-fit:contain;object-position:center center;background:#000000;margin:0;padding:0;border:0;outline:0;transform:translate3d(0,0,0);"></video>
 </div>
 <script>
@@ -12531,20 +12535,20 @@ main.andos-main.andos-cine-in { animation: andosCineIn 0.45s cubic-bezier(0.22, 
         }
     } catch (e) {}
 
-    var ZOOM_MS = 560; // 0.48s fly-through + margin
+    var ZOOM_MS = 550; // 0.55s fly-through + margin
     function finishSplash() {
         if (done) return;
         done = true;
         try { sessionStorage.setItem('andos_splash_done', '1'); } catch (e) {}
         window.__andosSplashActive = false;
         try { ov.id = ov.id || 'andosSplashOv'; } catch (e) {}
-        // NETFLIX CAMERA FLY-THROUGH: overlap trigger (end - 0.35s) -> scale(3.2) camera punch-through + fade, 0.48s
+        // NETFLIX CAMERA FLY-THROUGH SMOOTH v2: trigger end-0.7s (wordmark formed, video still playing) -> scale(2.6) punch, transform 0.55s standard ease + opacity 0.36s ease-out (no jhatka, no frozen end-frame visible)
         try {
             ov.classList.add('andos-zoom-out');
-            ov.style.transition = 'transform 0.48s cubic-bezier(0.65, 0, 0.15, 1), opacity 0.48s cubic-bezier(0.65, 0, 0.15, 1)';
+            ov.style.transition = 'transform 0.55s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.36s cubic-bezier(0.22, 1, 0.36, 1)';
             ov.style.transformOrigin = 'center center';
             ov.style.willChange = 'transform, opacity';
-            ov.style.transform = 'scale(3.2)';
+            ov.style.transform = 'scale(2.6)';
             ov.style.opacity = '0';
         } catch (e) {
             ov.style.opacity = '0';
@@ -12611,7 +12615,7 @@ main.andos-main.andos-cine-in { animation: andosCineIn 0.45s cubic-bezier(0.22, 
         }, { once: true });
         // OVERLAP TRIGGER (no freeze): video ke khatam hone se 0.35s PEHLE hi zoom start — motion continuity bani rahe
         v.addEventListener('timeupdate', function () {
-            if (isFinite(v.duration) && v.duration > 0 && (v.duration - v.currentTime) <= 0.35) {
+            if (isFinite(v.duration) && v.duration > 0 && (v.duration - v.currentTime) <= 0.7) {
                 animDone = true;
                 maybeFinish();
             }
@@ -13365,7 +13369,7 @@ main.andos-main.andos-cine-in { animation: andosCineIn 0.45s cubic-bezier(0.22, 
             host.classList.remove('andos-cine-in');
             void host.offsetWidth;
             host.classList.add('andos-cine-in');
-            setTimeout(function () { try { host.classList.remove('andos-cine-in'); } catch (e) {} }, 620);
+            setTimeout(function () { try { host.classList.remove('andos-cine-in'); } catch (e) {} }, 660);
         } catch (e) {}
     };
 
