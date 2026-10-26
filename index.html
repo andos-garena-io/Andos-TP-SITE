@@ -169,7 +169,7 @@
     <meta name="theme-color" content="#000000">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#000000">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000">
-    <meta name="andos-build" content="andos-v3-20261022h">
+    <meta name="andos-build" content="andos-v3-20261022i">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -192,7 +192,7 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261022h';
+        var HTML_BUILD_ID = 'andos-v3-20261022i';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
@@ -12261,6 +12261,30 @@ main.andos-main{overscroll-behavior-x:none}
 #yuvaGate .mail-shown span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #yuvaGate .mail-shown button{border:0;background:none;cursor:pointer;font-family:inherit;flex:none;
   font-size:calc(27 * var(--u));font-weight:700;color:#0d0d0d;text-decoration:underline;text-underline-offset:3px}
+/* ---------- Last Used = PRIMARY action: Google One Tap force band ---------- */
+#yuvaGate.saved-account #accountBox .gbtn.accountbtn{
+  border:1px solid rgba(15,23,42,.55) !important;
+  box-shadow:0 6px 18px rgba(15,23,42,.10) !important;
+}
+#yuvaGate.saved-account .acc-floating-pill{background:#0f172a;color:#ffffff;border-color:#0f172a}
+#yuvaGate.saved-account .btn-box:not(.btn-box-account) .gbtn{
+  min-height:56px !important;
+  box-shadow:none !important;
+  border-color:#dfe3ea !important;
+}
+/* ---------- Last Used verify sheet (Google FORCE nahi, user choice) ---------- */
+#luVerify{position:fixed;inset:0;z-index:2147483000;display:none;align-items:flex-end;justify-content:center;
+  background:rgba(9,12,20,.55);font-family:"Plus Jakarta Sans","Inter",system-ui,-apple-system,sans-serif}
+#luVerify.show{display:flex}
+#luVerify .lu-sheet{width:100%;max-width:520px;background:#0f1420;border-top-left-radius:22px;border-top-right-radius:22px;
+  padding:18px 18px 20px;color:#ffffff;box-shadow:0 -18px 48px rgba(0,0,0,.45)}
+#luVerify h3{margin:0 0 6px;font-size:16px;font-weight:800;color:#ffffff}
+#luVerify p{margin:0 0 14px;font-size:13px;line-height:1.55;color:#9aa4bd}
+#luVerify .lu-email{display:block;font-weight:800;color:#ffffff;word-break:break-all;margin-bottom:14px;font-size:13px}
+#luVerify .lu-row{display:flex;gap:10px}
+#luVerify button{flex:1;border:0;border-radius:14px;padding:14px 12px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer}
+#luVerify .lu-primary{background:#ffffff;color:#0f1420}
+#luVerify .lu-ghost{background:rgba(255,255,255,.10);color:#e6e9f2}
 /* ---------- legal note (purani file jaisi do line) ---------- */
 #yuvaGate .legal-note{
   margin-top:auto;padding-top:calc(70 * var(--u));text-align:center;
@@ -12304,6 +12328,17 @@ main.andos-main{overscroll-behavior-x:none}
 
 </style>
 <body>
+<div id="luVerify" aria-hidden="true">
+  <div class="lu-sheet" role="dialog" aria-modal="true" aria-label="Verify last used account">
+    <h3>Last session verify karein</h3>
+    <p>Is device par aapka saved account mila, lekin session expire ho chuka hai. Google se ek baar verify karte hi aap direct dashboard me chale jayenge — UID wahi rahega.</p>
+    <span class="lu-email" id="luVerifyMail"></span>
+    <div class="lu-row">
+      <button type="button" class="lu-ghost" id="luVerifyNo">Doosra account</button>
+      <button type="button" class="lu-primary" id="luVerifyYes">Verify with Google</button>
+    </div>
+  </div>
+</div>
 <div id="yuvaGate" role="dialog" aria-modal="true" aria-label="Andos Sign In">
 <main class="screen" id="loginScreen">
     <canvas id="space"></canvas>
@@ -16026,7 +16061,7 @@ const PLANS = {
             if (!accountBox || !accAvatar || !accMail) return;
             try {
                 var s = JSON.parse(localStorage.getItem('andos_last_account') || 'null');
-                if (!s || !s.email) { accountBox.style.display = 'none'; return; }
+                if (!s || !s.email) { accountBox.style.display = 'none'; try { var g0 = document.getElementById('yuvaGate'); if (g0) g0.classList.remove('saved-account'); } catch (e0) {} return; }
                 accMail.textContent = s.email;
                 if (accNameSub) {
                     var cleanDisp = String(s.name || s.email.split('@')[0] || 'Google Account').trim();
@@ -16045,8 +16080,10 @@ const PLANS = {
                     accAvatar.innerHTML = DEFAULT_USER_CIRCLE_SVG;
                 }
                 accountBox.style.display = '';
+                try { var g1 = document.getElementById('yuvaGate'); if (g1) g1.classList.add('saved-account'); } catch (e1) {}
             } catch (e) {
                 accountBox.style.display = 'none';
+                try { var g2 = document.getElementById('yuvaGate'); if (g2) g2.classList.remove('saved-account'); } catch (e2) {}
             }
         }
 
@@ -16571,6 +16608,12 @@ const PLANS = {
         function mountGoogleOneTap() {
             if (document.documentElement.getAttribute('data-auth') !== 'login') return;
             if (!mainGbtn || !mainGbtn.parentElement) return;
+            // LAST USED card dikhai de rahi hai -> Google One Tap / auto-prompt BILKUL mount nahi hoga.
+            // Matlab: saved account ke saath Google kabhi FORCE nahi hota.
+            try {
+                var luBox = document.getElementById('accountBox');
+                if (luBox && luBox.style.display !== 'none') { unmountGoogleOneTap(); return; }
+            } catch (eLu) {}
             if (document.getElementById('andosOneTapFrame')) {
                 oneTapMounted = true;
                 return;
@@ -16685,16 +16728,89 @@ const PLANS = {
                     throw new Error((d && d.code) || 'PASS_REDEEM_FAILED');
                 } catch (err) {
                     ssoRedeemInFlight = false;
-                    // Pass expired/revoked on server -> re-authenticate cleanly once with login_hint
+                    // Pass expired/revoked -> Google FORCE nahi: user ko choice dikhayein
                     showLoginGate();
-                    window.__andosGoogleSignIn(saved.email);
+                    showLastUsedVerify(saved);
                     return;
                 }
             }
 
-            // Legacy bootstrap if no passToken existed yet on this device
-            window.__andosGoogleSignIn(saved.email);
+            // passToken nahi hai, lekin is device par Firebase session persisted hai -> bina Google popup ke direct unlock
+            if (hasPersistedFirebaseSession(saved.uid)) {
+                unlockWithSavedIdentity(saved);
+                try { if (auth && auth.currentUser && typeof ensureDevicePassSaved === 'function') ensureDevicePassSaved(auth.currentUser); } catch (ePass) {}
+                return;
+            }
+
+            // Kuch bhi valid nahi -> Google popup FORCE nahi, verify sheet dikhao (user khud choose kare)
+            showLastUsedVerify(saved);
         }
+
+        // Last Used Identity se turant dashboard unlock (0ms UI transition)
+        function unlockWithSavedIdentity(saved) {
+            unmountGoogleOneTap();
+            setGoogleBusy(false);
+            ssoRedeemInFlight = true;
+            user.uid = saved.uid || user.uid;
+            user.name = saved.name || (saved.email || '').split('@')[0] || 'ANDOS Member';
+            user.email = saved.email;
+            user.photoURL = localStorage.getItem('andos_profile_avatar') || saved.photo || DEFAULT_AVATAR_URL;
+            user.isGuest = false;
+            user.provider = 'google';
+            user.loggedIn = true;
+            try {
+                localStorage.setItem('andos_user', JSON.stringify(user));
+                localStorage.setItem('andos_onboarded', '1');
+                applyLiveAvatars();
+            } catch (e) {}
+            hideLoginGate();
+        }
+
+        function hasPersistedFirebaseSession(uid) {
+            try {
+                for (var i = 0; i < localStorage.length; i++) {
+                    var k = localStorage.key(i);
+                    if (!k || k.indexOf('firebase:authUser:') !== 0) continue;
+                    var obj = JSON.parse(localStorage.getItem(k) || 'null');
+                    if (!obj || !obj.uid) continue;
+                    if (uid && obj.uid !== uid) continue;
+                    var exp = obj && obj.stsTokenManager ? Number(obj.stsTokenManager.expirationTime) : 0;
+                    if (exp > Date.now() + 60000) return true;
+                }
+            } catch (e) {}
+            return false;
+        }
+
+        // Google FORCE band: Last Used verify sheet (user ke click ke bina kuch trigger nahi hota)
+        var luPending = null;
+        function showLastUsedVerify(saved) {
+            luPending = saved || null;
+            var box = document.getElementById('luVerify');
+            if (!box) return;
+            var mailEl = document.getElementById('luVerifyMail');
+            if (mailEl) mailEl.textContent = (saved && saved.email) ? String(saved.email) : '';
+            box.classList.add('show');
+        }
+        function hideLastUsedVerify() {
+            var box = document.getElementById('luVerify');
+            if (box) box.classList.remove('show');
+        }
+        (function bindLuVerify() {
+            var box = document.getElementById('luVerify');
+            if (!box) return;
+            var yes = document.getElementById('luVerifyYes');
+            var no = document.getElementById('luVerifyNo');
+            box.addEventListener('click', function (ev) { if (ev.target === box) hideLastUsedVerify(); });
+            if (yes) yes.addEventListener('click', function () {
+                var mail = luPending ? luPending.email : '';
+                hideLastUsedVerify();
+                window.__andosGoogleSignIn(mail);
+            });
+            if (no) no.addEventListener('click', function () {
+                hideLastUsedVerify();
+                window.__andosGoogleSignIn('');
+            });
+        })();
 
         function handleLoginError(e) {
             setGoogleBusy(false);
