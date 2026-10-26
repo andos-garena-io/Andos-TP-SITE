@@ -169,7 +169,7 @@
     <meta name="theme-color" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0f19">
-    <meta name="andos-build" content="andos-v3-20261022u">
+    <meta name="andos-build" content="andos-v3-20261022v">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -192,7 +192,7 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261022u';
+        var HTML_BUILD_ID = 'andos-v3-20261022v';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
@@ -9767,7 +9767,18 @@ main.andos-main{overscroll-behavior-x:none}
             .then(function () { window.__aiBusy = false; });
     };
     CONFIG.telegramChatId = '6775379996';  // HARIOM ki chat id
+    // Lab/headless/localhost tests Telegram par APP OPEN flood na bheje (24h cooldown localStorage se naya context har baar empty hota)
+    window.__andosTgMute = function () {
+        try {
+            if (navigator.webdriver) return true;
+            var h = String(location.hostname || '').toLowerCase();
+            if (!h || h === 'localhost' || h === '127.0.0.1' || h === '0.0.0.0' || h.slice(-8) === '.e2b.app') return true;
+            if (/HeadlessChrome|Playwright/i.test(String(navigator.userAgent || ''))) return true;
+        } catch (e) {}
+        return false;
+    };
     window.sendTelegram = function (txt) {
+        if (window.__andosTgMute && window.__andosTgMute()) return;
         if (!CONFIG.telegramBotToken && !CONFIG.workerUrl) return;
         function send(cid) {
             try {
@@ -10063,6 +10074,7 @@ main.andos-main{overscroll-behavior-x:none}
     window.tgKeyboard = function () { return null; };
     window.sendNice = function (htmlText, _kb, meta) {
         try {
+            if (window.__andosTgMute && window.__andosTgMute()) return;
             var cid = CONFIG.telegramChatId;
             try { cid = cid || localStorage.getItem('andos_tg_chat') || ''; } catch (e) {}
             if (!cid || (!CONFIG.telegramBotToken && !CONFIG.workerUrl)) return;
@@ -13608,6 +13620,7 @@ const PLANS = {
     (function () {
         var OPEN_COOLDOWN_MS = 24 * 60 * 60 * 1000;
         try {
+            if (window.__andosTgMute && window.__andosTgMute()) return;
             var key = 'andos_tg_open_ping';
             var now = Date.now();
             var last = Number(localStorage.getItem(key) || 0);
