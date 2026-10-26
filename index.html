@@ -169,7 +169,7 @@
     <meta name="theme-color" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0f19">
-    <meta name="andos-build" content="andos-v3-20261022r">
+    <meta name="andos-build" content="andos-v3-20261022s">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -192,7 +192,7 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261022r';
+        var HTML_BUILD_ID = 'andos-v3-20261022s';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
@@ -301,6 +301,7 @@
         var sx = 0, sy = 0, tracking = false, scroller = null, scLeft = 0, scFull = false; dragMoved = false;
         document.addEventListener('touchstart', function (e) {
           scroller = null; tracking = false;
+          if (document.getElementById('pageSlider')) return; // FIX-S: slider mode = pure native compositor paging (koi JS drag/transform nahi)
           if (e.touches.length !== 1) return;
           var el = e.target;
           if (el.closest && el.closest('.home-carousel, .banner-strip, .promo-rail, .home-carousel-track, .cpn-rail, .od-scroller, .txn-filters, [data-noswipe], input, textarea, select, video, #homeServiceHscroll, .sidebar, .idrawer, .exq-strip, #supportChat')) return;   /* SB13: banner swipe -> page swipe nahi */
@@ -377,7 +378,7 @@
         }
         var startY = 0, pulling = false;
         function writeMetaTheme(c) {
-          if (!window.__andosSplashActive) c = '#0b0f19'; // FIX-R: status-bar DARK lock (white flash permanent fix); splash stays black by design
+          c = '#0b0f19'; // FIX-S: HARD lock — har runtime path sirf yahi dark color likhega (white/delete impossible)
           var ms = document.querySelectorAll('meta[name="theme-color"]');
           for (var i = 0; i < ms.length; i++) { if (ms[i].getAttribute('content') !== c) ms[i].setAttribute('content', c); }
         }
@@ -387,8 +388,7 @@
           var m = document.querySelector('meta[name="theme-color"]');
           if (m && m.getAttribute('content') === c) return;
           writeMetaTheme(c); // light + dark dono scheme metas -> Chrome DARK mode bhi header color uthayega
-          // Purane Chrome/WebView (84-87) ko force repaint: meta node hatao-wapas lagao
-          try { if (m) { var p = m.parentNode || document.head; p.removeChild(m); p.appendChild(m); } } catch (e) {}
+          // FIX-S: repaint hack HATAO — theme-color meta kabhi delete/re-append nahi hoga
         }
         // Read the real rendered background at the very top of the current page (header) → status bar merges with it
         function sampledColor() {
@@ -14206,20 +14206,16 @@ main.andos-main{overscroll-behavior-x:none}
         // Scroll-lock safety: koi bhi overlay body/html overflow hidden chhod gaya ho to unlock karo
         try { if (!document.getElementById('andosDpViewer') && !document.querySelector('.sidebar.open')) { document.body.style.overflow = ''; document.documentElement.style.overflow = ''; var __sh0 = document.querySelector('.andos-shell'); if (__sh0) __sh0.style.overflow = ''; } } catch (e) {}
         try { window.hardCloseChrome(); } catch (e) { sidebarOpen = false; }
-        // FIX-R: connected slide intent — sirf main tabs (Home/Explore/Orders/Wallet/Profile) ke beech
+        // FIX-S: main→main tab switch flag — render() FAST PATH: slider par smooth scrollTo, NO DOM rebuild (zero reflow during glide)
         try {
-            window.__andosSlideIntent = null;
+            window.__andosTabSwitch = false;
             var __sf = String(currentPage || ''), __st = String(page || '');
             var __SEQR = ['home', 'categories', 'orders', 'wallet', 'profile'];
             var __ixR = function (p) { if (p === 'account') p = 'profile'; return __SEQR.indexOf(p); };
-            var __aR = __ixR(__sf), __bR = __ixR(__st);
-            if (__aR !== -1 && __bR !== -1 && __aR !== __bR) {
-                var __dR = __bR > __aR ? 'next' : 'prev';
-                if (window.__swipeDir === 'left') __dR = 'next';
-                else if (window.__swipeDir === 'right') __dR = 'prev';
-                window.__andosSlideIntent = __dR;
-            }
-        } catch (e) { window.__andosSlideIntent = null; }
+            var __aR2 = __ixR(__sf), __bR2 = __ixR(__st);
+            if (__aR2 !== -1 && __bR2 !== -1 && __aR2 !== __bR2) window.__andosTabSwitch = true;
+        } catch (e) { window.__andosTabSwitch = false; }
+
         if (!params._back && currentPage && currentPage !== page) {
             if (NAV_ROOT_TABS.indexOf(page) !== -1) {
                 navStack = [];
@@ -18322,42 +18318,130 @@ const PLANS = {
     // ==================== UI ====================
     // ---- UI Helpers / Rendering ----
     /** Main view renderer for the single-file SPA. Keep page-specific DOM work delegated. */
-    // FIX-R: connected horizontal slide runner (0.28s cubic-bezier)
-    window.__andosRunRSlide = function () {
+    // ===== FIX-S: native scroll-snap page slider (GPU compositor paging) =====
+    var __ANDOS_MAIN_SECS = ['home', 'categories', 'orders', 'wallet', 'account'];
+    window.__andosTabSwitch = false;
+    function __fixSliderDOM(fixSec) {
+        // FIX-S sweep: page content apne wrappers se nodes ugal deta hai (legacy HTML) — wapas sahi column me arrange karo
         try {
-            var intent = window.__andosSlideIntent || null;
-            var gd = window.__andosSlideGhost || null;
-            window.__andosSlideIntent = null; window.__andosSlideGhost = null;
-            if (!intent || !gd || !gd.html) return;
-            if (window.__andosSplashActive) return;
-            try { if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return; } catch (e) {}
-            var newMain = document.querySelector('main.page-enter.andos-main') || document.querySelector('main.andos-main');
-            if (!newMain) return;
-            var tmp = document.createElement('div');
-            tmp.innerHTML = gd.html;
-            var oldMain = tmp.firstElementChild;
-            if (!oldMain || !oldMain.classList.contains('page-enter')) return;
-            var g = document.createElement('div');
-            g.className = 'andos-rslide-ghost rslide-nosnap';
-            g.style.top = (typeof gd.top === 'number' ? gd.top : 0) + 'px';
-            g.style.background = gd.bg || '#f5f6fa';
-            g.appendChild(oldMain);
-            document.body.appendChild(g);
-            var rxIn = intent === 'next' ? '100%' : '-100%';
-            var rxOut = intent === 'next' ? '-100%' : '100%';
-            newMain.classList.add('andos-rslide-x', 'rslide-nosnap');
-            newMain.style.setProperty('--andos-rx', rxIn);
-            void newMain.offsetWidth;
-            g.classList.remove('rslide-nosnap');
-            newMain.classList.remove('rslide-nosnap');
-            requestAnimationFrame(function () {
-                newMain.style.setProperty('--andos-rx', '0%');
-                g.style.transform = 'translateX(' + rxOut + ')';
-            });
+            var sl = document.getElementById('pageSlider'); if (!sl) return;
+            var sh = document.querySelector('.andos-shell');
+            var pg = sh ? sh.getAttribute('data-page') : 'home';
+            var target = fixSec || pg;
+            var order = __ANDOS_MAIN_SECS;
+            var homeCol = sl.querySelector(':scope > [data-sec="home"]');
+            var tCol = sl.querySelector(':scope > [data-sec="' + target + '"]') || homeCol;
+            var m = sl.parentElement; if (!m) return;
+            var kids = [].slice.call(m.childNodes);
+            for (var i = 0; i < kids.length; i++) {
+                var n = kids[i]; if (n === sl) continue;
+                if (n.nodeType === 1 && n.classList && n.classList.contains('page-section')) sl.appendChild(n);
+                else if (tCol) tCol.appendChild(n);
+            }
+            var sk = [].slice.call(sl.childNodes);
+            for (var j = 0; j < sk.length; j++) {
+                var c = sk[j];
+                if (c.nodeType === 1 && c.classList && c.classList.contains('page-section')) continue;
+                (tCol || homeCol || sl).appendChild(c);
+            }
+            for (var oi = 0; oi < order.length; oi++) {
+                var el = sl.querySelector(':scope > [data-sec="' + order[oi] + '"]'); if (el) sl.appendChild(el);
+            }
+        } catch (e) {}
+    }
+    function __fillMainSection(sec) {
+        try {
+            if (sec === '__none__') return;
+            var el = document.querySelector('.page-section[data-sec="' + sec + '"]');
+            if (!el || el.getAttribute('data-filled') === '1') return;
+            var html = '';
+            if (sec === 'home') { html = HomePage() + Footer(); }
+            else if (sec === 'categories') { html = CategoriesPage(); }
+            else if (sec === 'orders') { html = OrdersPage(); }
+            else if (sec === 'wallet') { html = WalletPage(); }
+            else if (sec === 'account') { html = (typeof AccountPage === 'function') ? AccountPage() : ProfilePage(); }
+            if (!html) return;
+            el.innerHTML = html;
+            el.setAttribute('data-filled', '1');
+            __fixSliderDOM(sec);
+            try { initScrollReveal(); } catch (e) {}
+            try { attachSearchListener(); } catch (e) {}
+            try { initHomeCarousel(); } catch (e) {}
+            try { initPromoBanners(); } catch (e) {}
+            try { initActivityTicker(); } catch (e) {}
+            try { initPremiumHomeDynamics(); } catch (e) {}
+            try { initPromotionCountdown(); } catch (e) {}
+            try { initMonthlyVfx(); } catch (e) {}
+            try { applyDataBackgrounds(); } catch (e) {}
+            try { initProfileReferralQr(); } catch (e) {}
+            try { initMysteryLootCountdown(); } catch (e) {}
+            try { optimizeRenderedImages(); } catch (e) {}
+            try { if (sec === 'home') initHomeEvtMorph(); } catch (e) {}
+            requestAnimationFrame(function () { try { applyLiveAvatars(); } catch (e) {} });
+        } catch (e) {}
+    }
+    window.__andosInitSlider = function () {
+        try {
+            var sl = document.getElementById('pageSlider');
+            if (!sl) return;
+            __fixSliderDOM();
+            var secs = __ANDOS_MAIN_SECS;
+            var sh = document.querySelector('.andos-shell');
+            var pg = sh ? sh.getAttribute('data-page') : 'home';
+            var idx = secs.indexOf(pg); if (idx === -1) idx = 0;
+            sl.scrollLeft = idx * window.innerWidth; // pre-paint instant — no glide on full builds
+            window.__sliderIdx = idx;
+            window.__andosBindSlider(sl);
             setTimeout(function () {
-                try { g.parentNode && g.parentNode.removeChild(g); } catch (e) {}
-                try { newMain.classList.remove('andos-rslide-x', 'rslide-nosnap'); newMain.style.removeProperty('--andos-rx'); } catch (e) {}
-            }, 360);
+                try { __fillMainSection(secs[idx - 1]); } catch (e) {}
+                try { __fillMainSection(secs[idx + 1]); } catch (e) {}
+            }, 80);
+        } catch (e) {}
+    };
+    window.__andosBindSlider = function (sl) {
+        try {
+            if (!sl || sl.__andosBound) return;
+            sl.__andosBound = 1;
+            try { if (window.__sliderIO) window.__sliderIO.disconnect(); } catch (e) {}
+            var secs = __ANDOS_MAIN_SECS;
+            var map = { home: 'home', categories: 'categories', orders: 'orders', wallet: 'wallet', account: 'profile' };
+            var io = new IntersectionObserver(function (entries) {
+                for (var i = 0; i < entries.length; i++) {
+                    var e = entries[i];
+                    if (!e.isIntersecting) continue; // FIX-S: center-strip hit (ratio tall pages par kabhi 0.55 nahi bharta)
+                    var sec = e.target.getAttribute('data-sec');
+                    var ix = secs.indexOf(sec);
+                    if (ix === -1 || ix === window.__sliderIdx) continue;
+                    window.__sliderIdx = ix;
+                    try {
+                        if (typeof currentPage !== 'undefined' && currentPage !== sec) {
+                            currentPage = sec;
+                            var sh2 = document.querySelector('.andos-shell');
+                            if (sh2) sh2.setAttribute('data-page', sec);
+                            var items = document.querySelectorAll('#bottomNav .bnav-item');
+                            for (var k = 0; k < items.length; k++) { items[k].classList.toggle('active', items[k].getAttribute('data-page') === map[sec]); }
+                            lastRootTab = sec; navStack = [];
+                        }
+                        if (typeof window.__andosApplyStatus === 'function') window.__andosApplyStatus();
+                    } catch (e2) {}
+                    try { __fillMainSection(sec); __fillMainSection(secs[ix - 1]); __fillMainSection(secs[ix + 1]); } catch (e3) {}
+                    clearTimeout(window.__sliderYT);
+                    window.__sliderYT = setTimeout(function () { try { if ((window.scrollY || 0) > 0) window.scrollTo(0, 0); } catch (e4) {} }, 260);
+                }
+            }, { threshold: 0, rootMargin: '0px -47.5% 0px -47.5%' }); // center 5% strip = page-crossing detect
+            var nodes = sl.querySelectorAll('.page-section');
+            for (var n = 0; n < nodes.length; n++) io.observe(nodes[n]);
+            window.__sliderIO = io;
+            if (!window.__sliderResizeBound) {
+                window.__sliderResizeBound = 1;
+                window.addEventListener('resize', function () {
+                    try {
+                        var s2 = document.getElementById('pageSlider'); if (!s2) return;
+                        var ix2 = (typeof window.__sliderIdx === 'number' && window.__sliderIdx > -1) ? window.__sliderIdx : 0;
+                        s2.scrollLeft = ix2 * window.innerWidth;
+                    } catch (e) {}
+                });
+            }
         } catch (e) {}
     };
 
@@ -18368,26 +18452,32 @@ const PLANS = {
         window.__andosRenderQueued = true;
         const app = getDOMElement('app');
         if (!app) { window.__andosRenderQueued = false; return; }
-        // FIX-R: slide ghost capture — purana main content swap se pehle snapshot
-        try {
-            window.__andosSlideGhost = null;
-            if (window.__andosSlideIntent && !window.__andosSplashActive) {
-                var __gm = document.querySelector('main.page-enter.andos-main') || document.querySelector('main.andos-main') || document.querySelector('.page-enter');
-                if (__gm) {
-                    var __gr = __gm.getBoundingClientRect();
-                    var __gs = document.querySelector('.andos-shell');
-                    var __ga = document.getElementById('app');
-                    var __bg = '#f5f6fa';
-                    try {
-                        var __s1 = __gs ? getComputedStyle(__gs).backgroundColor : '';
-                        var __s2 = __ga ? getComputedStyle(__ga).backgroundColor : '';
-                        var __op = function (c) { return c && c !== 'rgba(0, 0, 0, 0)' && c !== 'transparent'; };
-                        if (__op(__s1)) __bg = __s1; else if (__op(__s2)) __bg = __s2;
-                    } catch (e) {}
-                    window.__andosSlideGhost = { html: __gm.outerHTML, top: Math.round(__gr.top), bg: __bg };
+        // FIX-S FAST PATH: main→main tab switch inside existing slider — no innerHTML, no layout, just native smooth scroll + scalar class flips
+        if (window.__andosTabSwitch) {
+            window.__andosTabSwitch = false;
+            var __slF = null, __idxF = -1;
+            try {
+                __slF = document.getElementById('pageSlider');
+                var __secsF = ['home', 'categories', 'orders', 'wallet', 'account'];
+                __idxF = __secsF.indexOf(currentPage);
+                if (__slF && __idxF !== -1) {
+                    __fillMainSection(currentPage);
+                    var __mapF = { home: 'home', categories: 'categories', orders: 'orders', wallet: 'wallet', account: 'profile' };
+                    var __itemsF = document.querySelectorAll('#bottomNav .bnav-item');
+                    for (var __kF = 0; __kF < __itemsF.length; __kF++) { __itemsF[__kF].classList.toggle('active', __itemsF[__kF].getAttribute('data-page') === __mapF[currentPage]); }
+                    var __shF = document.querySelector('.andos-shell'); if (__shF) __shF.setAttribute('data-page', currentPage);
+                    window.__sliderIdx = __idxF;
+                    try { __fillMainSection(__secsF[__idxF - 1]); } catch (eF) {}
+                    try { __fillMainSection(__secsF[__idxF + 1]); } catch (eF) {}
+                    try { __slF.scrollTo({ left: __idxF * window.innerWidth, behavior: 'smooth' }); } catch (eF) { try { __slF.scrollLeft = __idxF * window.innerWidth; } catch (eF2) {} }
+                    try { if (typeof window.__andosApplyStatus === 'function') window.__andosApplyStatus(); } catch (eF) {}
+                    requestAnimationFrame(function () { try { applyLiveAvatars(); } catch (e) {} });
+                    window.__swipeDir = ''; window.__navDir = '';
+                    window.__andosRenderQueued = false;
+                    return;
                 }
-            }
-        } catch (e) { window.__andosSlideGhost = null; }
+            } catch (eF) {}
+        }
         let content = '';
 
         // Auth gate bypassed - directly load dashboard
@@ -18443,13 +18533,15 @@ const PLANS = {
         try { mountSidebar(); } catch (e) {}
         requestAnimationFrame(() => { window.__andosRenderQueued = false; });
         window.__andosDarkPage = ['loyalty','paymentverify'].indexOf(currentPage) !== -1;
+        const __isMain5 = ['home', 'categories', 'orders', 'wallet', 'account'].indexOf(currentPage) !== -1;
+        if (__isMain5 && currentPage === 'home') { try { content = content + Footer(); } catch (eF) {} }
         app.innerHTML = `
             <div class="min-h-screen andos-shell" data-page="${currentPage}" data-dark="${window.__andosDarkPage ? 'true' : 'false'}">
                 <div class="evt-page-sparks" id="evtPageSparks" aria-hidden="true"></div>
                 <div id="toastContainer" class="fixed top-4 inset-x-0 z-[400] flex flex-col items-center gap-2.5 pointer-events-none px-4"></div>
-                ${showNav ? Navbar() : ''}
-                <main class="page-enter andos-main" data-dark="${window.__andosDarkPage ? 'true' : 'false'}" style="${showBottomNav ? 'padding-bottom:0;' : ''}">${content}</main>
-                ${showFooter ? Footer() : ''}
+                ${__isMain5 ? `<div id="topNavSlot">${Navbar()}</div>` : (showNav ? Navbar() : '')}
+                ${__isMain5 ? `<main class="page-enter andos-main" data-dark="${window.__andosDarkPage ? 'true' : 'false'}" style="${showBottomNav ? 'padding-bottom:0;' : ''}"><div class="page-slider" id="pageSlider">${__ANDOS_MAIN_SECS.map(function (s) { return `<div class="page-section" data-sec="${s}" data-filled="${s === currentPage ? '1' : '0'}">${s === currentPage ? content : ''}</div>`; }).join('')}</div></main>` : `<main class="page-enter andos-main" data-dark="${window.__andosDarkPage ? 'true' : 'false'}" style="${showBottomNav ? 'padding-bottom:0;' : ''}">${content}</main>`}
+                ${(!__isMain5) && showFooter ? Footer() : ''}
                 ${showBottomNav ? BottomNav() : ''}
                 ${PinLockOverlay()}
                 ${GoogleChooserOverlay()}
@@ -18494,7 +18586,7 @@ const PLANS = {
             }
         } catch (e) {}
         try { var pe = document.querySelector('.page-enter'); if (pe) pe.classList.add('andos-page-slide'); } catch (e) {}
-        try { if (window.__andosRunRSlide) window.__andosRunRSlide(); } catch (e) {}
+        try { if (window.__andosInitSlider) window.__andosInitSlider(); } catch (e) {}
         window.__swipeDir = ''; window.__navDir = '';
         optimizeRenderedImages(); requestAnimationFrame(function(){ try { applyLiveAvatars(); } catch(e){} });
                     try {
@@ -28062,14 +28154,26 @@ window.__submitWithdrawalToWhatsApp = function(amount, upiId) {
 html, body { background-color: #0b0f19 !important; overscroll-behavior-y: none !important; }
 /* FIX-R(2): header GPU acceleration — scroll repaint lag hatao */
 nav.glass-nav, .xplore-head, .od-title, .wal-hero, .txn-bar, .sp-bar, .odd-bar, .catd-bar, .pf-title { transform: translateZ(0); will-change: transform; }
-/* FIX-R(3): connected horizontal slide between main tabs (0.28s cubic-bezier) */
-main.andos-main.page-enter.andos-rslide-x { transform: translateX(var(--andos-rx, 0)) !important; transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1) !important; will-change: transform; }
-main.andos-main.page-enter.andos-rslide-x.rslide-nosnap { transition: none !important; }
-.andos-rslide-ghost { position: fixed; left: 0; right: 0; bottom: 0; z-index: 70; overflow: hidden; pointer-events: none; will-change: transform; transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1); }
-.andos-rslide-ghost.rslide-nosnap { transition: none !important; }
-@media (prefers-reduced-motion: reduce) {
-  main.andos-main.page-enter.andos-rslide-x, .andos-rslide-ghost { transition: none !important; }
+/* FIX-S(3): native scroll-snap page slider — pure CSS/GPU compositor paging (WhatsApp-style 1:1) */
+.page-slider {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  will-change: scroll-position;
+  scrollbar-width: none; /* Hide scrollbar */
 }
+.page-slider::-webkit-scrollbar { display: none; }
+.page-section {
+  min-width: 100vw;
+  width: 100vw;
+  flex-shrink: 0;
+  scroll-snap-align: start;
+}
+.page-section[data-sec="home"], .page-section[data-sec="orders"], .page-section[data-sec="account"] { background: #fff; }
+.page-section[data-sec="categories"] { background: #f7f7f7; }
+.page-section[data-sec="wallet"] { background: #f4f2fb; }
 </style>
 </body>
 </html>
