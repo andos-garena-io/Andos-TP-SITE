@@ -169,7 +169,7 @@
     <meta name="theme-color" content="#000000">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#000000">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000">
-    <meta name="andos-build" content="andos-v3-20261022m">
+    <meta name="andos-build" content="andos-v3-20261022n">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -192,7 +192,7 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261022m';
+        var HTML_BUILD_ID = 'andos-v3-20261022n';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
@@ -3466,7 +3466,7 @@
             padding: 8px 4px calc(8px + env(safe-area-inset-bottom)) 4px;
         }
         html.dark #bottomNav { background: rgba(15,20,34,0.95); border-top-color: rgba(255,255,255,0.06); }
-        .bnav-item { position: relative; z-index: 0; display: flex; flex-direction: column; align-items: center; gap: 3px; flex: 1; cursor: pointer; padding: 6px 0; border-radius: 14px; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); color: #94a3b8; -webkit-tap-highlight-color: transparent; }
+        .bnav-item { position: relative; z-index: 0; display: flex; flex-direction: column; align-items: center; gap: 3px; flex: 1; cursor: pointer; padding: 6px 0; border-radius: 14px; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); color: #7C8BA1; -webkit-tap-highlight-color: transparent; }
         .bnav-item.active { color: #4F46E5; }
         .bnav-item i { font-size: 18px; transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1); }
         .bnav-item.active i { transform: translateY(-3px) scale(1.1); }
@@ -3475,32 +3475,35 @@
         .bnav-item.active .bnav-dot { opacity: 1; }
         .bnav-item.active .bnav-dot { opacity: 1; }
 
-        /* ---- ACTIVE STATE (Instagram-style: NO pill box — clean color-shift + subtle icon bounce only) ---- */
+        /* ---- ACTIVE PILL (exact reference: wide soft pastel capsule — flat, no border, no shadow) ---- */
         #bottomNav .bnav-item::before {
             content: '';
             position: absolute; z-index: -1;
-            inset: 3px 11px;
-            background: transparent;
+            inset: 4px;
+            border-radius: 999px;
+            background: rgba(2, 132, 199, 0.10);
             border: none;
             box-shadow: none;
             opacity: 0;
+            transform: scale(.94);
+            transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1), transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             pointer-events: none;
         }
-        #bottomNav .bnav-item.active { color: #0284c7; font-weight: 800; }
-        #bottomNav .bnav-item.active i {
-            font-weight: 900;
-            transform: translateY(-1px) scale(1.1);
-            animation: bnavIconPop 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
+        #bottomNav .bnav-item.active::before {
+            opacity: 1;
+            transform: scale(1);
+            animation: bnavPillIn 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        @keyframes bnavIconPop {
-            0%   { transform: translateY(-1px) scale(.94); }
-            55%  { transform: translateY(-1px) scale(1.14); }
-            100% { transform: translateY(-1px) scale(1.1); }
+        @keyframes bnavPillIn {
+            from { opacity: 0; transform: scale(.94); }
+            to   { opacity: 1; transform: scale(1); }
         }
-        #bottomNav .bnav-item.active span { font-weight: 800; letter-spacing: .01em; }
+        #bottomNav .bnav-item.active { color: #0284c7; font-weight: 700; }
+        #bottomNav .bnav-item.active span { font-weight: 700; }
         #bottomNav .bnav-item .bnav-dot { display: none; }
         #bottomNav .bnav-item:active { transform: scale(.96); }
         html.dark #bottomNav .bnav-item.active { color: #38bdf8; }
+        html.dark #bottomNav .bnav-item.active::before { background: rgba(56, 189, 248, 0.12); }
 
         /* ---- ADMIN ---- */
         .admin-stat { background: white; border-radius: 20px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
@@ -10792,7 +10795,7 @@ html.dark .service-card, html.dark .service-card-glass {
 <style>
 
 /* ===== Instant page switch: no drop / no slide ===== */
-.page-enter{animation:none !important;transform:none !important;filter:none !important;opacity:1 !important}
+.page-enter:not(.andos-cine-in){animation:none !important;transform:none !important;filter:none !important;opacity:1 !important}
 .page-enter.andos-page-slide{animation:none !important}
 main.andos-main{overscroll-behavior-x:none}
 .home-carousel-track,.promo-rail,.cpn-rail,.od-scroller,.txn-filters,.exq-strip{touch-action:pan-x pan-y}
@@ -11558,16 +11561,17 @@ main.andos-main{overscroll-behavior-x:none}
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
 
 <style id="andos-nexus-ui">
-/* ---------- NETFLIX-STYLE CINEMATIC APP ENTRY (dashboard scale .95 -> 1 fade-in) ---------- */
+/* ---------- NETFLIX FLY-THROUGH DASHBOARD FOCUS SYNC (scale .94 -> 1 + blur 6px -> 0, splash zoom ke saath) ---------- */
 @keyframes andosCineIn {
-  from { opacity: 0; transform: scale(0.95); }
-  to   { opacity: 1; transform: scale(1); }
+  from { transform: scale(0.94); filter: blur(6px); }
+  to   { transform: scale(1); filter: blur(0px); }
 }
-.andos-cine-in { animation: andosCineIn .42s cubic-bezier(0.4, 0, 0.2, 1) both; will-change: transform, opacity; }
+.andos-cine-in { animation: andosCineIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) both; will-change: transform, filter; }
+main.andos-main.andos-cine-in { animation: andosCineIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) both !important; will-change: transform, filter; }
 #appSplashOverlay.andos-zoom-out, .andos-zoom-out {
-  transform: scale(2.2);
+  transform: scale(3.2);
   opacity: 0;
-  transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.35s ease;
+  transition: transform 0.48s cubic-bezier(0.65, 0, 0.15, 1), opacity 0.48s cubic-bezier(0.65, 0, 0.15, 1);
 }
 
 
@@ -12527,20 +12531,20 @@ main.andos-main{overscroll-behavior-x:none}
         }
     } catch (e) {}
 
-    var ZOOM_MS = 470;
+    var ZOOM_MS = 560; // 0.48s fly-through + margin
     function finishSplash() {
         if (done) return;
         done = true;
         try { sessionStorage.setItem('andos_splash_done', '1'); } catch (e) {}
         window.__andosSplashActive = false;
         try { ov.id = ov.id || 'andosSplashOv'; } catch (e) {}
-        // NETFLIX-STYLE CINEMATIC EXIT: video `ended` -> container zoom-in (scale 2.2) + fade out
+        // NETFLIX CAMERA FLY-THROUGH: overlap trigger (end - 0.35s) -> scale(3.2) camera punch-through + fade, 0.48s
         try {
             ov.classList.add('andos-zoom-out');
-            ov.style.transition = 'transform 0.45s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.35s ease';
+            ov.style.transition = 'transform 0.48s cubic-bezier(0.65, 0, 0.15, 1), opacity 0.48s cubic-bezier(0.65, 0, 0.15, 1)';
             ov.style.transformOrigin = 'center center';
             ov.style.willChange = 'transform, opacity';
-            ov.style.transform = 'scale(2.2)';
+            ov.style.transform = 'scale(3.2)';
             ov.style.opacity = '0';
         } catch (e) {
             ov.style.opacity = '0';
@@ -12605,6 +12609,13 @@ main.andos-main{overscroll-behavior-x:none}
         v.addEventListener('seeked', function () {
             v.style.opacity = '1';
         }, { once: true });
+        // OVERLAP TRIGGER (no freeze): video ke khatam hone se 0.35s PEHLE hi zoom start — motion continuity bani rahe
+        v.addEventListener('timeupdate', function () {
+            if (isFinite(v.duration) && v.duration > 0 && (v.duration - v.currentTime) <= 0.35) {
+                animDone = true;
+                maybeFinish();
+            }
+        });
         v.addEventListener('ended', function () {
             animDone = true;
             maybeFinish();
