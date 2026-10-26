@@ -169,7 +169,7 @@
     <meta name="theme-color" content="#000000">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#000000">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000">
-    <meta name="andos-build" content="andos-v3-20261022k">
+    <meta name="andos-build" content="andos-v3-20261022l">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -192,7 +192,7 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261022k';
+        var HTML_BUILD_ID = 'andos-v3-20261022l';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
@@ -3468,49 +3468,45 @@
         html.dark #bottomNav { background: rgba(15,20,34,0.95); border-top-color: rgba(255,255,255,0.06); }
         .bnav-item { position: relative; z-index: 0; display: flex; flex-direction: column; align-items: center; gap: 3px; flex: 1; cursor: pointer; padding: 6px 0; border-radius: 14px; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); color: #94a3b8; -webkit-tap-highlight-color: transparent; }
         .bnav-item.active { color: #4F46E5; }
-        .bnav-item i { font-size: 19px; transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1); }
+        .bnav-item i { font-size: 18px; transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1); }
         .bnav-item.active i { transform: translateY(-3px) scale(1.1); }
         .bnav-item span { font-size: 10px; font-weight: 700; }
         .bnav-item .bnav-dot { width: 4px; height: 4px; border-radius: 50%; background: #4F46E5; opacity: 0; transition: opacity 0.25s ease; margin-top: -2px; }
         .bnav-item.active .bnav-dot { opacity: 1; }
         .bnav-item.active .bnav-dot { opacity: 1; }
 
-        /* ---- ACTIVE PILL INDICATOR (rounded capsule + soft neon glow, Material-3 style) ---- */
+        /* ---- ACTIVE PILL INDICATOR (compact subtle capsule, muted tone — natural app look) ---- */
         #bottomNav .bnav-item::before {
             content: '';
             position: absolute; z-index: -1;
-            top: 1px; bottom: 1px; left: 5px; right: 5px;
-            border-radius: 999px;
-            background: #0284c718;
-            box-shadow: 0 6px 16px rgba(2, 132, 199, .16), inset 0 0 0 1px rgba(2, 132, 199, .14);
+            top: 3px; bottom: 3px; left: 11px; right: 11px;
+            border-radius: 13px;
+            background: rgba(148,163,184,.17);
             opacity: 0;
-            transform: scale(.82);
+            transform: scale(.9);
             transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             pointer-events: none;
         }
         #bottomNav .bnav-item.active::before {
             opacity: 1;
             transform: scale(1);
-            animation: bnavPillPop 0.34s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: bnavPillPop 0.32s cubic-bezier(0.4, 0, 0.2, 1);
         }
         @keyframes bnavPillPop {
-            0%   { transform: scale(.86); }
-            55%  { transform: scale(1.06); }
+            0%   { transform: scale(.9); }
+            55%  { transform: scale(1.03); }
             100% { transform: scale(1); }
         }
         #bottomNav .bnav-item.active { color: #0284c7; font-weight: 800; }
         #bottomNav .bnav-item.active i {
-            transform: translateY(-2px) scale(1.14);
-            filter: drop-shadow(0 4px 10px rgba(2, 132, 199, .28));
+            transform: translateY(-1px) scale(1.06);
+            filter: drop-shadow(0 2px 5px rgba(2, 132, 199, .20));
         }
         #bottomNav .bnav-item.active span { font-weight: 800; letter-spacing: .01em; }
         #bottomNav .bnav-item .bnav-dot { display: none; }
-        #bottomNav .bnav-item:active { transform: scale(.94); }
+        #bottomNav .bnav-item:active { transform: scale(.96); }
         html.dark #bottomNav .bnav-item.active { color: #38bdf8; }
-        html.dark #bottomNav .bnav-item.active::before {
-            background: rgba(56, 189, 248, .16);
-            box-shadow: 0 6px 16px rgba(56, 189, 248, .18), inset 0 0 0 1px rgba(56, 189, 248, .20);
-        }
+        html.dark #bottomNav .bnav-item.active::before { background: rgba(148,163,184,.20); }
 
         /* ---- ADMIN ---- */
         .admin-stat { background: white; border-radius: 20px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
@@ -12238,11 +12234,7 @@ main.andos-main{overscroll-behavior-x:none}
   box-shadow:0 6px 18px rgba(15,23,42,.10) !important;
 }
 #yuvaGate.saved-account .acc-floating-pill{background:#0f172a;color:#ffffff;border-color:#0f172a}
-#yuvaGate.saved-account .btn-box:not(.btn-box-account) .gbtn{
-  min-height:56px !important;
-  box-shadow:none !important;
-  border-color:#dfe3ea !important;
-}
+/* Google button saved-state me bhi ORIGINAL structure/style me rehta hai (koi override nahi) */
 /* ---------- Last Used verify sheet (Google FORCE nahi, user choice) ---------- */
 #luVerify{position:fixed;inset:0;z-index:2147483000;display:none;align-items:flex-end;justify-content:center;
   background:rgba(9,12,20,.55);font-family:"Plus Jakarta Sans","Inter",system-ui,-apple-system,sans-serif}
@@ -12477,8 +12469,8 @@ main.andos-main{overscroll-behavior-x:none}
   <div class="toast" id="toast"></div>
 </div>
 <!-- ==================== ZERO-JUMP PURE #000000 COLD-START VIDEO & STANDALONE PWA SPLASH ==================== -->
-<div id="appSplashOverlay" style="position:fixed;inset:0;width:100vw;height:100dvh;margin:0;padding:0;z-index:2147483640;background:#000000;display:flex;align-items:center;justify-content:center;overflow:hidden;transform:translate3d(0,0,0);transition:opacity .22s cubic-bezier(.16,1,.3,1);">
-    <video id="appSplashVideo" autoplay muted playsinline preload="auto" style="display:block;width:265.15px;height:149.15px;max-width:76vw;aspect-ratio:16/9;object-fit:contain;object-position:center center;background:#000000;margin:0;padding:0;border:0;outline:0;transform:translate3d(0,0,0);"></video>
+<div id="appSplashOverlay" style="position:fixed;inset:0;width:100vw;height:100vh;margin:0;padding:0;z-index:2147483640;background:#000000;display:flex;align-items:center;justify-content:center;overflow:hidden;transform:translate3d(0,0,0);transition:opacity .22s cubic-bezier(.16,1,.3,1);">
+    <video id="appSplashVideo" autoplay muted playsinline preload="auto" style="display:block;width:265.15px;height:149.15px;max-width:76vw;aspect-ratio:16/9;object-fit:contain;object-position:center center;background:#000000;opacity:0;transition:opacity .14s ease-out;margin:0;padding:0;border:0;outline:0;transform:translate3d(0,0,0);"></video>
 </div>
 <script>
 (function () {
@@ -12549,6 +12541,8 @@ main.andos-main{overscroll-behavior-x:none}
         window.__andosSplashActive = false;
         try { ov.id = ov.id || 'andosSplashOv'; } catch (e) {}
         // NETFLIX-STYLE CINEMATIC EXIT: video `ended` -> container zoom-in (scale 2.2) + fade out
+        // Zoom se PEHLE video hide -> scale(2.2) par bloated/flicker frame nahi dikhta, clean black-sheet dissolve
+        try { if (v) { v.style.transition = 'opacity 0.08s linear'; v.style.opacity = '0'; } } catch (eV) {}
         try {
             ov.classList.add('andos-zoom-out');
             ov.style.transition = 'transform 0.45s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.35s ease';
@@ -12617,6 +12611,9 @@ main.andos-main{overscroll-behavior-x:none}
             v.style.opacity = '1';
         }, { once: true });
         v.addEventListener('seeked', function () {
+            v.style.opacity = '1';
+        }, { once: true });
+        if (!isStandalonePWA) v.addEventListener('loadeddata', function () {
             v.style.opacity = '1';
         }, { once: true });
         v.addEventListener('ended', function () {
@@ -16040,8 +16037,7 @@ const PLANS = {
                 }
                 accountBox.style.display = '';
                 try { var g1 = document.getElementById('yuvaGate'); if (g1) g1.classList.add('saved-account'); } catch (e1) {}
-                // LAST USED maujood hai -> neeche wala duplicate "Continue with Google" pill HIDE (sirf Last Used + Continue as Guest)
-                try { var gb1 = document.getElementById('mainGoogleBtn'); if (gb1 && gb1.parentElement) gb1.parentElement.style.display = 'none'; } catch (e1b) {}
+                // LAST USED card upar, neeche "Continue with Google" HAMESHA visible (doosra/account-switch option)
             } catch (e) {
                 accountBox.style.display = 'none';
                 try { var g2 = document.getElementById('yuvaGate'); if (g2) g2.classList.remove('saved-account'); } catch (e2) {}

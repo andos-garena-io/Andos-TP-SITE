@@ -1,7 +1,7 @@
 /* ANDOS Production Service Worker v3 — Cache Versioning, Legacy PWA Auto-Purge & Fresh HTML Guarantee */
 const CACHE_VERSION = 'v3';
 const STATIC_MEDIA_CACHE = 'andos-media-' + CACHE_VERSION;
-const APP_BUILD_ID = 'andos-v3-20261022k';
+const APP_BUILD_ID = 'andos-v3-20261022l';
 const PRECACHE_MEDIA = [
   './assets/videos/splash-loading.mp4',
   './assets/app-icon/logo-192.png',
