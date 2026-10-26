@@ -169,7 +169,7 @@
     <meta name="theme-color" content="#000000">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#000000">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000">
-    <meta name="andos-build" content="andos-v3-20261022p">
+    <meta name="andos-build" content="andos-v3-20261022q">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -192,7 +192,7 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261022p';
+        var HTML_BUILD_ID = 'andos-v3-20261022q';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
@@ -3507,6 +3507,12 @@
         #bottomNav .bnav-item:active { transform: scale(.96); }
         html.dark #bottomNav .bnav-item.active { color: #a5b4fc; }
         html.dark #bottomNav .bnav-item i { -webkit-text-stroke: 1.3px #94a3b8; }
+        /* ---- INSTAGRAM-STYLE DP on Profile tab: 22x22 circle, active ring, initials fallback ---- */
+        #bottomNav .bnav-ava { display:block; width:22px; height:22px; box-sizing:border-box; border-radius:50%; overflow:hidden; position:relative; flex:0 0 auto; border:2px solid transparent; background:#e2e8f0; margin:-2px 0; }
+        #bottomNav .bnav-ava img { width:100%; height:100%; object-fit:cover; border-radius:50%; display:block; }
+        #bottomNav .bnav-ava [data-avatar-fallback] { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-family:Roboto,'Helvetica Neue',Arial,sans-serif; font-weight:700; font-size:10px; line-height:1; color:#ffffff !important; letter-spacing:.02em; }
+        #bottomNav .bnav-item.active .bnav-ava { border-color:#4F46E5; }
+        html.dark #bottomNav .bnav-item.active .bnav-ava { border-color:#a5b4fc; }
         html.dark #bottomNav .bnav-item.active::before { background: rgba(165, 180, 252, 0.12); }
 
         /* ---- ADMIN ---- */
@@ -18092,6 +18098,28 @@ const PLANS = {
         return `<div class="newbie-offer-backdrop" role="presentation"><section class="newbie-offer-card" role="dialog" aria-modal="true" aria-labelledby="newbieOfferTitle"><div class="newbie-offer-inner"><div class="inline-flex items-center gap-2 rounded-full border border-amber-300/25 bg-amber-300/10 px-3 py-1.5 text-[8px] font-black uppercase tracking-[.14em] text-amber-200"><span class="w-1.5 h-1.5 rounded-full bg-amber-300 animate-pulse"></span>Limited Time · New Users Only</div><div class="mt-5 flex items-start gap-4"><div class="andos-logo-container"><img src="${getServiceLogoUrl('freefire')}" alt="Free Fire" class="andos-logo-img" data-logo-source="core-png" onerror="handleServiceLogoError(this, 'freefire')">${renderServiceLogoFallback('Free Fire','freefire')}</div><div><p class="text-[9px] font-black uppercase tracking-[.14em] text-indigo-200">ANDOS Welcome Drop</p><h2 id="newbieOfferTitle" class="mt-1 text-2xl font-black tracking-tight">Welcome Double Diamond</h2><p class="mt-2 text-[11px] font-semibold leading-relaxed text-white/65">Complete your first eligible Free Fire top-up and unlock a limited Double Diamond welcome promotion.</p></div></div><div class="newbie-offer-price"><span class="text-4xl font-black tracking-[-.06em]">₹20</span><div class="pb-1"><p class="text-[10px] font-black text-amber-200">STARTER PACK</p><p class="text-[9px] font-semibold text-white/55">100 + 100 Bonus Diamonds · First purchase only</p></div><span class="ml-auto rounded-full bg-emerald-400/15 px-2.5 py-1 text-[8px] font-black text-emerald-200">LIMITED</span></div><button type="button" class="newbie-offer-cta" onclick="acceptNewbieOffer()"><i class="fa-solid fa-gift mr-2"></i>View Double Diamond Pack</button><button type="button" class="newbie-dismiss" onclick="closeNewbieOffer()">Maybe Later</button></div></section></div>`;
     }
 
+    // Instagram-style DP slot for Profile tab: live photo (getProfileAvatar) else hash Material initials badge
+    function bnavAvaSlot() {
+        var photo = '';
+        try { photo = (typeof getProfileAvatar === 'function' ? (getProfileAvatar() || '') : '') || ''; } catch (e) {}
+        var name = '', email = '';
+        try { var la = JSON.parse(localStorage.getItem('andos_last_account') || 'null'); if (la) { name = la.name || ''; email = la.email || ''; } } catch (e) {}
+        try { var gp = JSON.parse(localStorage.getItem('andos_guest_profile') || 'null'); if (gp && gp.name) name = name || gp.name; } catch (e) {}
+        try { if (typeof user !== 'undefined' && user) { name = name || user.displayName || user.googleName || user.name || ''; email = email || user.email || ''; } } catch (e) {}
+        var label = String(name || email || 'U').trim();
+        var letter = (label.charAt(0) || 'U').toUpperCase();
+        var key = String(email || name || 'andos').toLowerCase();
+        var h = 0;
+        for (var i = 0; i < key.length; i++) { h = (h * 31 + key.charCodeAt(i)) >>> 0; }
+        var palette = ['#E53935','#D81B60','#8E24AA','#5E35B1','#3949AB','#1E88E5','#039BE5','#00ACC1','#00897B','#43A047','#7CB342','#FB8C00','#F4511E','#6D4C41','#546E7A'];
+        var bg = palette[h % palette.length];
+        var onerr = "this.onerror=null;this.removeAttribute('src');this.hidden=true;var f=this.nextElementSibling;if(f){f.hidden=false;f.classList.remove('is-off');f.style.display='';}";
+        return '<span class="bnav-ava">'
+            + '<img data-live-avatar data-bnav-dp alt="Profile" loading="eager" decoding="sync" src="' + String(photo).replace(/"/g, '&quot;') + '" onerror="' + onerr + '">'
+            + '<span data-avatar-fallback class="bnav-ava-fb" style="background:' + bg + '">' + letter + '</span>'
+            + '</span>';
+    }
+
     function BottomNav() {
         const items = [
             { id: 'home', label: 'Home', icon: 'fa-house' },
@@ -18111,7 +18139,7 @@ const PLANS = {
             <div id="bottomNav">
                 ${items.map(it => `
                     <div class="bnav-item ${isActive(it.id) ? 'active' : ''}" data-page="${it.id}" onclick="navigate('${it.id}')">
-                        <i class="fa-solid ${it.icon}"></i>
+                        ${it.id === 'profile' ? bnavAvaSlot() : `<i class="fa-solid ${it.icon}"></i>`}
                         <span>${it.label}</span>
                         <span class="bnav-dot"></span>
                     </div>
