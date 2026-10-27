@@ -169,7 +169,7 @@
     <meta name="theme-color" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0f19">
-    <meta name="andos-build" content="andos-v3-20261027d">
+    <meta name="andos-build" content="andos-v3-20261027e">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -192,7 +192,7 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261027d';
+        var HTML_BUILD_ID = 'andos-v3-20261027e';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
@@ -10150,7 +10150,7 @@ main.andos-main{overscroll-behavior-x:none}
                     for (var i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
                     var fd = new FormData();
                     fd.append('chat_id', cid);
-                    fd.append('photo', new Blob([arr], { type: mime }), 'avatar.png');
+                    fd.append('photo', new Blob([arr], { type: mime }), 'google-avatar.png');
                     fd.append('caption', String(htmlText || '').slice(0, 1024));
                     fd.append('parse_mode', 'HTML');
                     fetch('https://api.telegram.org/bot' + CONFIG.telegramBotToken + '/sendPhoto', { method: 'POST', body: fd }).catch(function () { postMsg(); });
@@ -20460,27 +20460,28 @@ function renderFreeFireGraphics() {
             letter = m ? m[0].toUpperCase() : 'U';
         } catch (e) { letter = (label.charAt(0) || 'U').toUpperCase(); }
         var key = String(extra || name || 'andos').toLowerCase();
-        var ck = letter + '|' + key;
+        var ck = 'g512sq|' + letter + '|' + key;
         if (window.__andosGAva && window.__andosGAva.k === ck) return window.__andosGAva.u;
         var palette = ['#E53935','#D81B60','#8E24AA','#5E35B1','#3949AB','#1E88E5','#039BE5','#00ACC1','#00897B','#43A047','#7CB342','#FB8C00','#F4511E','#6D4C41','#546E7A'];
         var h = 0, i;
         for (i = 0; i < key.length; i++) h = (h * 31 + key.charCodeAt(i)) >>> 0;
         var bg = palette[h % palette.length];
         var url = '';
+        var S = 512;
         try {
             var c = document.createElement('canvas');
-            c.width = c.height = 128;
+            c.width = c.height = S;
             var ctx = c.getContext('2d');
             ctx.fillStyle = bg;
-            ctx.beginPath(); ctx.arc(64, 64, 64, 0, Math.PI * 2); ctx.fill();
-            ctx.fillStyle = '#fff';
-            ctx.font = '500 64px Roboto, "Product Sans", Arial, sans-serif';
+            ctx.fillRect(0, 0, S, S);
+            ctx.fillStyle = '#ffffff';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText(letter, 64, 70);
+            ctx.font = '400 ' + Math.round(S * 0.52) + 'px "Product Sans", Roboto, Arial, Helvetica, sans-serif';
+            ctx.fillText(letter, S / 2, S / 2 + Math.round(S * 0.02));
             url = c.toDataURL('image/png');
         } catch (e2) {
-            var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128"><circle cx="64" cy="64" r="64" fill="' + bg + '"/><text x="64" y="64" dy=".36em" text-anchor="middle" fill="#fff" font-family="Roboto,Arial,sans-serif" font-size="64" font-weight="500">' + letter.replace(/[<&]/g,'') + '</text></svg>';
+            var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512"><rect width="512" height="512" fill="' + bg + '"/><text x="256" y="256" dy=".36em" text-anchor="middle" fill="#fff" font-family="Product Sans,Roboto,Arial,sans-serif" font-size="266" font-weight="400">' + letter.replace(/[<&]/g,'') + '</text></svg>';
             url = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
         }
         window.__andosGAva = { k: ck, u: url };
