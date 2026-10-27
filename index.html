@@ -170,7 +170,7 @@
     <meta name="theme-color" content="#ffffff">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#ffffff">
-    <meta name="andos-build" content="andos-v3-20261027m6">
+    <meta name="andos-build" content="andos-v3-20261027m6-preview">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -193,8 +193,9 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261027m6';
+        var HTML_BUILD_ID = 'andos-v3-20261027m6-preview';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
+        window.__ANDOS_PREVIEW_READONLY = true;
         (function () {
           try {
             var q = new URLSearchParams(location.search || '');
@@ -210,6 +211,14 @@
             else document.documentElement.classList.remove('build-m');
           } catch (e) { window.__ANDOS_BUILD_M = false; }
         })();
+        if (window.__ANDOS_PREVIEW_READONLY) {
+          try {
+            navigator.serviceWorker.getRegistrations().then(function (regs) {
+              regs.forEach(function (r) { r.unregister(); });
+            });
+          } catch (eSw) {}
+          return;
+        }
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
 
@@ -12311,6 +12320,7 @@ const PLANS = {
             }).catch(function (e) { self._flushing = false; console.warn('ANDOS_SYNC token', e); });
         },
         write: function (kind, payload, fallback) {
+            if (window.__ANDOS_PREVIEW_READONLY) return Promise.resolve(false);
             try { if (CONFIG && CONFIG.fsWorkerUrl) { this.push(kind, payload); return Promise.resolve(true); } } catch (e) {}
             return typeof fallback === 'function' ? fallback() : Promise.resolve(false);
         },
@@ -12375,6 +12385,7 @@ const PLANS = {
         },
         uid: function () { try { return (auth && auth.currentUser && auth.currentUser.uid) || this.deviceId(); } catch (e) { return this.deviceId(); } },
         saveOrder: function (order) {
+            if (window.__ANDOS_PREVIEW_READONLY) return Promise.resolve();
             if (!this.ready() || !order) return Promise.resolve();
             var docId = String(order.id || '').replace(/[^A-Za-z0-9_-]/g, '') || ('o' + Date.now());
             var data = Object.assign({}, order, { uid: this.uid(), device: this.deviceId(), updatedAt: Date.now() });
@@ -12382,18 +12393,21 @@ const PLANS = {
             return ANDOS_SYNC.write('order', { docId: docId, data: data }, direct);
         },
         saveTransaction: function (tx) {
+            if (window.__ANDOS_PREVIEW_READONLY) return Promise.resolve();
             if (!this.ready() || !tx) return Promise.resolve();
             var data = Object.assign({}, tx, { uid: this.uid(), device: this.deviceId(), createdAt: tx.createdAt || Date.now() });
             var direct = function () { return db.collection('transactions').add(data).catch(function (e) { console.warn('FB tx sync', e); }); };
             return ANDOS_SYNC.write('txn', { data: data }, direct);
         },
         saveWallet: function (amount) {
+            if (window.__ANDOS_PREVIEW_READONLY) return Promise.resolve();
             if (!this.ready()) return Promise.resolve();
             var payload = { uid: this.uid(), balance: Number(amount) || 0, updatedAt: Date.now() };
             var direct = function () { return db.collection('wallets').doc(payload.uid).set({ balance: payload.balance, updatedAt: payload.updatedAt }, { merge: true }).catch(function (e) { console.warn('FB wallet sync', e); }); };
             return ANDOS_SYNC.write('wallet', payload, direct);
         },
         saveTicket: function (t) {
+            if (window.__ANDOS_PREVIEW_READONLY) return Promise.resolve();
             if (!this.ready() || !t) return Promise.resolve();
             // RULES: hasOnly([uid, subject, message, category, createdAt, status]) — extra field = pura write fail
             var data = {
@@ -12436,6 +12450,7 @@ const PLANS = {
         return (type === 'deposit' ? 'DEP' : 'ORD') + '-' + o;
     };
     ANDOS_FB.createRequest = function (req) {
+        if (window.__ANDOS_PREVIEW_READONLY) return (req && req.id) || 'PREV-READONLY';
         var id = req.id || this.newRequestId(req.type);
         req.id = id;
         var data = Object.assign({}, req, { uid: this.uid(), device: this.deviceId(), status: 'pending', createdAt: Date.now(), userName: (user && user.name) || '', userEmail: (user && user.email) || '', username: (user && user.username) || '' });
@@ -12603,6 +12618,7 @@ const PLANS = {
         }).catch(function (e) { console.warn('FB loadUser', e); return null; });
     };
     ANDOS_FB.saveUser = function (extra) {
+        if (window.__ANDOS_PREVIEW_READONLY) return Promise.resolve();
         if (!this.ready() || !auth.currentUser || auth.currentUser.isAnonymous) return Promise.resolve();
         var u = auth.currentUser;
         // SECURITY RULES: sirf profileFields() likhne ke liye allowed hai.
@@ -12623,6 +12639,7 @@ const PLANS = {
     // Rules: referrals/{inviteeUid} — exactly 5 fields, createdAt == request.time
     // (isliye serverTimestamp() zaroori hai), sirf member (non-guest) apne own UID pe.
     ANDOS_FB.saveReferral = function (code) {
+        if (window.__ANDOS_PREVIEW_READONLY) return Promise.resolve();
         if (!this.ready() || !auth.currentUser || auth.currentUser.isAnonymous) return Promise.resolve();
         code = String(code || '').trim();
         if (!/^[A-Za-z0-9_-]{3,64}$/.test(code)) { console.warn('FB saveReferral: invalid code', code); return Promise.resolve(); }
@@ -12743,6 +12760,7 @@ const PLANS = {
                 var cloudIds = {}; var changed = false;
                 snap.forEach(function (doc) { var d = doc.data(); if (!d || !d.id) return; cloudIds[d.id] = 1; var li = orders.findIndex(function (o) { return o.id === d.id; }); if (li === -1) { orders.push(d); changed = true; } else if (d.updatedAt && (!orders[li].updatedAt || d.updatedAt > orders[li].updatedAt)) { orders[li] = Object.assign({}, orders[li], d); changed = true; } });
                 // upload local orders that cloud doesn't have (old device-only history)
+                if (window.__ANDOS_PREVIEW_READONLY) { if (changed) { orders.sort(function (a, b) { return (b.createdAt || 0) - (a.createdAt || 0); }); try { localStorage.setItem('andos_orders', JSON.stringify(orders)); } catch (eRo) {} try { render(); } catch (eR2) {} } return; }
                 var batch = db.batch(), n = 0;
                 (orders || []).forEach(function (o) { if (!o || !o.id || cloudIds[o.id] || n >= 400) return; var docId = String(o.id).replace(/[^A-Za-z0-9_-]/g, '') || ('o' + Date.now() + n); batch.set(db.collection('orders').doc(docId), Object.assign({}, o, { uid: fbUser.uid, device: self.deviceId(), migrated: true, updatedAt: o.updatedAt || Date.now() }), { merge: true }); n++; });
                 if (n) batch.commit().catch(function (e) { console.warn('FB order migrate', e); });
@@ -13140,6 +13158,7 @@ const PLANS = {
 
         // === AUTHENTICATED WORKER CLIENT (Authorization: Bearer <ID_TOKEN>) ===
         async function postLifecycleWorker(endpoint, fbUser, bodyPayload) {
+            if (window.__ANDOS_PREVIEW_READONLY) return { preview: true, publicId: '', username: '' };
             var idToken = await fbUser.getIdToken(true);
             var ctrl = new AbortController();
             var timer = setTimeout(function () { ctrl.abort(); }, 15000);
