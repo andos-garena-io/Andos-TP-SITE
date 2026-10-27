@@ -167,10 +167,10 @@
     <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="apple-touch-icon" href="https://cdn.jsdelivr.net/gh/CIDHARIOM/ANDOS-VS-0.172.1919@main/assets/logo/logo.png">
-    <meta name="theme-color" content="#0b0f19">
-    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0b0f19">
-    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0f19">
-    <meta name="andos-build" content="andos-v3-20261027m5">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#ffffff">
+    <meta name="andos-build" content="andos-v3-20261027m6">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -193,7 +193,7 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261027m5';
+        var HTML_BUILD_ID = 'andos-v3-20261027m6';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
         (function () {
           try {
@@ -418,7 +418,7 @@
           // FIX-T: pull par WHITE theme nahi — page ka original header color bana rahe
           if (isHome) {
             var nav = document.querySelector('nav.glass-nav');
-            var hsU = document.querySelector('.page-section[data-sec="home"]');
+            var hsU = document.querySelector('.page-section[data-sec="home"] > .tab-body') || document.querySelector('.page-section[data-sec="home"]');
             var yU = hsU ? (hsU.scrollTop || 0) : (window.scrollY || 0);
             if (nav) { try { nav.style.removeProperty('--hdr-p'); } catch (eH) {} }
             var scrolled = nav ? nav.classList.contains('is-scrolled') : (yU > 18);
@@ -443,7 +443,8 @@
           if (document.getElementById('pageSlider')) {
             var __pg = document.querySelector('.andos-shell');
             var __ps = document.querySelector('.page-section[data-sec="' + (__pg ? __pg.getAttribute('data-page') : '') + '"]');
-            __psTop = __ps ? (__ps.scrollTop || 0) : 0;
+            var __psBody = __ps ? (__ps.querySelector(':scope > .tab-body') || __ps) : null;
+            __psTop = __psBody ? (__psBody.scrollTop || 0) : 0;
           }
           if ((window.scrollY || 0) <= 0 && __psTop <= 0 && e.touches[0].clientY - startY > 24) {
             pulling = true; // FIX-T: sirf flag — WHITE flash band, theme-color BANA rahe (point 5)
@@ -486,8 +487,9 @@
             if (!t || !t.classList || !t.classList.contains || t === document) return;
             var isSec = t.classList.contains('page-section');
             var isMain = t.classList.contains('andos-main');
-            if (!isSec && !isMain) return;
-            if (isSec && t.getAttribute('data-sec') === 'home') { try { syncHomeHeroNav(t.scrollTop || 0); } catch (err) {} }
+            var isTabBody = t.classList.contains('tab-body');
+            if (!isSec && !isMain && !isTabBody) return;
+            if ((isTabBody && t.classList.contains('home-tab-body')) || (isSec && t.getAttribute('data-sec') === 'home')) { try { syncHomeHeroNav(t.scrollTop || 0); } catch (err) {} }
             var now = Date.now();
             if (now - (window.__andosFixtST || 0) < 120) return;
             window.__andosFixtST = now;
@@ -15329,6 +15331,19 @@ const PLANS = {
             }
         } catch (e) {}
     }
+    function __andosTabScroller(sec) {
+        var el = typeof sec === 'string' ? document.querySelector('.page-section[data-sec="' + sec + '"]') : sec;
+        if (!el) return null;
+        return el.querySelector(':scope > .tab-body') || el;
+    }
+    window.__andosTabScroller = __andosTabScroller;
+    function __wrapMainTab(sec, inner) {
+        inner = inner || '';
+        if (sec === 'home') {
+            return '<div id="topNavSlot" class="tab-header home-tab-header">' + Navbar('home') + '</div><div class="tab-body home-tab-body">' + inner + '</div>';
+        }
+        return '<div class="tab-body">' + inner + '</div>';
+    }
     function __fillMainSection(sec) {
         try {
             if (sec === '__none__') return;
@@ -15341,7 +15356,7 @@ const PLANS = {
             else if (sec === 'wallet') { html = WalletPage(); }
             else if (sec === 'account') { html = (typeof AccountPage === 'function') ? AccountPage() : ProfilePage(); }
             if (!html) return;
-            el.innerHTML = html;
+            el.innerHTML = __wrapMainTab(sec, html);
             el.setAttribute('data-filled', '1');
             __fixSliderDOM(sec);
             try { initScrollReveal(); } catch (e) {}
@@ -15603,8 +15618,8 @@ const PLANS = {
             <div class="min-h-screen andos-shell" data-page="${currentPage}" data-dark="${window.__andosDarkPage ? 'true' : 'false'}">
                 <div class="evt-page-sparks" id="evtPageSparks" aria-hidden="true"></div>
                 <div id="toastContainer" class="fixed top-4 inset-x-0 z-[400] flex flex-col items-center gap-2.5 pointer-events-none px-4"></div>
-                ${__isMain5 ? `<div id="topNavSlot">${Navbar('home')}</div>` : (showNav ? Navbar() : '')}
-                ${__isMain5 ? `<main class="page-enter andos-main" data-dark="${window.__andosDarkPage ? 'true' : 'false'}" style="${showBottomNav ? 'padding-bottom:0;' : ''}"><div class="page-slider" id="pageSlider">${__ANDOS_MAIN_SECS.map(function (s) { return `<div class="page-section" data-sec="${s}" data-filled="${s === currentPage ? '1' : '0'}">${s === currentPage ? content : ''}</div>`; }).join('')}</div></main>` : `<main class="page-enter andos-main" data-dark="${window.__andosDarkPage ? 'true' : 'false'}" style="${showBottomNav ? 'padding-bottom:0;' : ''}">${content}</main>`}
+                ${__isMain5 ? '' : (showNav ? Navbar() : '')}
+                ${__isMain5 ? `<main class="page-enter andos-main" data-dark="${window.__andosDarkPage ? 'true' : 'false'}" style="${showBottomNav ? 'padding-bottom:0;' : ''}"><div class="page-slider" id="pageSlider">${__ANDOS_MAIN_SECS.map(function (s) { return `<div class="page-section" data-sec="${s}" data-filled="${s === currentPage ? '1' : '0'}">${s === currentPage ? __wrapMainTab(s, content) : ''}</div>`; }).join('')}</div></main>` : `<main class="page-enter andos-main" data-dark="${window.__andosDarkPage ? 'true' : 'false'}" style="${showBottomNav ? 'padding-bottom:0;' : ''}">${content}</main>`}
                 ${(!__isMain5) && showFooter ? Footer() : ''}
                 ${showBottomNav ? BottomNav() : ''}
                 ${PinLockOverlay()}
@@ -20954,11 +20969,12 @@ function renderFreeFireGraphics() {
         var root = document.getElementById('xploreRoot');
         var drill = document.getElementById('exploreDrill');
         if (!root || !drill) return false;
-        try { window.__exploreScroll = pane ? (pane.scrollTop || 0) : 0; } catch (e) { window.__exploreScroll = 0; }
+        var scOpen = pane ? (pane.querySelector(':scope > .tab-body') || pane) : null;
+        try { window.__exploreScroll = scOpen ? (scOpen.scrollTop || 0) : 0; } catch (e) { window.__exploreScroll = 0; }
         root.style.display = 'none';
         drill.hidden = false;
         drill.innerHTML = CategoryDetailPage();
-        try { if (pane) pane.scrollTop = 0; } catch (e2) {}
+        try { if (scOpen) scOpen.scrollTop = 0; } catch (e2) {}
         try { if (window.__andosSyncTabSwipeLock) window.__andosSyncTabSwipeLock(); } catch (eLk) {}
         return true;
     };
@@ -20971,7 +20987,10 @@ function renderFreeFireGraphics() {
             drill.hidden = true;
             root.style.display = '';
             selectedCategory = null;
-            try { if (pane) pane.scrollTop = window.__exploreScroll || 0; } catch (e) {}
+            try {
+                var scClose = pane ? (pane.querySelector(':scope > .tab-body') || pane) : null;
+                if (scClose) scClose.scrollTop = window.__exploreScroll || 0;
+            } catch (e) {}
             try { if (window.__andosSyncTabSwipeLock) window.__andosSyncTabSwipeLock(); } catch (eLk) {}
             return;
         }
@@ -23186,7 +23205,7 @@ function renderFreeFireGraphics() {
         if (sidebarOpen) return;
         nav.classList.add('hero-over-image');
         const y = (typeof yArg === 'number') ? yArg : (function () {
-            var hs = document.querySelector('.page-section[data-sec="home"]');
+            var hs = document.querySelector('.page-section[data-sec="home"] > .tab-body') || document.querySelector('.page-section[data-sec="home"]');
             return (hs && document.getElementById('pageSlider')) ? (hs.scrollTop || 0) : (window.scrollY || document.documentElement.scrollTop || 0);
         })();
         if (window.__andosHdrRaf) cancelAnimationFrame(window.__andosHdrRaf);
@@ -26184,6 +26203,142 @@ html.build-m #orderFilterPanel, html.build-m .od-filters {
   overflow: visible !important;
   width: 100% !important;
   max-width: none !important;
+}
+
+/* ===== m6: per-tab standalone screens (header rides with carousel) ===== */
+html, body {
+  height: 100%;
+  height: 100dvh;
+  margin: 0;
+  overflow: hidden;
+}
+html, body, #app {
+  height: 100%;
+  height: 100dvh;
+  overflow: hidden;
+  background-color: #ffffff !important;
+}
+#app { position: relative; }
+.andos-shell {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #ffffff !important;
+}
+.andos-shell[data-page="wallet"] { background: #2e1065 !important; }
+main.andos-main:has(#pageSlider) {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden !important;
+}
+#pageSlider.page-slider {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.page-section {
+  flex: 0 0 100%;
+  min-width: 100%;
+  width: 100%;
+  height: 100%;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden !important;
+  box-sizing: border-box;
+  position: relative;
+}
+.tab-header, .home-tab-header, .page-section[data-sec="home"] > #topNavSlot {
+  display: block !important;
+  flex: 0 0 auto;
+  pointer-events: auto;
+}
+/* Home header lives INSIDE home section — overlays hero, swipes with the page */
+.page-section[data-sec="home"] > #topNavSlot,
+.page-section[data-sec="home"] > .tab-header {
+  position: absolute !important;
+  top: 0; left: 0; right: 0;
+  z-index: 60;
+}
+.andos-shell:not([data-page="home"]) #topNavSlot { display: block !important; }
+.tab-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+  box-sizing: border-box;
+}
+.tab-body:not(.home-tab-body) {
+  padding-bottom: 0;
+}
+.home-tab-body { position: relative; isolation: isolate; }
+.home-tab-body::before {
+  content: '';
+  position: absolute;
+  top: -72px; left: 0; right: 0;
+  height: 72px;
+  background: #F9A8D4;
+  z-index: -1;
+}
+.page-section[data-sec="home"] > nav.glass-nav,
+.page-section[data-sec="home"] nav.glass-nav,
+.page-section[data-sec="home"] nav.home-topbar,
+.page-section[data-sec="home"] nav.glass-nav.enterprise-nav.hero-over-image {
+  background: transparent !important;
+  background-image: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  padding-top: max(16px, env(safe-area-inset-top, 0px)) !important;
+}
+.page-section[data-sec="home"] nav.glass-nav.is-scrolled,
+.page-section[data-sec="home"] nav.glass-nav.enterprise-nav.hero-over-image.is-scrolled {
+  background: rgba(255,255,255,.58) !important;
+  backdrop-filter: blur(16px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(160%) !important;
+}
+nav.glass-nav, nav.home-topbar, .xplore-head, .catd-bar, .odd-bar, .txn-bar, .sp-bar, .pf-title, .wal-hero, .wal-m-hero, .od-title {
+  padding-top: max(16px, env(safe-area-inset-top, 0px)) !important;
+  box-sizing: border-box;
+}
+.tab-body .xplore-head,
+.tab-body .pf-title {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: #ffffff;
+}
+.page-section[data-sec="categories"] .tab-body .xplore-head { background: #f7f7f7; }
+.page-section[data-sec="wallet"] > .tab-body {
+  overflow: hidden !important;
+  display: flex;
+  flex-direction: column;
+}
+html.build-m .page-section[data-sec="wallet"] > .tab-body,
+html.build-m .page-section[data-sec="wallet"] > .tab-body > .page-enter.wal-m {
+  min-height: 100% !important;
+  height: 100% !important;
+  overflow: hidden !important;
+}
+.tab-body > .xplore-stack { min-height: 100%; }
+@media (display-mode: browser) {
+  /* env(safe-area-inset-top) is 0 in browser — max(16px, …) already keeps spacing */
+}
+@media (display-mode: standalone), (display-mode: fullscreen) {
+  html, body, #app { height: 100dvh; }
 }
 
 </style>
