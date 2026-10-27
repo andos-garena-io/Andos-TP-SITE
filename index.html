@@ -156,7 +156,6 @@
         })();
     </script>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 
     <!-- ==================== PWA MANIFEST & APP ICONS ==================== -->
     <link rel="manifest" href="manifest.json">
@@ -170,7 +169,7 @@
     <meta name="theme-color" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0f19">
-    <meta name="andos-build" content="andos-v3-20261028n">
+    <meta name="andos-build" content="andos-v3-20261028l2">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -193,14 +192,8 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261028n';
+        var HTML_BUILD_ID = 'andos-v3-20261028l2';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
-        window.__ANDOS_BUILD_M6 = false;
-        window.__ANDOS_BUILD_M = true;
-        try {
-          document.documentElement.classList.add('build-m');
-          document.documentElement.classList.remove('build-m6');
-        } catch (eBm) {}
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
 
@@ -335,25 +328,13 @@
           for (var i = 0; i < ms.length; i++) { if (ms[i].getAttribute('content') !== c) ms[i].setAttribute('content', c); }
         }
         window.__andosWriteMetaTheme = writeMetaTheme;
-        window.updateStatusBarTheme = function (activeTab) {
-          try {
-            var tab = activeTab || '';
-            if (!tab) {
-              var sh = document.querySelector('.andos-shell');
-              tab = sh ? (sh.getAttribute('data-page') || '') : '';
-            }
-            if (tab === 'wallet') writeMetaTheme('#2e1065');
-            else if (tab === 'home') writeMetaTheme('#F9A8D4');
-            else writeMetaTheme('#E2E8F0');
-          } catch (e) {}
-        };
         // FIX-U(1): home glass progress -> status-bar color INTERPOLATE (jump band)
         window.__andosHomeMetaP = function (p) {
           if (window.__andosSplashActive) return;
           var gateU = document.getElementById('yuvaGate');
           if (gateU && !gateU.classList.contains('yg-out')) { writeMetaTheme('#ffffff'); return; }
           // rest: theme-color = hero-top #F9A8D4 (status bar continues gradient). scrolled: white glass.
-          writeMetaTheme('#F9A8D4');
+          writeMetaTheme((p * 80) > 18 ? '#ffffff' : '#F9A8D4');
         };
         function setTheme(c) {
           if (window.__andosSplashActive) return; // splash chal raha hai -> status bar BLACK rahega
@@ -409,7 +390,7 @@
           // FIX-T: pull par WHITE theme nahi — page ka original header color bana rahe
           if (isHome) {
             var nav = document.querySelector('nav.glass-nav');
-            var hsU = document.querySelector('.page-section[data-sec="home"] > .tab-body') || document.querySelector('.page-section[data-sec="home"]');
+            var hsU = document.querySelector('.page-section[data-sec="home"]');
             var yU = hsU ? (hsU.scrollTop || 0) : (window.scrollY || 0);
             if (nav) { try { nav.style.removeProperty('--hdr-p'); } catch (eH) {} }
             var scrolled = nav ? nav.classList.contains('is-scrolled') : (yU > 18);
@@ -434,8 +415,7 @@
           if (document.getElementById('pageSlider')) {
             var __pg = document.querySelector('.andos-shell');
             var __ps = document.querySelector('.page-section[data-sec="' + (__pg ? __pg.getAttribute('data-page') : '') + '"]');
-            var __psBody = __ps ? (__ps.querySelector(':scope > .tab-body') || __ps) : null;
-            __psTop = __psBody ? (__psBody.scrollTop || 0) : 0;
+            __psTop = __ps ? (__ps.scrollTop || 0) : 0;
           }
           if ((window.scrollY || 0) <= 0 && __psTop <= 0 && e.touches[0].clientY - startY > 24) {
             pulling = true; // FIX-T: sirf flag — WHITE flash band, theme-color BANA rahe (point 5)
@@ -478,9 +458,8 @@
             if (!t || !t.classList || !t.classList.contains || t === document) return;
             var isSec = t.classList.contains('page-section');
             var isMain = t.classList.contains('andos-main');
-            var isTabBody = t.classList.contains('tab-body');
-            if (!isSec && !isMain && !isTabBody) return;
-            if ((isTabBody && t.classList.contains('home-tab-body')) || (isSec && t.getAttribute('data-sec') === 'home')) { try { syncHomeHeroNav(t.scrollTop || 0); } catch (err) {} }
+            if (!isSec && !isMain) return;
+            if (isSec && t.getAttribute('data-sec') === 'home') { try { syncHomeHeroNav(t.scrollTop || 0); } catch (err) {} }
             var now = Date.now();
             if (now - (window.__andosFixtST || 0) < 120) return;
             window.__andosFixtST = now;
@@ -5952,15 +5931,15 @@ html.dark .plan-asset-slot {
 
 
 #app input[type="text"]:focus, #app input[type="tel"]:focus, #app input[type="email"]:focus,
-#app input[type="number"]:focus, #app input[type="search"]:focus, #app input[type="password"]:focus,
-#app textarea:focus, #app .input-field:focus {
+#app input[type="number"]:focus, #app input[type="search"]:focus, #app textarea:focus, #app .input-field:focus {
   outline: none !important;
-  box-shadow: none !important;
-  -webkit-box-shadow: none !important;
-  animation: none !important;
-  border: 1.5px solid #4F46E5 !important;
+  border-color: #f97316 !important;
+  animation: inputFire 1s ease-in-out infinite;
 }
-@keyframes inputFire { 0%,100% { box-shadow: none; } }
+@keyframes inputFire {
+  0%, 100% { box-shadow: 0 0 0 2px rgba(249,115,22,.28), 0 0 14px rgba(239,68,68,.45); }
+  50% { box-shadow: 0 0 0 4px rgba(251,146,60,.22), 0 0 22px rgba(234,88,12,.6); }
+}
 
 
 .rf-hero {
@@ -11344,6 +11323,7 @@ function saveOrder(order) {
     }
 
     function isWalletDepositUnlocked() {
+        if (window.__andosWalletUnlockedServer === false) return false;
         try { if (typeof isAdminDevMode === 'function' && isAdminDevMode()) return true; } catch(e) {}
         return localStorage.getItem('isWalletUnlocked') === 'true';
     }
@@ -12456,7 +12436,8 @@ const PLANS = {
             txs.forEach(function (t) { if (t.reference === d.reference || t.requestId === d.id) { t.status = ok ? 'approved' : 'failed'; t.desc = ok ? 'Wallet Recharge - Approved' : 'Wallet Recharge - Failed'; t.approvedAt = Date.now(); } });
             localStorage.setItem('andos_transactions', JSON.stringify(txs.slice(0, 50)));
             if (ok) {
-                unlockWalletAfterApprovedDeposit(Number(d.amount || 0));
+                unlockWalletAfterApprovedDeposit(Number(d.amount || 0)); // check against balance BEFORE credit
+                saveWallet((Number(wallet) || 0) + Number(d.amount || 0));
                 try { addLoyaltyPoints(Math.max(5, Math.floor(Number(d.amount || 0) / 20))); } catch (e) {}
                 try { triggerConfetti(); } catch (e) {}
                 showToast('✅ ₹' + d.amount + ' wallet me add ho gaye!' + (isWalletDepositUnlocked() ? ' Wallet unlocked.' : ''), 'success');
@@ -12486,91 +12467,6 @@ const PLANS = {
                 snap.docChanges().forEach(function (ch) { try { self.applyRequest(ch.doc.data()); } catch (e) { console.warn(e); } });
             }, function (e) { console.warn('FB watchRequests', e); });
         } catch (e) {}
-    };
-    ANDOS_FB.ingestCloudTx = function (fid, x) {
-        if (!x) return false;
-        var txs = readLocalJSON('andos_transactions', []);
-        var ref = String(x.reference || fid || '');
-        var exists = txs.some(function (t) {
-            return (fid && t.fid === fid) || (ref && t.reference && String(t.reference) === ref);
-        });
-        if (exists) return false;
-        var when = Number(x.createdAt || Date.now());
-        var dateStr = '';
-        try {
-            dateStr = x.date && String(x.date).indexOf('T') === -1 ? String(x.date) : new Date(when).toLocaleDateString('en-IN');
-        } catch (e0) { dateStr = new Date().toLocaleDateString('en-IN'); }
-        var desc = String(x.desc || (x.source === 'admin' ? 'Admin se wallet credit' : 'Wallet credit'));
-        txs.unshift({
-            fid: fid || '',
-            type: x.type === 'debit' ? 'debit' : 'credit',
-            amount: Number(x.amount || 0),
-            desc: desc,
-            source: x.source || 'admin',
-            status: x.status || 'approved',
-            date: dateStr,
-            createdAt: when,
-            reference: ref
-        });
-        try { localStorage.setItem('andos_transactions', JSON.stringify(txs.slice(0, 80))); } catch (e1) {}
-        return true;
-    };
-    ANDOS_FB.watchMoney = function () {
-        if (!this.ready() || this._unsubMoney) return;
-        this._unsubMoney = 1;
-        var uid = this.uid();
-        var self = this;
-        try {
-            this._unsubWal = db.collection('wallets').doc(uid).onSnapshot(function (doc) {
-                try {
-                    if (!doc.exists) return;
-                    var b = Number((doc.data() || {}).balance);
-                    if (!isFinite(b)) return;
-                    if (Number(wallet) === b) return;
-                    wallet = Math.max(0, b);
-                    try { localStorage.setItem('andos_wallet', String(wallet)); } catch (e) {}
-                    try {
-                        var header = document.getElementById('headerWalletBalance');
-                        if (header) header.textContent = '₹' + Number(wallet || 0).toFixed(0);
-                    } catch (e2) {}
-                    try { if (currentPage === 'wallet' || currentPage === 'account' || currentPage === 'profile') render(); } catch (e3) {}
-                } catch (e4) {}
-            }, function (e) { console.warn('FB watchWallet', e); });
-        } catch (eW) {}
-        try {
-            this._unsubTx = db.collection('transactions').where('uid', '==', uid).onSnapshot(function (snap) {
-                var first = !self._txReady;
-                self._txReady = 1;
-                var added = false;
-                var last = null;
-                snap.docChanges().forEach(function (ch) {
-                    if (ch.type === 'removed') return;
-                    var x = ch.doc.data() || {};
-                    if (self.ingestCloudTx(ch.doc.id, x)) { added = true; last = x; }
-                });
-                if (added) {
-                    if (!first) {
-                        try {
-                            if (last) showToast((last.type === 'debit' ? '−' : '+') + '₹' + Number(last.amount || 0).toLocaleString('en-IN') + ' · ' + String(last.desc || 'Wallet'), 'success');
-                        } catch (eT) {}
-                    }
-                    try { if (currentPage === 'wallet' || currentPage === 'transactions' || currentPage === 'account') render(); } catch (eR) {}
-                }
-            }, function (e) { console.warn('FB watchTx', e); });
-        } catch (eX) {}
-        try {
-            this._unsubNote = db.collection('notifications').where('uid', '==', uid).onSnapshot(function (snap) {
-                var boot = !self._noteReady;
-                self._noteReady = 1;
-                if (boot) return;
-                snap.docChanges().forEach(function (ch) {
-                    if (ch.type !== 'added') return;
-                    var n = ch.doc.data() || {};
-                    if (n.read) return;
-                    try { if (n.title) showToast(String(n.title) + (n.body ? ' — ' + n.body : ''), 'info'); } catch (eN) {}
-                });
-            }, function (e) { console.warn('FB watchNote', e); });
-        } catch (eN2) {}
     };
 
     // ---- User profile cloud sync (users/{uid}) ----
@@ -12655,8 +12551,14 @@ const PLANS = {
                 wallet = Math.max(cw, localSnapshot.wallet); loyaltyPoints = Math.max(cl, localSnapshot.loyalty);
             }
             localStorage.setItem('andos_wallet', String(wallet)); localStorage.setItem('andos_loyalty', String(loyaltyPoints));
-            // Flags: koi bhi taraf true → true
-            if ((cloud && cloud.walletUnlocked) || localStorage.getItem('isWalletUnlocked') === 'true') localStorage.setItem('isWalletUnlocked', 'true');
+            // Server walletUnlocked=false is admin lock — never keep a stale local true.
+            if (cloud && cloud.walletUnlocked === false) {
+                window.__andosWalletUnlockedServer = false;
+                try { localStorage.setItem('isWalletUnlocked', 'false'); } catch (eLock) {}
+            } else if (cloud && cloud.walletUnlocked === true) {
+                window.__andosWalletUnlockedServer = true;
+                try { localStorage.setItem('isWalletUnlocked', 'true'); } catch (eUn) {}
+            }
             if ((cloud && cloud.ddUsed) || localStorage.getItem('andos_ff_double_diamond_used') === 'true') { localStorage.setItem('andos_ff_double_diamond_used', 'true'); try { isNewbie = false; } catch (e) {} }
             if (cloud && cloud.walletPin && !localStorage.getItem('andos_pin')) { localStorage.setItem('andos_pin', cloud.walletPin); try { walletPin = cloud.walletPin; } catch (e) {} }
             // Transactions history: union by reference/desc+date
@@ -13285,7 +13187,7 @@ const PLANS = {
                         name: verified.name
                     });
                 }
-                try { ANDOS_FB.watchOrders(); ANDOS_FB.watchRequests(); ANDOS_FB.watchMoney && ANDOS_FB.watchMoney(); applyLiveAvatars(); } catch (e) {}
+                try { ANDOS_FB.watchOrders(); ANDOS_FB.watchRequests(); applyLiveAvatars(); } catch (e) {}
 
                 guestOnboardingInFlight = false;
                 setGuestSetupBusy(false);
@@ -13984,7 +13886,7 @@ const PLANS = {
                         applyVerifiedServerIdentity(fbUser, minted, '', '');
                     }
                     firstAuthEvent = false;
-                    try { ANDOS_FB.watchOrders(); ANDOS_FB.watchRequests(); ANDOS_FB.watchMoney && ANDOS_FB.watchMoney(); applyLiveAvatars(); } catch (e) {}
+                    try { ANDOS_FB.watchOrders(); ANDOS_FB.watchRequests(); applyLiveAvatars(); } catch (e) {}
                     hideLoginGate();
                     markAuthBootResolved();
                 } catch (err) {
@@ -14034,7 +13936,7 @@ const PLANS = {
                 var isTrulyNew = (cloud === null) && isNewMeta;
 
                 try { ANDOS_FB.applyCloud(fbUser, cloud, isTrulyNew); } catch (e) { console.warn('applyCloud', e); }
-                try { ANDOS_FB.watchOrders(); ANDOS_FB.watchRequests(); ANDOS_FB.watchMoney && ANDOS_FB.watchMoney(); ANDOS_SYNC.syncNotifications(); } catch (e) {}
+                try { ANDOS_FB.watchOrders(); ANDOS_FB.watchRequests(); ANDOS_SYNC.syncNotifications(); } catch (e) {}
                 try { if (typeof render === 'function') render(); } catch (e) {}
 
                 try {
@@ -15055,8 +14957,10 @@ const PLANS = {
                 <section class="ios-wallet-alert" role="alertdialog" aria-modal="true" aria-labelledby="walletLockedTitle">
                     <div class="ios-wallet-alert-body">
                         <div class="ios-wallet-alert-icon"><i class="fa-solid fa-lock text-xl"></i></div>
-                        <h2 id="walletLockedTitle" class="text-xl font-black text-slate-950 tracking-tight">Wallet Locked!</h2>
-                        <p class="mt-3 text-[12px] font-semibold leading-relaxed text-slate-600">Aapka balance <b>${formatPrice(wallet)}</b> hai. Wallet unlock karne ke liye ek baar <b>₹${getFirstDepositMin()}</b> deposit karein.</p><p class="mt-2 text-[10.5px] font-semibold text-slate-400">Isse kam amount accept nahi hoga. Unlock ke baad ₹10 se koi bhi amount.</p>
+                        <h2 id="walletLockedTitle" class="text-xl font-black text-slate-950 tracking-tight">${window.__andosWalletUnlockedServer === false ? 'Wallet locked' : 'Wallet Locked!'}</h2>
+                        <p class="mt-3 text-[12px] font-semibold leading-relaxed text-slate-600">${window.__andosWalletUnlockedServer === false
+                            ? 'This wallet is locked. New payments are blocked. Your balance and past orders are unchanged.'
+                            : 'Aapka balance <b>' + formatPrice(wallet) + '</b> hai. Wallet unlock karne ke liye ek baar <b>₹' + getFirstDepositMin() + '</b> deposit karein.'}</p>${window.__andosWalletUnlockedServer === false ? '' : '<p class="mt-2 text-[10.5px] font-semibold text-slate-400">Isse kam amount accept nahi hoga. Unlock ke baad ₹10 se koi bhi amount.</p>'}
                     </div>
                     <div class="ios-wallet-alert-actions"><button type="button" onclick="closeWalletLockModal()">Not Now</button><button type="button" onclick="closeWalletLockModal();navigate('wallet')">Deposit ₹${getFirstDepositMin()}</button></div>
                 </section>
@@ -15322,15 +15226,6 @@ const PLANS = {
             }
         } catch (e) {}
     }
-    function __andosTabScroller(sec) {
-        var el = typeof sec === 'string' ? document.querySelector('.page-section[data-sec="' + sec + '"]') : sec;
-        if (!el) return null;
-        return el.querySelector(':scope > .tab-body') || el;
-    }
-    window.__andosTabScroller = __andosTabScroller;
-    function __wrapMainTab(sec, inner) {
-        return inner || '';
-    }
     function __fillMainSection(sec) {
         try {
             if (sec === '__none__') return;
@@ -15343,7 +15238,7 @@ const PLANS = {
             else if (sec === 'wallet') { html = WalletPage(); }
             else if (sec === 'account') { html = (typeof AccountPage === 'function') ? AccountPage() : ProfilePage(); }
             if (!html) return;
-            el.innerHTML = __wrapMainTab(sec, html);
+            el.innerHTML = html;
             el.setAttribute('data-filled', '1');
             __fixSliderDOM(sec);
             try { initScrollReveal(); } catch (e) {}
@@ -15427,7 +15322,6 @@ const PLANS = {
                             currentPage = sec;
                             var sh2 = document.querySelector('.andos-shell');
                             if (sh2) sh2.setAttribute('data-page', sec);
-                            try { if (window.updateStatusBarTheme) window.updateStatusBarTheme(sec === 'account' ? 'profile' : sec); } catch (eTh) {}
                             var items = document.querySelectorAll('#bottomNav .bnav-item');
                             for (var k = 0; k < items.length; k++) { items[k].classList.toggle('active', items[k].getAttribute('data-page') === map[sec]); }
                             lastRootTab = sec; navStack = [];
@@ -15530,7 +15424,6 @@ const PLANS = {
                     var __itemsF = document.querySelectorAll('#bottomNav .bnav-item');
                     for (var __kF = 0; __kF < __itemsF.length; __kF++) { __itemsF[__kF].classList.toggle('active', __itemsF[__kF].getAttribute('data-page') === __mapF[currentPage]); }
                     var __shF = document.querySelector('.andos-shell'); if (__shF) __shF.setAttribute('data-page', currentPage);
-                    try { if (window.updateStatusBarTheme) window.updateStatusBarTheme(currentPage === 'account' ? 'profile' : currentPage); } catch (eTh2) {}
                     window.__sliderIdx = __idxF;
                     try { __fillMainSection(__secsF[__idxF - 1]); } catch (eF) {}
                     try { __fillMainSection(__secsF[__idxF + 1]); } catch (eF) {}
@@ -15599,14 +15492,14 @@ const PLANS = {
         try { mountSidebar(); } catch (e) {}
         requestAnimationFrame(() => { window.__andosRenderQueued = false; });
         window.__andosDarkPage = ['loyalty','paymentverify'].indexOf(currentPage) !== -1;
-        const __isMain5 = false; // swipe/carousel removed — click tabs only
+        const __isMain5 = ['home', 'categories', 'orders', 'wallet', 'account'].indexOf(currentPage) !== -1;
         if (__isMain5 && currentPage === 'home') { try { content = content + Footer(); } catch (eF) {} }
         app.innerHTML = `
             <div class="min-h-screen andos-shell" data-page="${currentPage}" data-dark="${window.__andosDarkPage ? 'true' : 'false'}">
                 <div class="evt-page-sparks" id="evtPageSparks" aria-hidden="true"></div>
                 <div id="toastContainer" class="fixed top-4 inset-x-0 z-[400] flex flex-col items-center gap-2.5 pointer-events-none px-4"></div>
-                ${__isMain5 ? '' : (showNav ? Navbar() : '')}
-                ${__isMain5 ? `<main class="page-enter andos-main" data-dark="${window.__andosDarkPage ? 'true' : 'false'}" style="${showBottomNav ? 'padding-bottom:0;' : ''}"><div class="page-slider" id="pageSlider">${__ANDOS_MAIN_SECS.map(function (s) { return `<div class="page-section" data-sec="${s}" data-filled="${s === currentPage ? '1' : '0'}">${s === currentPage ? __wrapMainTab(s, content) : ''}</div>`; }).join('')}</div></main>` : `<main class="page-enter andos-main" data-dark="${window.__andosDarkPage ? 'true' : 'false'}" style="${showBottomNav ? 'padding-bottom:0;' : ''}">${content}</main>`}
+                ${__isMain5 ? `<div id="topNavSlot">${Navbar('home')}</div>` : (showNav ? Navbar() : '')}
+                ${__isMain5 ? `<main class="page-enter andos-main" data-dark="${window.__andosDarkPage ? 'true' : 'false'}" style="${showBottomNav ? 'padding-bottom:0;' : ''}"><div class="page-slider" id="pageSlider">${__ANDOS_MAIN_SECS.map(function (s) { return `<div class="page-section" data-sec="${s}" data-filled="${s === currentPage ? '1' : '0'}">${s === currentPage ? content : ''}</div>`; }).join('')}</div></main>` : `<main class="page-enter andos-main" data-dark="${window.__andosDarkPage ? 'true' : 'false'}" style="${showBottomNav ? 'padding-bottom:0;' : ''}">${content}</main>`}
                 ${(!__isMain5) && showFooter ? Footer() : ''}
                 ${showBottomNav ? BottomNav() : ''}
                 ${PinLockOverlay()}
@@ -16350,7 +16243,7 @@ const PLANS = {
         var inp = document.getElementById('orderSearchInput');
         if (inp && inp.value !== String(orderSearchQuery || '')) inp.value = orderSearchQuery || '';
         var panel = document.getElementById('orderFilterPanel');
-        if (panel) panel.hidden = isAndosBuildM() ? false : !orderFiltersOpen;
+        if (panel) panel.hidden = !orderFiltersOpen;
         return true;
     }
 
@@ -20525,42 +20418,9 @@ function renderFreeFireGraphics() {
         if (id === 'instagram' || id === 'facebook' || id === 'youtube') return 'social';
         return 'others';
     }
-
-    function isAndosBuildM() { return window.__ANDOS_BUILD_M === true; }
-    window.isAndosBuildM = isAndosBuildM;
-    function isAndosBuildM6() { return window.__ANDOS_BUILD_M6 === true; }
-    window.isAndosBuildM6 = isAndosBuildM6;
-    function odFilterIcon() {
-        return '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 14 14" aria-hidden="true" class="od-chip-svg"><path fill="currentColor" fill-rule="evenodd" d="M.5 0a.5.5 0 0 0-.407.79L5 7.66v5.84a.5.5 0 0 0 .777.416l3-2A.5.5 0 0 0 9 11.5V7.66L13.907.79A.5.5 0 0 0 13.5 0z" clip-rule="evenodd"/></svg>';
-    }
-    function odFilterTriggerBtn() {
-        return '<button type="button" id="btn-filter-trigger" class="od-filterbtn w-11 h-11 flex items-center justify-center rounded-2xl border border-slate-200 bg-white" onclick="toggleOrderFilters()" aria-label="Filter"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 14 14" class="text-slate-800" aria-hidden="true"><path fill="currentColor" fill-rule="evenodd" d="M.5 0a.5.5 0 0 0-.407.79L5 7.66v5.84a.5.5 0 0 0 .777.416l3-2A.5.5 0 0 0 9 11.5V7.66L13.907.79A.5.5 0 0 0 13.5 0z" clip-rule="evenodd"/></svg></button>';
-    }
-    function odCopySvg() {
-        return '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
-    }
-    function walGroupTx(transactions) {
-        var groups = [];
-        var map = {};
-        (transactions || []).forEach(function (t) {
-            var key = String(t.date || '').trim() || 'Earlier';
-            if (!map[key]) { map[key] = { label: key, items: [] }; groups.push(map[key]); }
-            map[key].items.push(t);
-        });
-        return groups;
-    }
-    window.togglePfEditor = function () {
-        var el = document.getElementById('pfMForm');
-        if (!el) return;
-        el.hidden = !el.hidden;
-    };
-
     function getFilteredOrders() {
         var list = orders.slice();
-        if (orderFilter && orderFilter !== 'all') list = list.filter(function(o) {
-            if (isAndosBuildM() && orderFilter === 'pending') return o.status === 'pending' || o.status === 'processing';
-            return o.status === orderFilter;
-        });
+        if (orderFilter && orderFilter !== 'all') list = list.filter(function(o) { return o.status === orderFilter; });
         if (orderCatFilter && orderCatFilter !== 'all') list = list.filter(function(o) { return orderServiceBucket(o.serviceId) === orderCatFilter; });
         var q = String(orderSearchQuery || '').trim().toLowerCase();
         if (q) list = list.filter(function(o) {
@@ -20589,17 +20449,7 @@ function renderFreeFireGraphics() {
     window.copyOrderId = function(id, ev) {
         if (ev) { ev.stopPropagation(); ev.preventDefault(); }
         const t = String(id || '');
-        const btn = ev && (ev.currentTarget || ev.target);
-        const done = function() {
-            try {
-                var b = btn && btn.closest ? (btn.closest('.od-copy') || btn) : btn;
-                if (b && b.classList) {
-                    b.classList.add('is-copied');
-                    setTimeout(function(){ try { b.classList.remove('is-copied'); } catch (e2) {} }, 1200);
-                }
-            } catch (e1) {}
-            if (typeof showToast === 'function') showToast('Copied', 'success');
-        };
+        const done = function() { if (typeof showToast === 'function') showToast('Order ID copied', 'success'); };
         try {
             if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(done).catch(done);
             else done();
@@ -20634,7 +20484,7 @@ function renderFreeFireGraphics() {
                 + orderThumb(order)
                 + '<div class="od-mid"><h3>'+escapeHtml(order.service || 'Service')+'</h3>'
                 + '<p>'+escapeHtml(order.plan || '')+'</p>' + window.ddBadge(order, true)
-                + '<div class="od-id">Order ID: '+escapeHtml(order.id || '')+' '+(isAndosBuildM() ? '<span role="button" tabindex="0" class="od-copy" aria-label="Copy order ID" onclick="copyOrderId(\''+String(order.id||'').replace(/'/g,'')+'\', event)">'+odCopySvg()+'</span>' : '<i class="fa-regular fa-copy" onclick="copyOrderId(\''+String(order.id||'').replace(/'/g,'')+'\', event)"></i>')+'</div>'+(order.refBy ? '<div style="margin-top:4px"><span style="display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:999px;background:#eef2ff;color:#4338ca;font-size:8.5px;font-weight:900"><i class="fa-solid fa-user-group"></i>REF: '+escapeHtml(order.refBy)+'</span></div>' : '')+'</div>'
+                + '<div class="od-id">Order ID: '+escapeHtml(order.id || '')+' <i class="fa-regular fa-copy" onclick="copyOrderId(\''+String(order.id||'').replace(/'/g,'')+'\', event)"></i></div>'+(order.refBy ? '<div style="margin-top:4px"><span style="display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:999px;background:#eef2ff;color:#4338ca;font-size:8.5px;font-weight:900"><i class="fa-solid fa-user-group"></i>REF: '+escapeHtml(order.refBy)+'</span></div>' : '')+'</div>'
                 + '<div class="od-right"><div class="amt">'+formatPrice(order.amount)+'</div>'
                 + '<span class="od-pill '+st.cls+'"><i class="fa-solid '+st.icon+'"></i> '+st.label+'</span>'
                 + '<span class="when">'+when+'</span></div>'
@@ -20651,52 +20501,7 @@ function renderFreeFireGraphics() {
         if (id === 'failed') return '<svg class="od-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="'+color+'" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>';
         return '<svg class="od-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2.2"><rect x="3" y="3" width="7" height="7" rx="1.2"/><rect x="14" y="3" width="7" height="7" rx="1.2"/><rect x="3" y="14" width="7" height="7" rx="1.2"/><rect x="14" y="14" width="7" height="7" rx="1.2"/></svg>';
     }
-
-    function OrdersPageM() {
-        const cats = [
-            { id:'all', label:'All' },
-            { id:'gaming', label:'Game' },
-            { id:'mobile', label:'Mobile' },
-            { id:'dth', label:'DTH' },
-            { id:'ott', label:'OTT' },
-            { id:'giftcard', label:'Gift Cards' }
-        ];
-        const statuses = [
-            { id:'all', label:'All' },
-            { id:'completed', label:'Success' },
-            { id:'pending', label:'Pending' },
-            { id:'failed', label:'Failed' }
-        ];
-        var n = getFilteredOrders().length;
-        var qEsc = String(orderSearchQuery || '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
-        var ico = odFilterIcon();
-        return `
-            <div class="page-enter od-page od-m">
-                <h1 class="od-title">Orders</h1>
-                <p class="od-sub" id="ordersCountLabel">${n} ${n===1?'order':'orders'}</p>
-                <div class="od-searchbar">
-                    <label class="od-searchwrap">
-                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#94a3b8" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.2-3.2"/></svg>
-                        <input id="orderSearchInput" type="search" placeholder="Search orders..." value="${qEsc}" oninput="onOrderSearchInput(this)" autocomplete="off">
-                    </label>
-                    ${odFilterTriggerBtn()}
-                </div>
-                <div id="orderFilterPanel" class="od-filters">
-                <div class="od-scroller chip-scroll-track orders-chip-track" id="orderCatTabs" data-hswipe>
-                    ${cats.map(c => `<button type="button" class="od-chip ${orderCatFilter === c.id ? 'on' : ''}" data-cat="${c.id}" onclick="setOrderCatFilter('${c.id}')">${ico}<span>${c.label}</span></button>`).join('')}
-                </div>
-                <div class="od-scroller od-status chip-scroll-track orders-chip-track" id="orderTabs" data-hswipe>
-                    ${statuses.map(c => `<button type="button" class="od-chip ${orderFilter === c.id ? 'on' : ''}" data-filter="${c.id}" onclick="setOrderFilter('${c.id}')">${ico}<span>${c.label}</span></button>`).join('')}
-                </div>
-                </div>
-                <div id="ordersList">${renderOrdersList()}</div>
-            </div>
-        `;
-    }
-
     function OrdersPage() {
-        if (isAndosBuildM()) return OrdersPageM();
-
         const cats = [
             { id:'all', label:'All' },
             { id:'gaming', label:'Game' },
@@ -20726,7 +20531,9 @@ function renderFreeFireGraphics() {
                         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#94a3b8" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.2-3.2"/></svg>
                         <input id="orderSearchInput" type="search" placeholder="Search orders..." value="${qEsc}" oninput="onOrderSearchInput(this)" autocomplete="off">
                     </label>
-                    ${odFilterTriggerBtn()}
+                    <button type="button" class="od-filterbtn" onclick="toggleOrderFilters()" aria-label="Filter">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M2 14h4M10 8h4M18 16h4"/></svg>
+                    </button>
                 </div>
                 <div id="orderFilterPanel" ${orderFiltersOpen ? '' : 'hidden'}>
                 <div class="od-scroller" id="orderCatTabs" data-hswipe>
@@ -20860,33 +20667,6 @@ function renderFreeFireGraphics() {
     }
 
     function CategoriesPage() {
-        if (isAndosBuildM()) {
-            const cats = getExploreCatalog();
-            return `
-            <div class="xplore-stack">
-            <div class="page-enter xplore-page" id="xploreRoot" ${selectedCategory ? 'style="display:none"' : ''}>
-                <div class="xplore-head">
-                    <div>
-                        <h1>Explore</h1>
-                        <p>Every category, ready to open</p>
-                    </div>
-                </div>
-                ${exqStripHTML()}
-                <div class="xplore-grid">
-                    ${cats.map(function(cat) {
-                        const art = cat.img
-                            ? '<img src="'+cat.img+'" alt="" draggable="false">'
-                            : '<span class="xplore-fa" style="background:'+cat.tone+'"><i class="fa-solid '+cat.icon+'"></i></span>';
-                        return '<button type="button" class="xplore-tile" onclick="navigate(\'category\', {category:\''+cat.id+'\'})">'
-                            + art + '<b>'+cat.name+'</b></button>';
-                    }).join('')}
-                </div>
-            </div>
-            <div id="exploreDrill" ${selectedCategory ? '' : 'hidden'}>${selectedCategory ? CategoryDetailPage() : ''}</div>
-            </div>
-        `;
-        }
-
         const cats = getExploreCatalog();
         return `
             <div class="xplore-stack">
@@ -20940,7 +20720,7 @@ function renderFreeFireGraphics() {
                     <h1>${escapeHtml(category.name)}</h1>
                     <span class="catd-count">${count} ${count===1?'item':'items'}</span>
                 </div>
-                <div class="catd-list${isAndosBuildM() ? ' catd-list-2' : ''}">
+                <div class="catd-list">
                     ${ordered.length ? ordered.map(s => `
                         <button type="button" class="catd-svc" onclick="navigate('plans', {service:'${s.id}'})">
                             <span class="andos-logo-rank-wrap"><span class="icon-box andos-logo-container">${s.icon || ''}</span></span>
@@ -20958,12 +20738,11 @@ function renderFreeFireGraphics() {
         var root = document.getElementById('xploreRoot');
         var drill = document.getElementById('exploreDrill');
         if (!root || !drill) return false;
-        var scOpen = pane ? (pane.querySelector(':scope > .tab-body') || pane) : null;
-        try { window.__exploreScroll = scOpen ? (scOpen.scrollTop || 0) : 0; } catch (e) { window.__exploreScroll = 0; }
+        try { window.__exploreScroll = pane ? (pane.scrollTop || 0) : 0; } catch (e) { window.__exploreScroll = 0; }
         root.style.display = 'none';
         drill.hidden = false;
         drill.innerHTML = CategoryDetailPage();
-        try { if (scOpen) scOpen.scrollTop = 0; } catch (e2) {}
+        try { if (pane) pane.scrollTop = 0; } catch (e2) {}
         try { if (window.__andosSyncTabSwipeLock) window.__andosSyncTabSwipeLock(); } catch (eLk) {}
         return true;
     };
@@ -20976,10 +20755,7 @@ function renderFreeFireGraphics() {
             drill.hidden = true;
             root.style.display = '';
             selectedCategory = null;
-            try {
-                var scClose = pane ? (pane.querySelector(':scope > .tab-body') || pane) : null;
-                if (scClose) scClose.scrollTop = window.__exploreScroll || 0;
-            } catch (e) {}
+            try { if (pane) pane.scrollTop = window.__exploreScroll || 0; } catch (e) {}
             try { if (window.__andosSyncTabSwipeLock) window.__andosSyncTabSwipeLock(); } catch (eLk) {}
             return;
         }
@@ -20988,54 +20764,7 @@ function renderFreeFireGraphics() {
         navigate('categories', { _back: true });
     };
 
-
-    function WalletPageM() {
-        const transactions = readLocalJSON('andos_transactions', []);
-        const walletUnlocked = isWalletDepositUnlocked();
-        const hideBal = localStorage.getItem('andos_hide_wallet') === '1';
-        const balTxt = hideBal ? '₹••••' : formatPrice(wallet);
-        const groups = walGroupTx(transactions);
-        const txHtml = groups.length ? groups.map(function(g) {
-            var rows = g.items.map(function(t) {
-                const pending = t.status === 'pending';
-                const credit = t.type === 'credit';
-                const src = String(t.source || t.desc || '').toLowerCase();
-                const ico = pending ? 'fa-hourglass-half' : (/spin/.test(src) ? 'fa-trophy' : (/streak/.test(src) ? 'fa-fire' : (credit ? 'fa-plus' : 'fa-minus')));
-                const bg = pending ? 'wait' : (credit ? 'in' : 'out');
-                const amt = pending ? formatPrice(t.amount) : ((credit?'+':'−') + formatPrice(t.amount));
-                const amtCls = pending ? 'pend' : (credit ? 'plus' : 'minus');
-                return '<div class="wal-tx"><span class="wal-tx-ico '+bg+'"><i class="fa-solid '+ico+'"></i></span><div class="wal-tx-mid"><b>'+escapeHtml(t.desc||'Transaction')+'</b><small>'+escapeHtml(t.date||'')+'</small></div><span class="wal-tx-amt '+amtCls+'">'+amt+'</span></div>';
-            }).join('');
-            return '<div class="wal-m-day">'+escapeHtml(g.label)+'</div>'+rows;
-        }).join('') : '<p class="wal-empty">No transactions yet</p>';
-        const unlock = !walletUnlocked ? ('<button type="button" class="wu-btn" style="margin-top:12px;width:100%" onclick="addMoney('+getFirstDepositMin()+')">Unlock with ₹'+getFirstDepositMin().toLocaleString('en-IN')+'</button>') : '';
-        return `
-            <div class="page-enter wal-m">
-                <header class="wal-m-hero">
-                    <h1>Wallet</h1>
-                    <p class="wal-m-cap">ANDOS Cash</p>
-                    <div class="wal-m-balrow">
-                        <div class="wal-bal">${balTxt}</div>
-                        <button type="button" class="wal-eye" onclick="toggleWalletHide()" aria-label="Hide balance"><i class="fa-solid fa-eye${hideBal?'-slash':''}"></i></button>
-                    </div>
-                    <div class="wal-m-pills">
-                        <button type="button" class="wal-add" onclick="addMoney(${walletUnlocked?500:getFirstDepositMin()})">Add money</button>
-                        <button type="button" class="wal-hist" onclick="navigate('transactions')">History</button>
-                    </div>
-                    <div class="wal-custom wal-m-custom">
-                        <input type="number" id="customAmount" placeholder="Custom ₹10 – ₹50,000" inputmode="numeric" min="10" max="50000">
-                        <button type="button" onclick="addCustomMoney()">Transfer</button>
-                    </div>
-                    ${unlock}
-                </header>
-                <div class="wal-m-sheet">${txHtml}</div>
-            </div>
-        `;
-    }
-
     function WalletPage() {
-        if (isAndosBuildM()) return WalletPageM();
-
         const transactions = readLocalJSON('andos_transactions', []);
         const walletUnlocked = isWalletDepositUnlocked();
         const quickDepositAmounts = [200, 500, 1000, 2000];
@@ -21484,60 +21213,7 @@ function renderFreeFireGraphics() {
         { name:'Kabir A.', points:2190 }
     ]);
 
-
-    function AccountPageM() {
-        const photo = getProfileAvatar();
-        const name = escapeHtml(user.name || 'ANDOS Member');
-        const uname = escapeHtml(user.username || '');
-        const bio = escapeHtml(user.bio || '');
-        const pts = Number(loyaltyPoints || 0);
-        const orderCount = Array.isArray(orders) ? orders.length : 0;
-        const uid = escapeHtml(String(user.publicId || ''));
-        const av = '<img id="pfLiveAva" data-live-avatar alt="Profile" src="' + String(photo || '').replace(/"/g, '&quot;') + '"><span data-avatar-fallback class="pf-fallback" hidden><i class="fa-solid fa-user"></i></span>';
-        const email = escapeHtml(user.email || '');
-        const mobile = escapeHtml(user.mobile || '');
-        return `
-            <div class="page-enter pf-page pf-m">
-                <div class="pf-title"><h1>Profile</h1></div>
-                <div class="pf-m-ava" role="button" onclick="var src=(window.getAvatarSrc?window.getAvatarSrc():''); if(src){ if(window.openProfilePhotoViewer) window.openProfilePhotoViewer(); } else { var f=document.getElementById('pfAvaFile'); if(f) f.click(); }">
-                    ${av}
-                    <input id="pfAvaFile" type="file" accept="image/png,image/jpeg,image/webp,image/*" class="hidden" onchange="handleProfileAvatarUpload(this)">
-                    <button type="button" class="pf-cam" aria-label="Change photo" onclick="event.stopPropagation(); var f=document.getElementById('pfAvaFile'); if(f) f.click();"><i class="fa-solid fa-camera"></i></button>
-                </div>
-                <h2 class="pf-m-name">${name}</h2>
-                <p class="pf-m-user">${uname ? ('@' + uname) : '@username'}</p>
-                ${uid ? '<button type="button" class="pf-m-uid" onclick="copyOrderId(\'' + uid.replace(/'/g,'') + '\', event)"><span>UID ' + uid + '</span>' + odCopySvg() + '</button>' : ''}
-                ${bio ? '<p class="pf-m-bio">' + bio + '</p>' : ''}
-                <div class="pf-m-stats">
-                    <div><b>${orderCount}</b><small>Orders</small></div>
-                    <div><b>${pts.toLocaleString('en-IN')}</b><small>Points</small></div>
-                    <div><b>${formatPrice(wallet)}</b><small>Wallet</small></div>
-                </div>
-                <div class="pf-m-group">
-                    <button type="button" class="pf-m-row" onclick="togglePfEditor()"><i class="fa-solid fa-pen lead"></i><b>Edit profile</b><i class="fa-solid fa-chevron-right"></i></button>
-                    <button type="button" class="pf-m-row" onclick="navigate('activity')"><i class="fa-solid fa-bolt lead"></i><b>Activity</b><i class="fa-solid fa-chevron-right"></i></button>
-                    <button type="button" class="pf-m-row out" onclick="confirmSignOut()"><i class="fa-solid fa-arrow-right-from-bracket lead"></i><b>Sign out</b><i class="fa-solid fa-chevron-right"></i></button>
-                </div>
-                <div class="pf-m-group">
-                    <button type="button" class="pf-m-row" onclick="navigate('loyalty')"><i class="fa-solid fa-star lead"></i><b>Loyalty</b><i class="fa-solid fa-chevron-right"></i></button>
-                    <button type="button" class="pf-m-row" onclick="navigate('wallet')"><i class="fa-solid fa-wallet lead"></i><b>Wallet</b><i class="fa-solid fa-chevron-right"></i></button>
-                    <button type="button" class="pf-m-row" onclick="navigate('support')"><i class="fa-solid fa-life-ring lead"></i><b>Support</b><i class="fa-solid fa-chevron-right"></i></button>
-                </div>
-                <div id="pfMForm" class="pf-m-form pf-form" hidden>
-                    <label>Name<input id="pfName" type="text" value="${name}" maxlength="40" autocomplete="off" spellcheck="false"></label>
-                    <label>Username (@)<input id="pfUsername" type="text" value="${uname}" maxlength="28" placeholder="username" autocomplete="off" spellcheck="false"></label>
-                    <label>Mobile<input id="pfMobile" type="tel" value="${mobile}" maxlength="10" inputmode="numeric" autocomplete="off"></label>
-                    <label>Email<input id="pfEmail" type="email" value="${email}" maxlength="80" autocomplete="off"></label>
-                    <button type="button" class="pf-save" onclick="saveProfileDetails()">Save profile</button>
-                </div>
-                ${user.isGuest ? '<div style="margin-top:10px;"><button type="button" onclick="andosLinkGoogle()" class="pf-m-row" style="border:1px solid #0f172a;border-radius:14px;justify-content:center"><i class="fa-brands fa-google lead"></i><b>Link with Google</b></button></div>' : ''}
-            </div>
-        `;
-    }
-
     function AccountPage() {
-        if (isAndosBuildM()) return AccountPageM();
-
         const photo = getProfileAvatar();
         const name = escapeHtml(user.name || 'ANDOS Member');
         const mobile = escapeHtml(user.mobile || '');
@@ -23194,7 +22870,7 @@ function renderFreeFireGraphics() {
         if (sidebarOpen) return;
         nav.classList.add('hero-over-image');
         const y = (typeof yArg === 'number') ? yArg : (function () {
-            var hs = document.querySelector('.page-section[data-sec="home"] > .tab-body') || document.querySelector('.page-section[data-sec="home"]');
+            var hs = document.querySelector('.page-section[data-sec="home"]');
             return (hs && document.getElementById('pageSlider')) ? (hs.scrollTop || 0) : (window.scrollY || document.documentElement.scrollTop || 0);
         })();
         if (window.__andosHdrRaf) cancelAnimationFrame(window.__andosHdrRaf);
@@ -24925,12 +24601,10 @@ function renderFreeFireGraphics() {
     };
 
     window.addCustomMoney = () => {
-        var raw = document.getElementById('customAmount');
-        var amount = Math.floor(Number(raw && raw.value));
-        var minimumDeposit = isWalletDepositUnlocked() ? 10 : getFirstDepositMin();
-        if (!isFinite(amount) || amount <= 0) { showToast('Custom amount daalo (₹10 – ₹50,000).', 'error'); if (raw) raw.focus(); return; }
-        if (!isWalletDepositUnlocked() && amount < minimumDeposit) { showToast('Wallet locked — minimum ₹' + minimumDeposit + ' deposit karna hoga.', 'warning'); openWalletLockModal(); return; }
-        if (amount < minimumDeposit) { showToast('Minimum ₹' + minimumDeposit + '.', 'error'); return; }
+        const amount = parseInt(document.getElementById('customAmount')?.value);
+        const minimumDeposit = isWalletDepositUnlocked() ? 10 : getFirstDepositMin();
+        if (!isWalletDepositUnlocked() && (!amount || amount < minimumDeposit)) { showToast('Wallet locked — minimum ₹' + minimumDeposit + ' deposit karna hoga.', 'warning'); openWalletLockModal(); return; }
+        if (!amount || amount < minimumDeposit) { showToast('Enter a valid amount (minimum ₹' + minimumDeposit + ').', 'error'); return; }
         if (amount > 50000) { showToast('Ek baar me max ₹50,000.', 'error'); return; }
         walletRechargeAmount = amount;
         paymentContext = 'wallet';
@@ -25747,453 +25421,6 @@ main.andos-main:not(:has(#pageSlider)) {
 .andos-shell[data-page="home"] footer {
   padding-bottom: calc(var(--bottom-nav-height) + 16px) !important;
 }
-
-/* ===== BUILD M (gated: html.build-m) ===== */
-html.build-m #app button:focus-visible,
-html.build-m #app a:focus-visible,
-html.build-m #app select:focus-visible {
-  outline: 2px solid #0F172A !important;
-  outline-offset: 2px !important;
-  box-shadow: none !important;
-  animation: none !important;
-}
-html.build-m #app input:focus-visible,
-html.build-m #app textarea:focus-visible {
-  outline: none !important;
-  box-shadow: none !important;
-}
-html.build-m #bottomNav .bnav-item:focus,
-html.build-m #bottomNav .bnav-item:focus-visible,
-html.build-m #bottomNav .bnav-item:active {
-  outline: none !important;
-  box-shadow: none !important;
-}
-html.build-m .xplore-grid,
-html.build-m .xplore-grid-all {
-  display: grid !important;
-  grid-template-columns: repeat(2, minmax(0,1fr)) !important;
-  gap: 16px !important;
-}
-html.build-m .xplore-grid-all .xplore-tile {
-  min-height: 0;
-  padding: 16px 12px 14px;
-}
-html.build-m .catd-list,
-html.build-m .catd-list-2 {
-  display: grid !important;
-  grid-template-columns: repeat(2, minmax(0,1fr)) !important;
-  gap: 16px !important;
-  margin-top: 16px !important;
-  padding: 16px 16px 28px !important;
-}
-html.build-m .catd-bar {
-  height: 56px !important;
-  min-height: 56px !important;
-}
-html.build-m .catd-page,
-html.build-m #exploreDrill:not([hidden]),
-html.build-m #exploreDrill .catd-page {
-  touch-action: pan-y !important;
-}
-html.build-m .page-section[data-sec="orders"] {
-  overflow-x: hidden !important;
-}
-html.build-m .od-page.od-m {
-  padding-left: 16px !important;
-  padding-right: 16px !important;
-  overflow: visible !important;
-}
-html.build-m .od-m .od-title,
-html.build-m .od-m .od-sub,
-html.build-m .od-m .od-searchbar,
-html.build-m .od-m #ordersList {
-  padding-left: 0;
-  padding-right: 0;
-}
-html.build-m #orderFilterPanel,
-html.build-m .od-filters {
-  display: block !important;
-  overflow: visible !important;
-  width: 100% !important;
-  max-width: none !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  position: sticky;
-  top: 0;
-  z-index: 15;
-  background: #fff;
-}
-html.build-m .od-scroller,
-html.build-m .chip-scroll-track {
-  display: flex;
-  gap: 8px;
-  overflow-x: auto !important;
-  overflow-y: hidden;
-  scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  width: 100%;
-  max-width: none;
-  margin-left: -16px;
-  margin-right: -16px;
-  padding: 8px 16px 10px;
-  box-sizing: content-box;
-  overscroll-behavior-x: contain;
-  pointer-events: auto;
-}
-html.build-m .od-scroller::-webkit-scrollbar,
-html.build-m .chip-scroll-track::-webkit-scrollbar { display: none; }
-html.build-m .od-chip {
-  flex: 0 0 auto;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  white-space: nowrap;
-}
-html.build-m .od-chip-svg { width: 12px; height: 12px; flex: 0 0 12px; display: block; }
-html.build-m .od-chip.on { color: #5b21b6; }
-html.build-m .od-copy {
-  border: 0;
-  background: #f1f5f9;
-  color: #64748b;
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  cursor: pointer;
-  flex: 0 0 28px;
-  pointer-events: auto;
-}
-html.build-m .od-copy.is-copied { background: #ecfdf5; color: #059669; }
-html.build-m .od-id { display: flex; align-items: center; gap: 8px; }
-html.build-m .page-section[data-sec="wallet"] {
-  background: #2e1065 !important;
-  overflow: hidden !important;
-}
-html.build-m .wal-m {
-  height: 100%;
-  min-height: 100%;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden !important;
-  background: #2e1065;
-  padding-bottom: 0 !important;
-  color: #fff;
-}
-html.build-m .wal-m-hero {
-  flex: 0 0 auto;
-  padding: calc(12px + env(safe-area-inset-top,0px)) 16px 18px;
-  background: #2e1065;
-}
-html.build-m .wal-m-hero h1 { margin: 0; font-size: 20px; font-weight: 900; letter-spacing: -.03em; color: #fff; }
-html.build-m .wal-m-hero .wal-m-cap { margin: 4px 0 0; font-size: 12px; font-weight: 600; color: rgba(255,255,255,.65); }
-html.build-m .wal-m-balrow { display: flex; align-items: center; gap: 10px; margin-top: 14px; }
-html.build-m .wal-m .wal-bal { font-size: 34px; font-weight: 900; letter-spacing: -.04em; padding-right: 0; color: #fff; }
-html.build-m .wal-m .wal-eye { border: 0; background: rgba(255,255,255,.12); color: #fff; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; }
-html.build-m .wal-m-pills { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 16px; }
-html.build-m .wal-m-pills button {
-  min-height: 42px; border: 0; border-radius: 999px; font-size: 13px; font-weight: 800; cursor: pointer;
-}
-html.build-m .wal-m-pills .wal-add { background: #fff; color: #2e1065; }
-html.build-m .wal-m-pills .wal-hist { background: rgba(255,255,255,.12); color: #fff; }
-html.build-m .wal-m-sheet {
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior-y: contain;
-  background: #fff;
-  border-radius: 24px 24px 0 0;
-  padding: 16px 16px calc(var(--bottom-nav-height) + 20px);
-  color: #0f172a;
-}
-html.build-m .wal-m-day { margin: 12px 0 6px; font-size: 11px; font-weight: 800; color: #94a3b8; letter-spacing: .06em; text-transform: uppercase; }
-html.build-m .wal-m-day:first-child { margin-top: 0; }
-html.build-m .pf-m { padding: 12px 16px calc(var(--bottom-nav-height) + 16px) !important; background: #fff !important; }
-html.build-m .pf-m-ava {
-  width: 96px; height: 96px; border-radius: 50%; margin: 8px auto 0; position: relative;
-  overflow: visible; background: #f1f5f9;
-}
-html.build-m .page-section[data-sec="wallet"] > .page-enter.wal-m {
-  min-height: 100% !important;
-  height: 100% !important;
-  overflow: hidden !important;
-}
-html.build-m .pf-m-ava img, html.build-m .pf-m-ava .pf-fallback {
-  width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 50%;
-}
-html.build-m .pf-m-ava .pf-cam {
-  position: absolute; right: 2px; bottom: 2px; width: 28px; height: 28px; border-radius: 50%;
-  border: 2px solid #fff; background: #4f46e5; color: #fff; display: flex; align-items: center; justify-content: center;
-}
-html.build-m .pf-m-name { margin: 12px 0 0; text-align: center; font-size: 22px; font-weight: 900; color: #0f172a; }
-html.build-m .pf-m-user { margin: 4px 0 0; text-align: center; font-size: 14px; font-weight: 700; color: #64748b; }
-html.build-m .pf-m-uid {
-  margin: 10px auto 0; display: flex; align-items: center; justify-content: center; gap: 8px;
-  font-size: 12px; font-weight: 800; color: #0f172a; background: #f8fafc; border: 1px solid #eef2ff;
-  border-radius: 999px; padding: 6px 12px; width: fit-content; max-width: 100%; cursor: pointer;
-}
-html.build-m .pf-m-bio { margin: 10px 8px 0; text-align: center; font-size: 13px; font-weight: 600; color: #475569; }
-html.build-m .pf-m-stats {
-  display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 8px; margin: 16px 0;
-}
-html.build-m .pf-m-stats div {
-  background: #f8fafc; border: 1px solid #eef2ff; border-radius: 14px; padding: 10px 6px; text-align: center;
-}
-html.build-m .pf-m-stats b { display: block; font-size: 14px; font-weight: 900; color: #0f172a; }
-html.build-m .pf-m-stats small { display: block; margin-top: 2px; font-size: 10px; font-weight: 700; color: #94a3b8; }
-html.build-m .pf-m-group {
-  background: #fff; border: 1px solid #eef2ff; border-radius: 16px; overflow: hidden; margin-bottom: 12px;
-}
-html.build-m .pf-m-row {
-  width: 100%; display: flex; align-items: center; gap: 12px; padding: 14px 14px; border: 0; background: #fff;
-  text-align: left; cursor: pointer; border-bottom: 1px solid #f1f5f9;
-}
-html.build-m .pf-m-row:last-child { border-bottom: 0; }
-html.build-m .pf-m-row i.lead { width: 20px; color: #6366f1; }
-html.build-m .pf-m-row b { flex: 1; font-size: 14px; font-weight: 800; color: #0f172a; }
-html.build-m .pf-m-row.out b { color: #dc2626; }
-html.build-m .pf-m-row.out i.lead { color: #dc2626; }
-html.build-m .pf-m-form { margin-top: 8px; }
-
-
-/* GLOBAL INPUT FOCUS — no orange/indigo glow; login-style dark border */
-#app input[type="text"],
-#app input[type="tel"],
-#app input[type="email"],
-#app input[type="number"],
-#app input[type="search"],
-#app input[type="password"],
-#app textarea,
-#app .input-field {
-  border: 1px solid #E2E8F0;
-  border-radius: 16px;
-  transition: border-color 0.15s ease-in-out;
-  box-shadow: none;
-  outline: none;
-}
-#app input[type="search"],
-#app .od-searchwrap input {
-  border-radius: 16px;
-}
-#app input[type="text"]:focus,
-#app input[type="text"]:focus-visible,
-#app input[type="tel"]:focus,
-#app input[type="tel"]:focus-visible,
-#app input[type="email"]:focus,
-#app input[type="email"]:focus-visible,
-#app input[type="number"]:focus,
-#app input[type="number"]:focus-visible,
-#app input[type="search"]:focus,
-#app input[type="search"]:focus-visible,
-#app input[type="password"]:focus,
-#app input[type="password"]:focus-visible,
-#app textarea:focus,
-#app textarea:focus-visible,
-#app .input-field:focus,
-#app .input-field:focus-visible,
-#app .od-searchwrap input:focus,
-#app .pf-form input:focus,
-#app .ge-input:focus,
-#app .verify-input:focus,
-#app .plans-verify-input:focus,
-#app .ff-custom-input:focus,
-#app .ff-custom-input:focus-visible,
-#app .referral-modal-input:focus,
-#app .qty-stepper .qty-input:focus,
-#app .review-comment-input:focus,
-#app .sp-form input:focus,
-#app .sp-form textarea:focus,
-#app .pvx-in:focus,
-html.build-m #app input:focus,
-html.build-m #app input:focus-visible,
-html.build-m #app textarea:focus,
-html.build-m #app textarea:focus-visible {
-  outline: none !important;
-  outline-offset: 0 !important;
-  box-shadow: none !important;
-  -webkit-box-shadow: none !important;
-  animation: none !important;
-  filter: none !important;
-  --tw-ring-offset-shadow: 0 0 #0000 !important;
-  --tw-ring-shadow: 0 0 #0000 !important;
-  --tw-ring-color: transparent !important;
-  border: 1.5px solid #4F46E5 !important;
-}
-#app input:-webkit-autofill:focus {
-  outline: none !important;
-  animation: none !important;
-  border: 1.5px solid #4F46E5 !important;
-  box-shadow: 0 0 0 1000px #ffffff inset !important;
-  -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
-}
-#app input.search-page-input,
-#app .search-page-input,
-#app .search-page-input:focus,
-#app .search-page-input:focus-visible,
-#app .pf4 input,
-#app .pf4 input:focus,
-#app .pf4 input:focus-visible,
-#app .pf4 textarea,
-#app .pf4 textarea:focus {
-  border: 0 !important;
-  box-shadow: none !important;
-  outline: none !important;
-  animation: none !important;
-}
-.search-bar:focus-within,
-.search-page-input-wrap:focus-within,
-.od-searchwrap:focus-within {
-  outline: none !important;
-  box-shadow: none !important;
-  -webkit-box-shadow: none !important;
-  border: 1.5px solid #4F46E5 !important;
-  transition: border-color 0.15s ease-in-out;
-}
-#app input:focus-visible {
-  outline: none !important;
-}
-/* chips: full-bleed track; gaming 16px under 56px bar */
-html.build-m .page-section[data-sec="orders"] {
-  overflow-x: hidden !important;
-}
-html.build-m .od-page.od-m {
-  padding-left: 16px !important;
-  padding-right: 16px !important;
-  overflow: visible !important;
-}
-html.build-m .od-scroller,
-html.build-m .chip-scroll-track {
-  display: flex !important;
-  overflow-x: auto !important;
-  overflow-y: hidden !important;
-  scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  width: 100%;
-  max-width: none !important;
-  margin-left: -16px !important;
-  margin-right: -16px !important;
-  padding-left: 16px !important;
-  padding-right: 16px !important;
-  box-sizing: content-box !important;
-}
-html.build-m .catd-bar { height: 56px !important; min-height: 56px !important; }
-html.build-m .catd-list,
-html.build-m .catd-list-2 { margin-top: 16px !important; padding-top: 16px !important; gap: 16px !important; }
-html.build-m .catd-page,
-html.build-m #exploreDrill:not([hidden]),
-html.build-m #exploreDrill .catd-page {
-  touch-action: pan-y !important;
-}
-
-
-#btn-filter-trigger,
-html.build-m #btn-filter-trigger,
-.od-filterbtn {
-  width: 44px;
-  height: 44px;
-  flex: 0 0 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 16px;
-  border: 1px solid #E2E8F0;
-  background: #fff;
-  color: #1e293b;
-  cursor: pointer;
-  pointer-events: auto;
-  touch-action: manipulation;
-  transition: background-color 150ms ease, transform 150ms ease;
-}
-#btn-filter-trigger:hover { background: #f8fafc; }
-#btn-filter-trigger:active { transform: scale(.95); }
-#btn-filter-trigger svg { width: 16px; height: 16px; display: block; }
-
-
-html.build-m .wal-m-custom { display:flex; gap:8px; margin-top:12px; min-width:0; }
-html.build-m .wal-m-custom input {
-  flex:1; min-width:0; height:42px; border-radius:16px; border:1px solid rgba(255,255,255,.28);
-  background:rgba(255,255,255,.12); color:#fff; padding:0 12px; font-weight:700;
-  transition: border-color 0.15s ease-in-out;
-}
-html.build-m .wal-m-custom input::placeholder { color:rgba(255,255,255,.55); }
-html.build-m .wal-m-custom input:focus {
-  outline:none !important; box-shadow:none !important;
-  border:1.5px solid #4F46E5 !important; background:rgba(255,255,255,.18);
-}
-html.build-m .wal-m-custom button {
-  flex:0 0 auto; height:42px; border:0; border-radius:16px; padding:0 14px;
-  background:#fff; color:#2e1065; font-weight:800; cursor:pointer;
-}
-
-
-/* ===== Immersive PWA: canvas under status bar / notch ===== */
-html, body, #app {
-  height: 100%;
-  min-height: 100%;
-  min-height: 100dvh;
-  min-height: -webkit-fill-available;
-}
-html, body, #app {
-  background-color: #ffffff !important;
-  background-image: none !important;
-}
-.andos-shell {
-  background: #ffffff !important;
-  min-height: 100%;
-  min-height: 100dvh;
-}
-.andos-shell[data-page="wallet"] {
-  background: #2e1065 !important;
-}
-.page-slider, #pageSlider, .page-section {
-  min-height: 100%;
-}
-nav.glass-nav, nav.home-topbar, .xplore-head, .catd-bar, .odd-bar, .txn-bar, .sp-bar, .pf-title, .wal-hero, .wal-m-hero {
-  padding-top: max(12px, env(safe-area-inset-top, 0px)) !important;
-  box-sizing: border-box;
-}
-.catd-page {
-  padding-top: 0 !important;
-}
-.catd-bar {
-  height: auto !important;
-  min-height: calc(56px + env(safe-area-inset-top, 0px)) !important;
-  position: sticky;
-  top: 0;
-  z-index: 20;
-}
-/* Orders chips: true viewport bleed */
-.orders-chip-track, .chip-scroll-track, html.build-m .od-scroller {
-  display: flex !important;
-  overflow-x: auto !important;
-  overflow-y: hidden !important;
-  scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  width: 100vw !important;
-  max-width: 100vw !important;
-  margin-left: calc(50% - 50vw) !important;
-  margin-right: calc(50% - 50vw) !important;
-  padding-left: max(16px, env(safe-area-inset-left, 0px)) !important;
-  padding-right: max(16px, env(safe-area-inset-right, 0px)) !important;
-  box-sizing: border-box !important;
-}
-.orders-chip-track::-webkit-scrollbar,
-.chip-scroll-track::-webkit-scrollbar,
-html.build-m .od-scroller::-webkit-scrollbar { display: none; }
-html.build-m .page-section[data-sec="orders"] { overflow-x: hidden !important; }
-html.build-m #orderFilterPanel, html.build-m .od-filters {
-  overflow: visible !important;
-  width: 100% !important;
-  max-width: none !important;
-}
-
 </style>
 </body>
 </html>
