@@ -169,7 +169,7 @@
     <meta name="theme-color" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0f19">
-    <meta name="andos-build" content="andos-v3-20261027f">
+    <meta name="andos-build" content="andos-v3-20261027g">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -192,7 +192,7 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261027f';
+        var HTML_BUILD_ID = 'andos-v3-20261027g';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
@@ -1659,22 +1659,35 @@
         }
         .xplore-tile.wide { grid-column: 1 / -1; display: flex; align-items: center; gap: 14px; }
         .xplore-tile.wide b, .xplore-tile.wide small { margin-top: 0; }
-                                                .catd-page { padding-bottom: 20px; }
+                                                .xplore-stack { position: relative; min-height: 100%; }
+        .catd-page { padding-bottom: 20px; }
         .catd-bar {
             display: flex; align-items: center; gap: 12px;
-            padding: 14px 16px 10px;
+            padding: 10px 16px;
+            position: sticky; top: 0; z-index: 20;
+            background: rgba(255,255,255,.88);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
         }
         .catd-bar button {
-            width: 40px; height: 40px; border: 0; border-radius: 14px;
+            width: 44px; height: 44px; min-width: 44px; min-height: 44px; flex: 0 0 44px;
+            border: 0; border-radius: 14px;
             background: #f1f5f9; color: #0f172a; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            pointer-events: auto; touch-action: manipulation;
         }
-        .catd-bar h1 { margin: 0; font-size: 20px; font-weight: 900; letter-spacing: -.03em; color: #0f172a; }
+        .catd-bar h1 { margin: 0; font-size: 18px; font-weight: 900; letter-spacing: -.03em; color: #0f172a; }
         .catd-bar p { margin: 2px 0 0; color: #94a3b8; font-size: 11px; font-weight: 600; }
-        .catd-list { padding: 8px 16px 20px; display: flex; flex-direction: column; gap: 10px; }
+        .catd-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 12px;
+            padding: 16px;
+        }
         .catd-svc {
-            display: flex; align-items: center; gap: 12px;
-            width: 100%; border: 0; background: #fff; cursor: pointer;
-            padding: 12px; border-radius: 20px; text-align: left;
+            display: flex; flex-direction: column; align-items: center; gap: 8px;
+            width: 100%; border: 1px solid #eef2ff; background: #fff; cursor: pointer;
+            padding: 14px 10px; border-radius: 16px; text-align: center;
             box-shadow: 0 10px 26px -18px rgba(15,23,42,.32);
             -webkit-tap-highlight-color: transparent;
         }
@@ -1682,9 +1695,12 @@
         .catd-svc .icon-box, .catd-svc .andos-logo-container {
             width: 48px; height: 48px; flex: 0 0 48px;
         }
-        .catd-svc h3 { margin: 0; font-size: 14px; font-weight: 800; color: #0f172a; }
-        .catd-svc p { margin: 3px 0 0; font-size: 11px; font-weight: 600; color: #94a3b8; }
-        .catd-empty { text-align: center; padding: 48px 20px; color: #94a3b8; font-weight: 700; }
+        .catd-svc h3, .catd-svc p {
+            width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
+        .catd-svc h3 { margin: 0; font-size: 13px; font-weight: 800; color: #0f172a; }
+        .catd-svc p { margin: 0; font-size: 11px; font-weight: 600; color: #94a3b8; }
+        .catd-empty { text-align: center; padding: 48px 20px; color: #94a3b8; font-weight: 700; grid-column: 1 / -1; }
         .evt-page { min-height: 100vh; background: linear-gradient(180deg, #ede9fe 0%, #ffffff 38%); }
                                                                                         
         .ff-story-rail { margin: 8px 0 14px; }
@@ -5807,22 +5823,44 @@ html.dark .plan-asset-slot {
 .od-title { margin:0; font-size:26px; font-weight:900; letter-spacing:-.04em; color:#0f172a; }
 .od-sub { margin:4px 0 14px; font-size:12px; font-weight:600; color:#94a3b8; }
 .od-tools { display:flex; gap:8px; margin-bottom:14px; }
+.od-searchbar { display:flex; gap:8px; align-items:center; width:100%; margin:0 0 12px; }
+.od-searchwrap { flex:1; min-width:0; position:relative; display:block; }
+.od-searchwrap svg { position:absolute; left:12px; top:50%; transform:translateY(-50%); pointer-events:none; }
+.od-searchwrap input {
+  width:100%; height:42px; box-sizing:border-box; border-radius:14px; border:1px solid #eef2ff;
+  background:#fff; padding:0 12px 0 38px; font-size:13px; font-weight:600; color:#0f172a; outline:none;
+}
+.od-searchwrap input::placeholder { color:#94a3b8; font-weight:600; }
+.od-filterbtn {
+  width:42px; height:42px; flex:0 0 42px; border-radius:14px; border:1px solid #eef2ff; background:#fff;
+  color:#0f172a; display:flex; align-items:center; justify-content:center;
+  cursor:pointer; pointer-events:auto; touch-action:manipulation;
+}
 .od-iconbtn {
   width:42px; height:42px; border-radius:14px; border:1px solid #eef2ff; background:#fff;
   color:#0f172a; display:flex; align-items:center; justify-content:center; cursor:pointer;
+  pointer-events:auto; touch-action:manipulation;
 }
 .od-filterchip {
   height:42px; padding:0 14px; border-radius:14px; border:1px solid #eef2ff; background:#fff;
   font-size:12px; font-weight:800; color:#0f172a; cursor:pointer; display:flex; align-items:center; gap:6px;
+  pointer-events:auto; touch-action:manipulation;
 }
-.od-scroller { display:flex; gap:8px; overflow-x:auto; padding-bottom:10px; -webkit-overflow-scrolling:touch; }
+.od-scroller { display:flex; gap:8px; overflow-x:auto; padding-bottom:10px; -webkit-overflow-scrolling:touch; pointer-events:auto; }
 .od-scroller::-webkit-scrollbar { display:none; }
 .od-chip {
-  flex:0 0 auto; border:1px solid #eef2ff; background:#fff; color:#64748b;
-  border-radius:999px; padding:8px 12px; font-size:11px; font-weight:800; cursor:pointer;
+  flex:0 0 auto; border:1px solid #eef2ff; background:#fff; color:#94a3b8;
+  border-radius:999px; padding:7px 12px; font-size:11px; font-weight:800; cursor:pointer;
   display:inline-flex; align-items:center; gap:6px;
+  pointer-events:auto; touch-action:manipulation;
 }
 .od-chip.on { border-color:#c4b5fd; background:#f5f3ff; color:#5b21b6; }
+.od-chip .od-ico { flex:0 0 auto; display:block; }
+@media (max-width:420px) {
+  .od-searchbar { gap:8px; }
+  .od-searchwrap input { font-size:13px; height:42px; }
+  .od-filterbtn { width:42px; height:42px; }
+}
 .od-status { margin-bottom:12px; }
 .od-status .od-chip.on { box-shadow:0 0 0 1px #ddd6fe inset; }
 .od-card {
@@ -10459,6 +10497,8 @@ main.andos-main{overscroll-behavior-x:none}
     /* 15-tap admin bypass permanently removed */
     let orderFilter = 'all';
     let orderCatFilter = 'all';
+    let orderSearchQuery = '';
+    let orderFiltersOpen = true;
     let selectedOrderIndex = -1;
     let selectedCategory = null;
     let navStack = [];
@@ -10466,6 +10506,10 @@ main.andos-main{overscroll-behavior-x:none}
     const NAV_ROOT_TABS = ['home','categories','orders','wallet','profile'];
 
     function goBack(fallback) {
+        var drill = document.getElementById('exploreDrill');
+        if (drill && !drill.hidden && drill.innerHTML) {
+            if (typeof window.closeExploreCat === 'function') { window.closeExploreCat(); return; }
+        }
         const prev = navStack.pop();
         if (prev && prev.page) {
             if (prev.category) selectedCategory = prev.category;
@@ -10832,6 +10876,13 @@ main.andos-main{overscroll-behavior-x:none}
             if (__aR2 !== -1 && __bR2 !== -1 && __aR2 !== __bR2) window.__andosTabSwitch = true;
         } catch (e) { window.__andosTabSwitch = false; }
 
+        if (page === 'category' && params.category && !params._back) {
+            selectedCategory = params.category;
+            if (document.getElementById('xploreRoot') && typeof window.openExploreCat === 'function') {
+                window.openExploreCat(params.category);
+                return;
+            }
+        }
         if (!params._back && currentPage && currentPage !== page) {
             if (NAV_ROOT_TABS.indexOf(page) !== -1) {
                 navStack = [];
@@ -10857,7 +10908,6 @@ main.andos-main{overscroll-behavior-x:none}
             }
         }
 
-        // Handle category page
         if (page === 'category' && params.category) {
             selectedCategory = params.category;
         }
@@ -15899,8 +15949,18 @@ const PLANS = {
             btn.classList.toggle('on', f === orderFilter);
             btn.classList.toggle('active', f === orderFilter);
         });
+        document.querySelectorAll('#orderCatTabs .od-chip').forEach(function(btn) {
+            const f = btn.getAttribute('data-cat');
+            if (!f) return;
+            btn.classList.toggle('on', f === orderCatFilter);
+        });
         const count = document.getElementById('ordersCountLabel');
-        if (count) count.textContent = 'Track all your orders in one place';
+        var n = getFilteredOrders().length;
+        if (count) count.textContent = n + (n === 1 ? ' order' : ' orders');
+        var inp = document.getElementById('orderSearchInput');
+        if (inp && inp.value !== String(orderSearchQuery || '')) inp.value = orderSearchQuery || '';
+        var panel = document.getElementById('orderFilterPanel');
+        if (panel) panel.hidden = !orderFiltersOpen;
         return true;
     }
 
@@ -20059,15 +20119,33 @@ function renderFreeFireGraphics() {
 
     function orderServiceBucket(id) {
         id = String(id || '');
-        if (id === 'freefire' || id === 'bgmi') return 'gaming';
-        if (id === 'jio' || id === 'airtel') return 'mobile';
-        if (id === 'amazon') return 'dth';
+        var svc = (typeof SERVICES !== 'undefined' ? SERVICES : []).find(function(s){ return s && s.id === id; });
+        var c = (svc && svc.category) ? String(svc.category) : '';
+        if (c === 'gaming') return 'gaming';
+        if (c === 'recharge') return 'mobile';
+        if (c === 'subscription' || c === 'ott') return 'ott';
+        if (c === 'giftcard') return 'giftcard';
+        if (c === 'social') return 'social';
+        if (c === 'bills' || c === 'utility') return 'utility';
+        if (c === 'dth') return 'dth';
+        if (id === 'freefire' || id === 'bgmi' || id === 'pubg' || id === 'cod') return 'gaming';
+        if (id === 'jio' || id === 'airtel' || id === 'vi' || id === 'bsnl') return 'mobile';
+        if (id === 'amazon' || id === 'netflix' || id === 'hotstar' || id === 'spotify') return 'ott';
+        if (id === 'redeem' || id === 'steam') return 'giftcard';
+        if (id === 'instagram' || id === 'facebook' || id === 'youtube') return 'social';
         return 'others';
     }
     function getFilteredOrders() {
         var list = orders.slice();
         if (orderFilter && orderFilter !== 'all') list = list.filter(function(o) { return o.status === orderFilter; });
         if (orderCatFilter && orderCatFilter !== 'all') list = list.filter(function(o) { return orderServiceBucket(o.serviceId) === orderCatFilter; });
+        var q = String(orderSearchQuery || '').trim().toLowerCase();
+        if (q) list = list.filter(function(o) {
+            return String(o.service || '').toLowerCase().indexOf(q) !== -1
+                || String(o.plan || '').toLowerCase().indexOf(q) !== -1
+                || String(o.id || '').toLowerCase().indexOf(q) !== -1
+                || String(o.customerDetail || '').toLowerCase().indexOf(q) !== -1;
+        });
         return list;
     }
 
@@ -20096,8 +20174,19 @@ function renderFreeFireGraphics() {
     };
     window.setOrderCatFilter = function(cat) {
         orderCatFilter = cat || 'all';
+        var tabs = document.getElementById('orderCatTabs');
+        if (tabs) try { tabs.dataset.sl = tabs.scrollLeft; } catch (e) {}
         if (currentPage === 'orders' && typeof updateOrdersDOM === 'function' && updateOrdersDOM()) return;
         render();
+    };
+    window.onOrderSearchInput = function(el) {
+        orderSearchQuery = el && el.value ? el.value : '';
+        if (currentPage === 'orders' && typeof updateOrdersDOM === 'function') updateOrdersDOM();
+    };
+    window.toggleOrderFilters = function() {
+        orderFiltersOpen = !orderFiltersOpen;
+        var panel = document.getElementById('orderFilterPanel');
+        if (panel) panel.hidden = !orderFiltersOpen;
     };
     function renderOrdersList() {
         const filteredOrders = getFilteredOrders();
@@ -20121,38 +20210,55 @@ function renderFreeFireGraphics() {
     }
 
 
+    function odStatusIcon(id, color) {
+        color = color || '#94a3b8';
+        if (id === 'completed') return '<svg class="od-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="'+color+'" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
+        if (id === 'pending') return '<svg class="od-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="'+color+'" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
+        if (id === 'processing') return '<svg class="od-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="'+color+'" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 0 1 9 9"/><path d="M21 3v6h-6"/></svg>';
+        if (id === 'failed') return '<svg class="od-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="'+color+'" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>';
+        return '<svg class="od-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2.2"><rect x="3" y="3" width="7" height="7" rx="1.2"/><rect x="14" y="3" width="7" height="7" rx="1.2"/><rect x="3" y="14" width="7" height="7" rx="1.2"/><rect x="14" y="14" width="7" height="7" rx="1.2"/></svg>';
+    }
     function OrdersPage() {
         const cats = [
-            { id:'all', label:'All Orders', icon:'fa-calendar' },
-            { id:'gaming', label:'Gaming', icon:'fa-gamepad' },
-            { id:'mobile', label:'Mobile', icon:'fa-mobile-screen' },
-            { id:'dth', label:'DTH', icon:'fa-satellite-dish' },
-            { id:'others', label:'Others', icon:'fa-grip' }
+            { id:'all', label:'All' },
+            { id:'gaming', label:'Game' },
+            { id:'mobile', label:'Mobile' },
+            { id:'dth', label:'DTH' },
+            { id:'ott', label:'OTT' },
+            { id:'giftcard', label:'Gift Cards' },
+            { id:'social', label:'Social' },
+            { id:'utility', label:'Utility' },
+            { id:'others', label:'Others' }
         ];
         const statuses = [
-            { id:'all', label:'All', icon:'fa-layer-group' },
-            { id:'completed', label:'Success', icon:'fa-circle', color:'#22c55e' },
-            { id:'pending', label:'Pending', icon:'fa-circle', color:'#f59e0b' },
-            { id:'processing', label:'Processing', icon:'fa-circle', color:'#3b82f6' },
-            { id:'failed', label:'Failed', icon:'fa-circle', color:'#ef4444' }
+            { id:'all', label:'All', color:'#64748b' },
+            { id:'completed', label:'Success', color:'#22c55e' },
+            { id:'pending', label:'Pending', color:'#f59e0b' },
+            { id:'processing', label:'Processing', color:'#3b82f6' },
+            { id:'failed', label:'Failed', color:'#ef4444' }
         ];
+        var n = getFilteredOrders().length;
+        var qEsc = String(orderSearchQuery || '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
         return `
             <div class="page-enter od-page">
-                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
-                    <div>
-                        <h1 class="od-title">My Orders</h1>
-                        <p class="od-sub" id="ordersCountLabel">Track all your orders in one place</p>
-                    </div>
-                    <div class="od-tools">
-                        <button type="button" class="od-iconbtn" onclick="navigate('search')" aria-label="Search"><i class="fa-solid fa-magnifying-glass"></i></button>
-                        <button type="button" class="od-filterchip" onclick="setOrderFilter(orderFilter === 'all' ? 'pending' : 'all')"><i class="fa-solid fa-sliders"></i> Filter</button>
-                    </div>
+                <h1 class="od-title">My Orders</h1>
+                <p class="od-sub" id="ordersCountLabel">${n} ${n===1?'order':'orders'}</p>
+                <div class="od-searchbar">
+                    <label class="od-searchwrap">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#94a3b8" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.2-3.2"/></svg>
+                        <input id="orderSearchInput" type="search" placeholder="Search orders..." value="${qEsc}" oninput="onOrderSearchInput(this)" autocomplete="off">
+                    </label>
+                    <button type="button" class="od-filterbtn" onclick="toggleOrderFilters()" aria-label="Filter">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M2 14h4M10 8h4M18 16h4"/></svg>
+                    </button>
                 </div>
+                <div id="orderFilterPanel" ${orderFiltersOpen ? '' : 'hidden'}>
                 <div class="od-scroller" id="orderCatTabs" data-hswipe>
-                    ${cats.map(c => `<button type="button" class="od-chip ${orderCatFilter === c.id ? 'on' : ''}" onclick="setOrderCatFilter('${c.id}')"><i class="fa-solid ${c.icon}"></i> ${c.label}</button>`).join('')}
+                    ${cats.map(c => `<button type="button" class="od-chip ${orderCatFilter === c.id ? 'on' : ''}" data-cat="${c.id}" onclick="setOrderCatFilter('${c.id}')">${c.label}</button>`).join('')}
                 </div>
                 <div class="od-scroller od-status" id="orderTabs" data-hswipe>
-                    ${statuses.map(c => `<button type="button" class="od-chip ${orderFilter === c.id ? 'on' : ''}" data-filter="${c.id}" onclick="setOrderFilter('${c.id}')">${c.id==='all' ? '<i class="fa-solid fa-layer-group"></i>' : '<i class="fa-solid fa-circle" style="font-size:8px;color:'+c.color+'"></i>'} ${c.label}</button>`).join('')}
+                    ${statuses.map(c => `<button type="button" class="od-chip ${orderFilter === c.id ? 'on' : ''}" data-filter="${c.id}" onclick="setOrderFilter('${c.id}')">${odStatusIcon(c.id, c.color)} ${c.label}</button>`).join('')}
+                </div>
                 </div>
                 <div id="ordersList">${renderOrdersList()}</div>
             </div>
@@ -20280,7 +20386,8 @@ function renderFreeFireGraphics() {
     function CategoriesPage() {
         const cats = getExploreCatalog();
         return `
-            <div class="page-enter xplore-page">
+            <div class="xplore-stack">
+            <div class="page-enter xplore-page" id="xploreRoot" ${selectedCategory ? 'style="display:none"' : ''}>
                 <div class="xplore-head">
                     <div>
                         <h1>Explore</h1>
@@ -20298,6 +20405,8 @@ function renderFreeFireGraphics() {
                     }).join('')}
                 </div>
             </div>
+            <div id="exploreDrill" ${selectedCategory ? '' : 'hidden'}>${selectedCategory ? CategoryDetailPage() : ''}</div>
+            </div>
         `;
     }
 
@@ -20307,41 +20416,68 @@ function renderFreeFireGraphics() {
         const catId = selectedCategory;
         const catalog = getExploreCatalog();
         const category = catalog.find(c => c.id === catId);
+        const backSvg = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>';
         if (!category) {
-            return `<div class="page-enter catd-page">
+            return `<div class="catd-page">
                 <div class="catd-bar">
-                    <button type="button" onclick="goBack('home')" aria-label="Back"><i class="fa-solid fa-arrow-left"></i></button>
-                    <div><h1>Category</h1><p>Pick a category again</p></div>
+                    <button type="button" onclick="closeExploreCat()" aria-label="Back">${backSvg}</button>
+                    <div><h1>Category</h1><p>0 items</p></div>
                 </div>
                 <div class="catd-empty">This category is not available.</div>
             </div>`;
         }
         const mapped = category.services || [];
         const ordered = mapped.map(id => SERVICES.find(s => s.id === id)).filter(Boolean);
+        const count = ordered.length;
         return `
-            <div class="page-enter catd-page">
+            <div class="catd-page">
                 <div class="catd-bar">
-                    <button type="button" onclick="goBack('home')" aria-label="Back"><i class="fa-solid fa-arrow-left"></i></button>
+                    <button type="button" onclick="closeExploreCat()" aria-label="Back">${backSvg}</button>
                     <div>
-                        <h1>${category.name}</h1>
-                        <p>${category.desc}</p>
+                        <h1>${escapeHtml(category.name)}</h1>
+                        <p>${count} ${count===1?'item':'items'}</p>
                     </div>
                 </div>
                 <div class="catd-list">
                     ${ordered.length ? ordered.map(s => `
                         <button type="button" class="catd-svc" onclick="navigate('plans', {service:'${s.id}'})">
                             <span class="andos-logo-rank-wrap"><span class="icon-box andos-logo-container">${s.icon || ''}</span></span>
-                            <span class="flex-1 min-w-0 text-left">
-                                <h3>${escapeHtml(s.title)}</h3>
-                                <p>${escapeHtml(s.subtitle || '')}</p>
-                            </span>
-                            <i class="fa-solid fa-chevron-right" style="color:#cbd5e1;font-size:12px"></i>
+                            <h3>${escapeHtml(s.title)}</h3>
+                            <p>${escapeHtml(s.subtitle || '')}</p>
                         </button>
                     `).join('') : `<div class="catd-empty">No live services in this category yet.</div>`}
                 </div>
             </div>
         `;
     }
+    window.openExploreCat = function (id) {
+        selectedCategory = id || selectedCategory;
+        var pane = document.querySelector('.page-section[data-sec="categories"]');
+        var root = document.getElementById('xploreRoot');
+        var drill = document.getElementById('exploreDrill');
+        if (!root || !drill) return false;
+        try { window.__exploreScroll = pane ? (pane.scrollTop || 0) : 0; } catch (e) { window.__exploreScroll = 0; }
+        root.style.display = 'none';
+        drill.hidden = false;
+        drill.innerHTML = CategoryDetailPage();
+        try { if (pane) pane.scrollTop = 0; } catch (e2) {}
+        return true;
+    };
+    window.closeExploreCat = function () {
+        var pane = document.querySelector('.page-section[data-sec="categories"]');
+        var root = document.getElementById('xploreRoot');
+        var drill = document.getElementById('exploreDrill');
+        if (root && drill) {
+            drill.innerHTML = '';
+            drill.hidden = true;
+            root.style.display = '';
+            selectedCategory = null;
+            try { if (pane) pane.scrollTop = window.__exploreScroll || 0; } catch (e) {}
+            return;
+        }
+        selectedCategory = null;
+        navigate('categories', { _back: true });
+    };
 
     function WalletPage() {
         const transactions = readLocalJSON('andos_transactions', []);
