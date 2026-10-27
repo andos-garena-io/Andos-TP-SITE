@@ -169,7 +169,7 @@
     <meta name="theme-color" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0f19">
-    <meta name="andos-build" content="andos-v3-20261022x">
+    <meta name="andos-build" content="andos-v3-20261022y">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -192,7 +192,7 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261022x';
+        var HTML_BUILD_ID = 'andos-v3-20261022y';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
@@ -333,8 +333,11 @@
           if (window.__andosSplashActive) return;
           var gateU = document.getElementById('yuvaGate');
           if (gateU && !gateU.classList.contains('yg-out')) { writeMetaTheme('#ffffff'); return; }
-          // FIX-W: beech ka mixed rgb HATAO — status bar = header: rest PINK, glass white hone par WHITE. koi ajeeb blend nahi.
-          writeMetaTheme((p >= 0.72) ? WHITE : (baseColor() || PINK));
+          // F1: theme-color = glass ke SAME mix (pink * (1-a) + white * a), a = 0.92*p — status bar alag se safed nahi
+          var a = p * 0.92; if (a < 0) a = 0; if (a > 1) a = 1;
+          if (a <= 0) { writeMetaTheme('#F9A8D4'); return; }
+          if (a >= 0.995) { writeMetaTheme('#ffffff'); return; }
+          writeMetaTheme('rgb(' + Math.round(249+(255-249)*a) + ',' + Math.round(168+(255-168)*a) + ',' + Math.round(212+(255-212)*a) + ')');
         };
         function setTheme(c) {
           if (window.__andosSplashActive) return; // splash chal raha hai -> status bar BLACK rahega
@@ -1235,16 +1238,9 @@
             z-index: 2; pointer-events: none;
         }
         nav.home-topbar, .home-topbar {
-            height: 52px !important;
-            min-height: 52px !important;
-            max-height: 52px !important;
-        }
-        @media (display-mode: standalone), (display-mode: fullscreen) {
-            nav.home-topbar, .home-topbar {
-                height: calc(52px + env(safe-area-inset-top, 0px)) !important;
-                min-height: calc(52px + env(safe-area-inset-top, 0px)) !important;
-                max-height: calc(52px + env(safe-area-inset-top, 0px)) !important;
-            }
+            height: calc(52px + env(safe-area-inset-top, 0px)) !important;
+            min-height: calc(52px + env(safe-area-inset-top, 0px)) !important;
+            max-height: calc(52px + env(safe-area-inset-top, 0px)) !important;
         }
         .home-hero-bleed {
             position: relative;
@@ -2654,22 +2650,16 @@
         .andos-shell[data-page="home"] nav.glass-nav.enterprise-nav.hero-over-image {
             /* FIX-U(1): SCROLL-LINKED glass — bg alpha + blur + border sab --hdr-p (0..1 = y/80) se continuous.
                p=0 se p=1 tak koi jump nahi; threshold rule/transition dono HATA diye. safe-area status-bar ke neeche glass. */
-            background: rgba(255, 255, 255, calc(var(--hdr-p, 0) * .58)) !important;
-            border-bottom-color: rgba(15, 23, 42, calc(var(--hdr-p, 0) * .06)) !important;
-            box-shadow: 0 1px 0 rgba(255, 255, 255, calc(var(--hdr-p, 0) * .35)) inset, 0 10px 28px rgba(15, 23, 42, calc(var(--hdr-p, 0) * .06)) !important;
-            backdrop-filter: blur(calc(var(--hdr-p, 0) * 16px)) saturate(160%) !important;
-            -webkit-backdrop-filter: blur(calc(var(--hdr-p, 0) * 16px)) saturate(160%) !important;
+            background: rgba(255, 255, 255, calc(var(--hdr-p, 0) * .92)) !important;
+            border-bottom-color: rgba(15, 23, 42, calc(var(--hdr-p, 0) * .08)) !important;
+            box-shadow: 0 1px 0 rgba(255, 255, 255, calc(var(--hdr-p, 0) * .4)) inset, 0 10px 28px rgba(15, 23, 42, calc(var(--hdr-p, 0) * .06)) !important;
+            backdrop-filter: blur(calc(var(--hdr-p, 0) * 18px)) saturate(160%) !important;
+            -webkit-backdrop-filter: blur(calc(var(--hdr-p, 0) * 18px)) saturate(160%) !important;
         }
         .home-topbar {
             box-sizing: border-box !important;
-            height: 52px !important;
-            padding: 0 16px !important;
-        }
-        @media (display-mode: standalone), (display-mode: fullscreen) {
-            .home-topbar {
-                height: calc(52px + env(safe-area-inset-top, 0px)) !important;
-                padding: env(safe-area-inset-top, 0px) 16px 0 !important;
-            }
+            height: calc(52px + env(safe-area-inset-top, 0px)) !important;
+            padding: env(safe-area-inset-top, 0px) 16px 0 !important;
         }
         .ann-ribbon {
             height: 28px;
@@ -24747,7 +24737,7 @@ html, body, #app { background-color: #0b0f19 !important; background-image: none 
 /* pull-gap = pink (hero top + status pink se blend); rest par content ke peeche chhupa */
 .page-section[data-sec="home"]::before { content: ''; position: absolute; top: -72px; left: 0; right: 0; height: 72px; background: #F9A8D4; z-index: -1; } /* FIX-U(6): halka bounce */
 /* FIX-U(2): horizontal strips ka swipe strip ke andar reh — tab-switch chain band */
-[data-hswipe] { touch-action: pan-x pan-y; overscroll-behavior-x: contain; overscroll-behavior-y: contain; } /* FIX-W: vertical scroll banner par bhi chale */
+[data-hswipe] { touch-action: pan-x pan-y; overscroll-behavior-x: contain; } /* F2: pan-x isolate + pan-y so vertical scroll na ruke */
 .page-enter { overscroll-behavior-y: contain; } /* FIX-U(6): .pf-page overflow-x:hidden -> computed overflow-y auto */
 </style>
 </body>
