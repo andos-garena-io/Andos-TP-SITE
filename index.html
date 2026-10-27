@@ -170,7 +170,7 @@
     <meta name="theme-color" content="#ffffff">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#ffffff">
-    <meta name="andos-build" content="andos-v3-20261027m6">
+    <meta name="andos-build" content="andos-v3-20261028m6g">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -193,23 +193,36 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261027m6';
+        var HTML_BUILD_ID = 'andos-v3-20261028m6g';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
         (function () {
           try {
             var q = new URLSearchParams(location.search || '');
-            var prev = String(q.get('preview') || '').toLowerCase();
             var v = String(q.get('v') || '').toLowerCase();
-            var h = String(location.hostname || '');
-            var sticky = false;
-            try { sticky = localStorage.getItem('andos_preview') === '1'; } catch (e0) {}
-            var on = prev === 'true' || prev === '1' || prev === 'm' || v === 'm' || sticky
-              || (h && h !== 'andostosites.vercel.app' && /vercel\.app$/i.test(h));
+            var prev = String(q.get('preview') || '').toLowerCase();
+            var hash = String(location.hash || '');
+            if (hash.charAt(0) === '#') hash = hash.slice(1);
+            if (hash.charAt(0) === '/') hash = hash.slice(1);
+            hash = hash.toLowerCase();
+            var on = hash === 'm6' || v === 'm6' || prev === 'm6';
+            window.__ANDOS_BUILD_M6 = !!on;
             window.__ANDOS_BUILD_M = !!on;
-            if (on) document.documentElement.classList.add('build-m');
-            else document.documentElement.classList.remove('build-m');
-          } catch (e) { window.__ANDOS_BUILD_M = false; }
+            document.documentElement.classList.toggle('build-m6', on);
+            document.documentElement.classList.toggle('build-m', on);
+          } catch (e) {
+            window.__ANDOS_BUILD_M6 = false;
+            window.__ANDOS_BUILD_M = false;
+          }
         })();
+        window.addEventListener('hashchange', function () {
+          try {
+            var h2 = String(location.hash || '');
+            if (h2.charAt(0) === '#') h2 = h2.slice(1);
+            if (h2.charAt(0) === '/') h2 = h2.slice(1);
+            var want = h2.toLowerCase() === 'm6';
+            if (want !== !!window.__ANDOS_BUILD_M6) location.reload();
+          } catch (eH) {}
+        });
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
 
@@ -15339,6 +15352,7 @@ const PLANS = {
     window.__andosTabScroller = __andosTabScroller;
     function __wrapMainTab(sec, inner) {
         inner = inner || '';
+        if (window.__ANDOS_BUILD_M6 !== true) return inner;
         if (sec === 'home') {
             return '<div id="topNavSlot" class="tab-header home-tab-header">' + Navbar('home') + '</div><div class="tab-body home-tab-body">' + inner + '</div>';
         }
@@ -15612,7 +15626,7 @@ const PLANS = {
         try { mountSidebar(); } catch (e) {}
         requestAnimationFrame(() => { window.__andosRenderQueued = false; });
         window.__andosDarkPage = ['loyalty','paymentverify'].indexOf(currentPage) !== -1;
-        const __isMain5 = ['home', 'categories', 'orders', 'wallet', 'account'].indexOf(currentPage) !== -1;
+        const __isMain5 = (window.__ANDOS_BUILD_M6 === true) && ['home', 'categories', 'orders', 'wallet', 'account'].indexOf(currentPage) !== -1;
         if (__isMain5 && currentPage === 'home') { try { content = content + Footer(); } catch (eF) {} }
         app.innerHTML = `
             <div class="min-h-screen andos-shell" data-page="${currentPage}" data-dark="${window.__andosDarkPage ? 'true' : 'false'}">
@@ -20541,6 +20555,8 @@ function renderFreeFireGraphics() {
 
     function isAndosBuildM() { return window.__ANDOS_BUILD_M === true; }
     window.isAndosBuildM = isAndosBuildM;
+    function isAndosBuildM6() { return window.__ANDOS_BUILD_M6 === true; }
+    window.isAndosBuildM6 = isAndosBuildM6;
     function odFilterIcon() {
         return '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 14 14" aria-hidden="true" class="od-chip-svg"><path fill="currentColor" fill-rule="evenodd" d="M.5 0a.5.5 0 0 0-.407.79L5 7.66v5.84a.5.5 0 0 0 .777.416l3-2A.5.5 0 0 0 9 11.5V7.66L13.907.79A.5.5 0 0 0 13.5 0z" clip-rule="evenodd"/></svg>';
     }
@@ -26205,21 +26221,21 @@ html.build-m #orderFilterPanel, html.build-m .od-filters {
   max-width: none !important;
 }
 
-/* ===== m6: per-tab standalone screens (header rides with carousel) ===== */
-html, body {
+/* ===== m6: per-tab screens — ONLY when html.build-m6 (#m6 / ?v=m6) ===== */
+html.build-m6, html.build-m6 body {
   height: 100%;
   height: 100dvh;
   margin: 0;
   overflow: hidden;
 }
-html, body, #app {
+html.build-m6, html.build-m6 body, html.build-m6 #app {
   height: 100%;
   height: 100dvh;
   overflow: hidden;
   background-color: #ffffff !important;
 }
-#app { position: relative; }
-.andos-shell {
+html.build-m6 #app { position: relative; }
+html.build-m6 .andos-shell {
   height: 100%;
   min-height: 0;
   display: flex;
@@ -26227,13 +26243,13 @@ html, body, #app {
   overflow: hidden;
   background: #ffffff !important;
 }
-.andos-shell[data-page="wallet"] { background: #2e1065 !important; }
-main.andos-main:has(#pageSlider) {
+html.build-m6 .andos-shell[data-page="wallet"] { background: #2e1065 !important; }
+html.build-m6 main.andos-main:has(#pageSlider) {
   flex: 1 1 auto;
   min-height: 0;
   overflow: hidden !important;
 }
-#pageSlider.page-slider {
+html.build-m6 #pageSlider.page-slider {
   display: flex;
   height: 100%;
   width: 100%;
@@ -26244,7 +26260,7 @@ main.andos-main:has(#pageSlider) {
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
 }
-.page-section {
+html.build-m6 .page-section {
   flex: 0 0 100%;
   min-width: 100%;
   width: 100%;
@@ -26257,20 +26273,19 @@ main.andos-main:has(#pageSlider) {
   box-sizing: border-box;
   position: relative;
 }
-.tab-header, .home-tab-header, .page-section[data-sec="home"] > #topNavSlot {
+html.build-m6 .tab-header, html.build-m6 .home-tab-header, html.build-m6 .page-section[data-sec="home"] > #topNavSlot {
   display: block !important;
   flex: 0 0 auto;
   pointer-events: auto;
 }
-/* Home header lives INSIDE home section — overlays hero, swipes with the page */
-.page-section[data-sec="home"] > #topNavSlot,
-.page-section[data-sec="home"] > .tab-header {
+html.build-m6 .page-section[data-sec="home"] > #topNavSlot,
+html.build-m6 .page-section[data-sec="home"] > .tab-header {
   position: absolute !important;
   top: 0; left: 0; right: 0;
   z-index: 60;
 }
-.andos-shell:not([data-page="home"]) #topNavSlot { display: block !important; }
-.tab-body {
+html.build-m6 .andos-shell:not([data-page="home"]) #topNavSlot { display: block !important; }
+html.build-m6 .tab-body {
   flex: 1 1 auto;
   min-height: 0;
   height: 100%;
@@ -26280,11 +26295,11 @@ main.andos-main:has(#pageSlider) {
   -webkit-overflow-scrolling: touch;
   box-sizing: border-box;
 }
-.tab-body:not(.home-tab-body) {
+html.build-m6 .tab-body:not(.home-tab-body) {
   padding-bottom: 0;
 }
-.home-tab-body { position: relative; isolation: isolate; }
-.home-tab-body::before {
+html.build-m6 .home-tab-body { position: relative; isolation: isolate; }
+html.build-m6 .home-tab-body::before {
   content: '';
   position: absolute;
   top: -72px; left: 0; right: 0;
@@ -26292,10 +26307,10 @@ main.andos-main:has(#pageSlider) {
   background: #F9A8D4;
   z-index: -1;
 }
-.page-section[data-sec="home"] > nav.glass-nav,
-.page-section[data-sec="home"] nav.glass-nav,
-.page-section[data-sec="home"] nav.home-topbar,
-.page-section[data-sec="home"] nav.glass-nav.enterprise-nav.hero-over-image {
+html.build-m6 .page-section[data-sec="home"] > nav.glass-nav,
+html.build-m6 .page-section[data-sec="home"] nav.glass-nav,
+html.build-m6 .page-section[data-sec="home"] nav.home-topbar,
+html.build-m6 .page-section[data-sec="home"] nav.glass-nav.enterprise-nav.hero-over-image {
   background: transparent !important;
   background-image: none !important;
   border: none !important;
@@ -26304,25 +26319,25 @@ main.andos-main:has(#pageSlider) {
   -webkit-backdrop-filter: none !important;
   padding-top: max(16px, env(safe-area-inset-top, 0px)) !important;
 }
-.page-section[data-sec="home"] nav.glass-nav.is-scrolled,
-.page-section[data-sec="home"] nav.glass-nav.enterprise-nav.hero-over-image.is-scrolled {
+html.build-m6 .page-section[data-sec="home"] nav.glass-nav.is-scrolled,
+html.build-m6 .page-section[data-sec="home"] nav.glass-nav.enterprise-nav.hero-over-image.is-scrolled {
   background: rgba(255,255,255,.58) !important;
   backdrop-filter: blur(16px) saturate(160%) !important;
   -webkit-backdrop-filter: blur(16px) saturate(160%) !important;
 }
-nav.glass-nav, nav.home-topbar, .xplore-head, .catd-bar, .odd-bar, .txn-bar, .sp-bar, .pf-title, .wal-hero, .wal-m-hero, .od-title {
+html.build-m6 nav.glass-nav, html.build-m6 nav.home-topbar, html.build-m6 .xplore-head, html.build-m6 .catd-bar, html.build-m6 .odd-bar, html.build-m6 .txn-bar, html.build-m6 .sp-bar, html.build-m6 .pf-title, html.build-m6 .wal-hero, html.build-m6 .wal-m-hero, html.build-m6 .od-title {
   padding-top: max(16px, env(safe-area-inset-top, 0px)) !important;
   box-sizing: border-box;
 }
-.tab-body .xplore-head,
-.tab-body .pf-title {
+html.build-m6 .tab-body .xplore-head,
+html.build-m6 .tab-body .pf-title {
   position: sticky;
   top: 0;
   z-index: 20;
   background: #ffffff;
 }
-.page-section[data-sec="categories"] .tab-body .xplore-head { background: #f7f7f7; }
-.page-section[data-sec="wallet"] > .tab-body {
+html.build-m6 .page-section[data-sec="categories"] .tab-body .xplore-head { background: #f7f7f7; }
+html.build-m6 .page-section[data-sec="wallet"] > .tab-body {
   overflow: hidden !important;
   display: flex;
   flex-direction: column;
@@ -26333,12 +26348,9 @@ html.build-m .page-section[data-sec="wallet"] > .tab-body > .page-enter.wal-m {
   height: 100% !important;
   overflow: hidden !important;
 }
-.tab-body > .xplore-stack { min-height: 100%; }
-@media (display-mode: browser) {
-  /* env(safe-area-inset-top) is 0 in browser — max(16px, …) already keeps spacing */
-}
+html.build-m6 .tab-body > .xplore-stack { min-height: 100%; }
 @media (display-mode: standalone), (display-mode: fullscreen) {
-  html, body, #app { height: 100dvh; }
+  html.build-m6, html.build-m6 body, html.build-m6 #app { height: 100dvh; }
 }
 
 </style>
