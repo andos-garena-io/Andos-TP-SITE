@@ -169,7 +169,7 @@
     <meta name="theme-color" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0f19">
-    <meta name="andos-build" content="andos-v3-20261022y">
+    <meta name="andos-build" content="andos-v3-20261022z">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -192,7 +192,7 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261022y';
+        var HTML_BUILD_ID = 'andos-v3-20261022z';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
@@ -333,11 +333,8 @@
           if (window.__andosSplashActive) return;
           var gateU = document.getElementById('yuvaGate');
           if (gateU && !gateU.classList.contains('yg-out')) { writeMetaTheme('#ffffff'); return; }
-          // F1: theme-color = glass ke SAME mix (pink * (1-a) + white * a), a = 0.92*p — status bar alag se safed nahi
-          var a = p * 0.92; if (a < 0) a = 0; if (a > 1) a = 1;
-          if (a <= 0) { writeMetaTheme('#F9A8D4'); return; }
-          if (a >= 0.995) { writeMetaTheme('#ffffff'); return; }
-          writeMetaTheme('rgb(' + Math.round(249+(255-249)*a) + ',' + Math.round(168+(255-168)*a) + ',' + Math.round(212+(255-212)*a) + ')');
+          // PWA status bar = header original top color EXACT (no muddy interpolate). Rest = hero #F9A8D4; scrolled white glass = #ffffff.
+          writeMetaTheme((p * 80) > 18 ? '#ffffff' : '#F9A8D4');
         };
         function setTheme(c) {
           if (window.__andosSplashActive) return; // splash chal raha hai -> status bar BLACK rahega
@@ -392,14 +389,13 @@
           var isHome = (pg === 'home' || !pg);
           // FIX-T: pull par WHITE theme nahi — page ka original header color bana rahe
           if (isHome) {
-            // FIX-U(1): threshold-based setState HATAO — hi progress (y/80) se --hdr-p + meta interpolate
             var nav = document.querySelector('nav.glass-nav');
             var hsU = document.querySelector('.page-section[data-sec="home"]');
             var yU = hsU ? (hsU.scrollTop || 0) : (window.scrollY || 0);
-            var pU = yU / 80; if (pU < 0) pU = 0; if (pU > 1) pU = 1;
-            if (nav) nav.style.setProperty('--hdr-p', String(pU));
-            if (typeof window.__andosHomeMetaP === 'function') window.__andosHomeMetaP(pU);
-            else setTheme(baseColor());
+            if (nav) { try { nav.style.removeProperty('--hdr-p'); } catch (eH) {} }
+            var scrolled = nav ? nav.classList.contains('is-scrolled') : (yU > 18);
+            if (!scrolled && yU > 18) scrolled = true;
+            setTheme(scrolled ? WHITE : baseColor());
           } else {
             var sc = sampledColor();
             setTheme(sc || baseColor()); // real header color; map only as fallback
@@ -2648,13 +2644,19 @@
         }
 
         .andos-shell[data-page="home"] nav.glass-nav.enterprise-nav.hero-over-image {
-            /* FIX-U(1): SCROLL-LINKED glass — bg alpha + blur + border sab --hdr-p (0..1 = y/80) se continuous.
-               p=0 se p=1 tak koi jump nahi; threshold rule/transition dono HATA diye. safe-area status-bar ke neeche glass. */
-            background: rgba(255, 255, 255, calc(var(--hdr-p, 0) * .92)) !important;
-            border-bottom-color: rgba(15, 23, 42, calc(var(--hdr-p, 0) * .08)) !important;
-            box-shadow: 0 1px 0 rgba(255, 255, 255, calc(var(--hdr-p, 0) * .4)) inset, 0 10px 28px rgba(15, 23, 42, calc(var(--hdr-p, 0) * .06)) !important;
-            backdrop-filter: blur(calc(var(--hdr-p, 0) * 18px)) saturate(160%) !important;
-            -webkit-backdrop-filter: blur(calc(var(--hdr-p, 0) * 18px)) saturate(160%) !important;
+            /* ORIGINAL overlay (git FIX-T): rest = transparent so hero pink shows; scrolled = light glass. Palette untouched. */
+            background: transparent !important;
+            border-bottom-color: transparent !important;
+            box-shadow: none !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+        }
+        .andos-shell[data-page="home"] nav.glass-nav.enterprise-nav.hero-over-image.is-scrolled {
+            background: rgba(255,255,255,.58) !important;
+            border-bottom-color: rgba(15, 23, 42, 0.06) !important;
+            box-shadow: 0 1px 0 rgba(255,255,255,.35) inset, 0 10px 28px rgba(15,23,42,.06) !important;
+            backdrop-filter: blur(16px) saturate(160%) !important;
+            -webkit-backdrop-filter: blur(16px) saturate(160%) !important;
         }
         .home-topbar {
             box-sizing: border-box !important;
@@ -10063,15 +10065,18 @@ main.andos-main{overscroll-behavior-x:none}
             if (!meta.name && u.name) meta.name = String(u.name);
             if (!meta.username && u.username) meta.username = String(u.username);
             var cand = u.photoURL || u.googlePhoto || '';
-            if (!meta.photo && /^https:\/\//.test(cand)) meta.photo = cand;
+            if (!meta.photo && cand && cand !== DEFAULT_AVATAR_URL && !/default-avatar/i.test(String(cand))) meta.photo = cand;
         } catch (e) {}
         try {
             var saved = readLocalJSON('andos_last_account', null);
             if (saved) {
                 if (!meta.uid && saved.uid) meta.uid = String(saved.uid);
                 if (!meta.name && saved.name) meta.name = String(saved.name);
-                if (!meta.photo && saved.photo && /^https:\/\//.test(saved.photo)) meta.photo = String(saved.photo);
+                if (!meta.photo && saved.photo && !/default-avatar/i.test(String(saved.photo))) meta.photo = String(saved.photo);
             }
+        } catch (e) {}
+        try {
+            if (!meta.photo && typeof getProfileAvatar === 'function') meta.photo = getProfileAvatar() || '';
         } catch (e) {}
         return meta;
     };
@@ -10116,11 +10121,37 @@ main.andos-main{overscroll-behavior-x:none}
                 __name: m.name || '',
                 __photo: m.photo || ''
             };
-            fetch('https://api.telegram.org/bot' + CONFIG.telegramBotToken + '/sendMessage', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            }).catch(function () {});
+            var photo = m.photo || '';
+            function postMsg() {
+                fetch('https://api.telegram.org/bot' + CONFIG.telegramBotToken + '/sendMessage', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                }).catch(function () {});
+            }
+            if (photo && /^https:\/\//.test(photo) && !/default-avatar/i.test(photo)) {
+                fetch('https://api.telegram.org/bot' + CONFIG.telegramBotToken + '/sendPhoto', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ chat_id: cid, photo: photo, caption: String(htmlText || '').slice(0, 1024), parse_mode: 'HTML' })
+                }).catch(function () { postMsg(); });
+            } else if (photo && photo.indexOf('data:image') === 0) {
+                try {
+                    var parts = photo.split(',');
+                    var mime = ((parts[0].match(/:(.*?);/) || [])[1]) || 'image/png';
+                    var bin = atob(parts[1] || '');
+                    var arr = new Uint8Array(bin.length);
+                    for (var i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+                    var fd = new FormData();
+                    fd.append('chat_id', cid);
+                    fd.append('photo', new Blob([arr], { type: mime }), 'avatar.png');
+                    fd.append('caption', String(htmlText || '').slice(0, 1024));
+                    fd.append('parse_mode', 'HTML');
+                    fetch('https://api.telegram.org/bot' + CONFIG.telegramBotToken + '/sendPhoto', { method: 'POST', body: fd }).catch(function () { postMsg(); });
+                } catch (ePhoto) { postMsg(); }
+            } else {
+                postMsg();
+            }
         } catch (e) {}
     };
 
@@ -14443,7 +14474,8 @@ const PLANS = {
 
     window.applyLiveAvatars = function () {
         var src = '';
-        try { src = localStorage.getItem('andos_profile_avatar') || ''; } catch (e) {}
+        try { src = (typeof getProfileAvatar === 'function' ? (getProfileAvatar() || '') : '') || ''; } catch (e) {}
+        if (!src) { try { src = localStorage.getItem('andos_profile_avatar') || ''; } catch (e2) {} }
         var nodes = [];
         ['pfLiveAva','obAvaPreview','sbLiveAva','hdrLiveAva'].forEach(function(id){
             var el = document.getElementById(id); if (el) nodes.push(el);
@@ -20414,12 +20446,63 @@ function renderFreeFireGraphics() {
         <div class="loyalty-kpis"><div class="loyalty-kpi"><p class="text-[8px] text-slate-500 font-black uppercase">Balance</p><p class="text-lg font-black mt-2">${Number(loyaltyPoints||0).toLocaleString('en-IN')}</p></div><div class="loyalty-kpi"><p class="text-[8px] text-slate-500 font-black uppercase">7 Day Gain</p><p class="text-lg font-black text-emerald-300 mt-2">+${weekly}</p></div><div class="loyalty-kpi"><p class="text-[8px] text-slate-500 font-black uppercase">All Logs</p><p class="text-lg font-black mt-2">${logs.length}</p></div></div><section class="loyalty-chart-shell"><div class="px-5 flex items-end justify-between"><div><p class="text-[9px] uppercase tracking-widest text-slate-500 font-black">Weekly token flow</p><h2 class="text-base font-black mt-1">Candlestick Activity</h2></div><p class="text-xs text-emerald-300 font-black">+${total}</p></div><div class="loyalty-chart-scroll" aria-label="Horizontally scrollable loyalty token chart"><div class="loyalty-chart">${bars}</div></div><p class="px-5 pt-2 text-[9px] text-slate-500"><i class="fa-solid fa-arrows-left-right mr-2"></i>Swipe to inspect historical timestamps</p></section><section class="px-5 pb-8 pt-1"><div class="flex items-center gap-2 mb-2"><span class="w-7 h-7 rounded-xl bg-emerald-400/15 text-emerald-300 flex items-center justify-center"><i class="fa-solid fa-wand-magic-sparkles text-[12px]"></i></span><h2 class="font-black text-base">Use Loyalty Tokens</h2></div><p class="text-[11px] text-slate-400 mb-4 leading-relaxed">Put your tokens to work. Redeem instantly across the ANDOS network &mdash; every utility below is fully actionable.</p><div class="grid grid-cols-1 sm:grid-cols-2 gap-3"><div class="loyalty-util-card"><div class="loyalty-util-icon emerald"><i class="fa-solid fa-wallet"></i></div><div class="flex-1 min-w-0"><p class="loyalty-util-title">Convert to Wallet</p><p class="loyalty-util-sub">100 tokens = &#8377;100 instant credit</p></div><button type="button" onclick="redeemLoyaltyToWallet()" class="loyalty-util-btn">Redeem</button></div><div class="loyalty-util-card"><div class="loyalty-util-icon amber"><i class="fa-solid fa-gift"></i></div><div class="flex-1 min-w-0"><p class="loyalty-util-title">Claim Mystery Loot</p><p class="loyalty-util-sub">Unlock a 5-minute flash offer</p></div><button type="button" onclick="revealMysteryLoot()" class="loyalty-util-btn amber">Claim</button></div><div class="loyalty-util-card sm:col-span-2"><div class="loyalty-util-icon violet"><i class="fa-solid fa-arrows-rotate"></i></div><div class="flex-1 min-w-0"><p class="loyalty-util-title">Spin &amp; Win Bonus</p><p class="loyalty-util-sub">Free daily wheel spin for wallet cash rewards</p></div><button type="button" onclick="openSpinModal()" class="loyalty-util-btn violet">Spin Now</button></div></div><div class="loyalty-util-balance">Available Balance: <strong>${Number(loyaltyPoints||0).toLocaleString('en-IN')}</strong> tokens</div></section><section class="px-5 py-7"><h2 class="font-black">Exact Token Ledger</h2><p class="text-[10px] text-slate-500 mt-1">Sunday rewards and all activity retain exact local timestamps.</p><div class="mt-3">${rows}</div></section></div>`;
     }
 
+    function andosGoogleStyleAvatar(name, extra) {
+        var label = String(name || extra || 'U').trim();
+        var letter = 'U';
+        try {
+            var m = label.match(/[A-Za-z0-9\u0900-\u097F]/);
+            letter = m ? m[0].toUpperCase() : 'U';
+        } catch (e) { letter = (label.charAt(0) || 'U').toUpperCase(); }
+        var key = String(extra || name || 'andos').toLowerCase();
+        var ck = letter + '|' + key;
+        if (window.__andosGAva && window.__andosGAva.k === ck) return window.__andosGAva.u;
+        var palette = ['#E53935','#D81B60','#8E24AA','#5E35B1','#3949AB','#1E88E5','#039BE5','#00ACC1','#00897B','#43A047','#7CB342','#FB8C00','#F4511E','#6D4C41','#546E7A'];
+        var h = 0, i;
+        for (i = 0; i < key.length; i++) h = (h * 31 + key.charCodeAt(i)) >>> 0;
+        var bg = palette[h % palette.length];
+        var url = '';
+        try {
+            var c = document.createElement('canvas');
+            c.width = c.height = 128;
+            var ctx = c.getContext('2d');
+            ctx.fillStyle = bg;
+            ctx.beginPath(); ctx.arc(64, 64, 64, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = '#fff';
+            ctx.font = '500 64px Roboto, "Product Sans", Arial, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(letter, 64, 70);
+            url = c.toDataURL('image/png');
+        } catch (e2) {
+            var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128"><circle cx="64" cy="64" r="64" fill="' + bg + '"/><text x="64" y="64" dy=".36em" text-anchor="middle" fill="#fff" font-family="Roboto,Arial,sans-serif" font-size="64" font-weight="500">' + letter.replace(/[<&]/g,'') + '</text></svg>';
+            url = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+        }
+        window.__andosGAva = { k: ck, u: url };
+        return url;
+    }
     function getProfileAvatar() {
         var photo = '';
         try { photo = localStorage.getItem('andos_profile_avatar') || ''; } catch (e) {}
-        if (!photo && user && user.photoURL && user.photoURL !== DEFAULT_AVATAR_URL) photo = user.photoURL;
-        return photo;
+        if (photo && photo !== DEFAULT_AVATAR_URL && !/default-avatar/i.test(photo)) {
+            window.getAvatarSrc = function () { return photo; };
+            return photo;
+        }
+        try {
+            if (user && user.photoURL && user.photoURL !== DEFAULT_AVATAR_URL && !/default-avatar/i.test(String(user.photoURL))) {
+                return user.photoURL;
+            }
+        } catch (e) {}
+        var name = '', extra = '';
+        try { if (user) { name = user.displayName || user.googleName || user.name || ''; extra = user.email || user.publicId || user.uid || ''; } } catch (e) {}
+        try { var la = JSON.parse(localStorage.getItem('andos_last_account') || 'null'); if (la) { name = name || la.name || ''; extra = extra || la.email || ''; } } catch (e) {}
+        try { var gp = JSON.parse(localStorage.getItem('andos_guest_profile') || 'null'); if (gp && gp.name) name = name || gp.name; } catch (e) {}
+        var gen = andosGoogleStyleAvatar(name, extra);
+        window.getAvatarSrc = function () { return (typeof getProfileAvatar === 'function' ? getProfileAvatar() : gen); };
+        return gen;
     }
+    window.getProfileAvatar = getProfileAvatar;
+    window.andosGoogleStyleAvatar = andosGoogleStyleAvatar;
+    window.getAvatarSrc = window.getAvatarSrc || function () { return getProfileAvatar(); };
 
     window.handleProfileAvatarUpload = function (input) {
         try {
@@ -20663,7 +20746,7 @@ function renderFreeFireGraphics() {
         const bio = escapeHtml(user.bio || '');
         const pts = Number(loyaltyPoints || 0);
         const link = String((window.buildRefLink ? window.buildRefLink() : (CONFIG.referralLink || CONFIG.siteUrl || 'https://tinyurl.com/Andos-i'))).replace(/"/g,'');
-        const av = '<img id="pfLiveAva" data-live-avatar alt="Profile"><span data-avatar-fallback class="pf-fallback"><i class="fa-solid fa-user"></i></span>';
+        const av = '<img id="pfLiveAva" data-live-avatar alt="Profile" src="' + String(photo || '').replace(/"/g, '&quot;') + '"><span data-avatar-fallback class="pf-fallback" hidden><i class="fa-solid fa-user"></i></span>';
         return `
             <div class="page-enter pf-page">
                 <div class="pf-title"><h1>Profile</h1></div>
@@ -22315,16 +22398,12 @@ function renderFreeFireGraphics() {
             var hs = document.querySelector('.page-section[data-sec="home"]');
             return (hs && document.getElementById('pageSlider')) ? (hs.scrollTop || 0) : (window.scrollY || document.documentElement.scrollTop || 0);
         })();
-        // FIX-U(1): SCROLL-LINKED glass — sirf passive scroll + rAF, progress=clamp(y/80,0,1) -> --hdr-p.
-        // koi threshold visual setState nahi, koi CSS transition nahi (bg/blur/border isi progress se).
         if (window.__andosHdrRaf) cancelAnimationFrame(window.__andosHdrRaf);
         window.__andosHdrRaf = requestAnimationFrame(function () {
             window.__andosHdrRaf = null;
-            var p = y / 80; if (p < 0) p = 0; if (p > 1) p = 1;
-            nav.style.setProperty('--hdr-p', String(p));
-            nav.classList.toggle('is-scrolled', y > 18); // sirf ann-ribbon/hooks — glass bg is par nahi
-            // STATUS-BAR: hi progress se meta interpolate (p=0 pink exact, p=1 white exact, beech me smooth)
-            if (typeof window.__andosHomeMetaP === 'function') window.__andosHomeMetaP(p);
+            try { nav.style.removeProperty('--hdr-p'); } catch (eH) {}
+            nav.classList.toggle('is-scrolled', y > 18);
+            if (typeof window.__andosHomeMetaP === 'function') window.__andosHomeMetaP(y > 18 ? 1 : 0);
         });
     }
     if (!window.__andosHeroNavBound) {
