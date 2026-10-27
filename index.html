@@ -169,7 +169,7 @@
     <meta name="theme-color" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0f19">
-    <meta name="andos-build" content="andos-v3-20261028l2">
+    <meta name="andos-build" content="andos-v3-20261028l3">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -192,7 +192,7 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261028l2';
+        var HTML_BUILD_ID = 'andos-v3-20261028l3';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
@@ -11323,9 +11323,8 @@ function saveOrder(order) {
     }
 
     function isWalletDepositUnlocked() {
-        if (window.__andosWalletUnlockedServer === false) return false;
         try { if (typeof isAdminDevMode === 'function' && isAdminDevMode()) return true; } catch(e) {}
-        return localStorage.getItem('isWalletUnlocked') === 'true';
+        return window.__andosWalletUnlockedServer === true;
     }
 
     function getFirstDepositMin() {
@@ -12468,6 +12467,26 @@ const PLANS = {
             }, function (e) { console.warn('FB watchRequests', e); });
         } catch (e) {}
     };
+    ANDOS_FB.watchWalletLock = function () {
+        if (!this.ready()) return;
+        try { if (this._unsubWalletLock) this._unsubWalletLock(); } catch (e0) {}
+        this._unsubWalletLock = null;
+        var uid = this.uid();
+        if (!uid) { window.__andosWalletUnlockedServer = false; return; }
+        window.__andosWalletUnlockedServer = null;
+        var self = this;
+        try {
+            this._unsubWalletLock = db.collection('users').doc(uid).onSnapshot(function (snap) {
+                var d = (snap && snap.exists) ? (snap.data() || {}) : {};
+                window.__andosWalletUnlockedServer = d.walletUnlocked === true;
+                try { localStorage.setItem('isWalletUnlocked', window.__andosWalletUnlockedServer ? 'true' : 'false'); } catch (e1) {}
+                try { if (typeof render === 'function') render(); } catch (e2) {}
+            }, function () {
+                window.__andosWalletUnlockedServer = false;
+                try { if (typeof render === 'function') render(); } catch (e3) {}
+            });
+        } catch (e) { window.__andosWalletUnlockedServer = false; }
+    };
 
     // ---- User profile cloud sync (users/{uid}) ----
     ANDOS_FB.loadUser = function (fbUser) {
@@ -13187,7 +13206,7 @@ const PLANS = {
                         name: verified.name
                     });
                 }
-                try { ANDOS_FB.watchOrders(); ANDOS_FB.watchRequests(); applyLiveAvatars(); } catch (e) {}
+                try { ANDOS_FB.watchOrders(); ANDOS_FB.watchRequests(); ANDOS_FB.watchWalletLock(); applyLiveAvatars(); } catch (e) {}
 
                 guestOnboardingInFlight = false;
                 setGuestSetupBusy(false);
@@ -13854,6 +13873,8 @@ const PLANS = {
             // 1) Signed out -> Lock & display original Login UI + launch native Google One Tap Bottom Sheet!
             if (!fbUser) {
                 firstAuthEvent = false;
+                window.__andosWalletUnlockedServer = false;
+                try { if (ANDOS_FB._unsubWalletLock) ANDOS_FB._unsubWalletLock(); } catch (eWL) {}
                 window.ANDOS_STAFF.reset();
                 showLoginGate();
                 markAuthBootResolved();
@@ -13886,7 +13907,7 @@ const PLANS = {
                         applyVerifiedServerIdentity(fbUser, minted, '', '');
                     }
                     firstAuthEvent = false;
-                    try { ANDOS_FB.watchOrders(); ANDOS_FB.watchRequests(); applyLiveAvatars(); } catch (e) {}
+                    try { ANDOS_FB.watchOrders(); ANDOS_FB.watchRequests(); ANDOS_FB.watchWalletLock(); applyLiveAvatars(); } catch (e) {}
                     hideLoginGate();
                     markAuthBootResolved();
                 } catch (err) {
@@ -13936,7 +13957,7 @@ const PLANS = {
                 var isTrulyNew = (cloud === null) && isNewMeta;
 
                 try { ANDOS_FB.applyCloud(fbUser, cloud, isTrulyNew); } catch (e) { console.warn('applyCloud', e); }
-                try { ANDOS_FB.watchOrders(); ANDOS_FB.watchRequests(); ANDOS_SYNC.syncNotifications(); } catch (e) {}
+                try { ANDOS_FB.watchOrders(); ANDOS_FB.watchRequests(); ANDOS_FB.watchWalletLock(); ANDOS_SYNC.syncNotifications(); } catch (e) {}
                 try { if (typeof render === 'function') render(); } catch (e) {}
 
                 try {
@@ -14852,7 +14873,6 @@ const PLANS = {
                     <button type="button" class="andos-avatar-btn" onclick="toggleHdrMenu()" aria-label="Open menu">
                         <span class="andos-avatar-ring" aria-hidden="true"></span>
                         ${avatarInner}
-                        <span class="andos-verified" aria-label="Verified"><img class="andos-verified-img" src="${VERIFY_BADGE_URL}" alt=""></span>
                     </button>
                     <div class="home-topbar-right">
                     <button type="button" class="header-wallet-coin" onclick="navigate('wallet')" aria-label="Wallet balance">
@@ -25421,6 +25441,84 @@ main.andos-main:not(:has(#pageSlider)) {
 .andos-shell[data-page="home"] footer {
   padding-bottom: calc(var(--bottom-nav-height) + 16px) !important;
 }
+
+/* l3: home header seamless + Gemini avatar ring */
+.andos-shell[data-page="home"] nav.home-topbar,
+.andos-shell[data-page="home"] nav.glass-nav.enterprise-nav.hero-over-image,
+.andos-shell[data-page="home"] nav.glass-nav.enterprise-nav.hero-over-image.is-scrolled {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  border: none !important;
+  border-bottom: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+.andos-shell[data-page="home"] {
+  position: relative;
+}
+.home-hero-stage {
+  margin-top: calc(-1 * (52px + env(safe-area-inset-top, 0px))) !important;
+}
+.home-hero-stage::before {
+  background: linear-gradient(180deg, #F9A8D4 0%, #F9A8D4 28%, rgba(249,168,212,.35) 70%, rgba(249,168,212,0) 100%) !important;
+  z-index: 1 !important;
+}
+.home-hero-bleed {
+  background: #F9A8D4 !important;
+}
+.home-hero-bleed img {
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 78%, rgba(0,0,0,0) 100%) !important;
+  mask-image: linear-gradient(to bottom, #000 0%, #000 78%, rgba(0,0,0,0) 100%) !important;
+}
+nav.home-topbar .andos-avatar-btn {
+  position: relative !important;
+  width: 44px !important;
+  height: 44px !important;
+  flex: 0 0 44px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  border-radius: 50% !important;
+  overflow: visible !important;
+  display: inline-grid !important;
+  place-items: center !important;
+  box-shadow: 0 0 14px rgba(42, 117, 255, 0.45) !important;
+}
+nav.home-topbar .andos-avatar-ring {
+  position: absolute !important;
+  inset: 0 !important;
+  border-radius: 50% !important;
+  background: conic-gradient(from -90deg, #2A75FF, #4F46E5, #7C3AED, #2A75FF) !important;
+  animation: none !important;
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2.5px), #000 calc(100% - 2px)) !important;
+  mask: radial-gradient(farthest-side, transparent calc(100% - 2.5px), #000 calc(100% - 2px)) !important;
+  pointer-events: none !important;
+  z-index: 0 !important;
+}
+nav.home-topbar .andos-avatar-btn img,
+nav.home-topbar .andos-avatar-btn #hdrLiveAva {
+  position: relative !important;
+  inset: auto !important;
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 50% !important;
+  object-fit: cover !important;
+  z-index: 1 !important;
+  display: block !important;
+}
+nav.home-topbar .andos-avatar-fallback {
+  position: relative !important;
+  inset: auto !important;
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 50% !important;
+}
+nav.home-topbar .andos-verified { display: none !important; }
+
 </style>
 </body>
 </html>
