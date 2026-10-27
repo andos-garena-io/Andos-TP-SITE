@@ -167,10 +167,10 @@
     <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="apple-touch-icon" href="https://cdn.jsdelivr.net/gh/CIDHARIOM/ANDOS-VS-0.172.1919@main/assets/logo/logo.png">
-    <meta name="theme-color" content="#ffffff">
-    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
-    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#ffffff">
-    <meta name="andos-build" content="andos-v3-20261028m6g">
+    <meta name="theme-color" content="#0b0f19">
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0b0f19">
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0f19">
+    <meta name="andos-build" content="andos-v3-20261028n">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -193,36 +193,14 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261028m6g';
+        var HTML_BUILD_ID = 'andos-v3-20261028n';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
-        (function () {
-          try {
-            var q = new URLSearchParams(location.search || '');
-            var v = String(q.get('v') || '').toLowerCase();
-            var prev = String(q.get('preview') || '').toLowerCase();
-            var hash = String(location.hash || '');
-            if (hash.charAt(0) === '#') hash = hash.slice(1);
-            if (hash.charAt(0) === '/') hash = hash.slice(1);
-            hash = hash.toLowerCase();
-            var on = hash === 'm6' || v === 'm6' || prev === 'm6';
-            window.__ANDOS_BUILD_M6 = !!on;
-            window.__ANDOS_BUILD_M = !!on;
-            document.documentElement.classList.toggle('build-m6', on);
-            document.documentElement.classList.toggle('build-m', on);
-          } catch (e) {
-            window.__ANDOS_BUILD_M6 = false;
-            window.__ANDOS_BUILD_M = false;
-          }
-        })();
-        window.addEventListener('hashchange', function () {
-          try {
-            var h2 = String(location.hash || '');
-            if (h2.charAt(0) === '#') h2 = h2.slice(1);
-            if (h2.charAt(0) === '/') h2 = h2.slice(1);
-            var want = h2.toLowerCase() === 'm6';
-            if (want !== !!window.__ANDOS_BUILD_M6) location.reload();
-          } catch (eH) {}
-        });
+        window.__ANDOS_BUILD_M6 = false;
+        window.__ANDOS_BUILD_M = true;
+        try {
+          document.documentElement.classList.add('build-m');
+          document.documentElement.classList.remove('build-m6');
+        } catch (eBm) {}
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
 
@@ -365,8 +343,8 @@
               tab = sh ? (sh.getAttribute('data-page') || '') : '';
             }
             if (tab === 'wallet') writeMetaTheme('#2e1065');
-            else if (tab === 'home') return;
-            else writeMetaTheme('#ffffff');
+            else if (tab === 'home') writeMetaTheme('#F9A8D4');
+            else writeMetaTheme('#E2E8F0');
           } catch (e) {}
         };
         // FIX-U(1): home glass progress -> status-bar color INTERPOLATE (jump band)
@@ -375,7 +353,7 @@
           var gateU = document.getElementById('yuvaGate');
           if (gateU && !gateU.classList.contains('yg-out')) { writeMetaTheme('#ffffff'); return; }
           // rest: theme-color = hero-top #F9A8D4 (status bar continues gradient). scrolled: white glass.
-          writeMetaTheme((p * 80) > 18 ? '#ffffff' : '#F9A8D4');
+          writeMetaTheme('#F9A8D4');
         };
         function setTheme(c) {
           if (window.__andosSplashActive) return; // splash chal raha hai -> status bar BLACK rahega
@@ -15351,12 +15329,7 @@ const PLANS = {
     }
     window.__andosTabScroller = __andosTabScroller;
     function __wrapMainTab(sec, inner) {
-        inner = inner || '';
-        if (window.__ANDOS_BUILD_M6 !== true) return inner;
-        if (sec === 'home') {
-            return '<div id="topNavSlot" class="tab-header home-tab-header">' + Navbar('home') + '</div><div class="tab-body home-tab-body">' + inner + '</div>';
-        }
-        return '<div class="tab-body">' + inner + '</div>';
+        return inner || '';
     }
     function __fillMainSection(sec) {
         try {
@@ -15626,7 +15599,7 @@ const PLANS = {
         try { mountSidebar(); } catch (e) {}
         requestAnimationFrame(() => { window.__andosRenderQueued = false; });
         window.__andosDarkPage = ['loyalty','paymentverify'].indexOf(currentPage) !== -1;
-        const __isMain5 = (window.__ANDOS_BUILD_M6 === true) && ['home', 'categories', 'orders', 'wallet', 'account'].indexOf(currentPage) !== -1;
+        const __isMain5 = false; // swipe/carousel removed — click tabs only
         if (__isMain5 && currentPage === 'home') { try { content = content + Footer(); } catch (eF) {} }
         app.innerHTML = `
             <div class="min-h-screen andos-shell" data-page="${currentPage}" data-dark="${window.__andosDarkPage ? 'true' : 'false'}">
@@ -26219,138 +26192,6 @@ html.build-m #orderFilterPanel, html.build-m .od-filters {
   overflow: visible !important;
   width: 100% !important;
   max-width: none !important;
-}
-
-/* ===== m6: per-tab screens — ONLY when html.build-m6 (#m6 / ?v=m6) ===== */
-html.build-m6, html.build-m6 body {
-  height: 100%;
-  height: 100dvh;
-  margin: 0;
-  overflow: hidden;
-}
-html.build-m6, html.build-m6 body, html.build-m6 #app {
-  height: 100%;
-  height: 100dvh;
-  overflow: hidden;
-  background-color: #ffffff !important;
-}
-html.build-m6 #app { position: relative; }
-html.build-m6 .andos-shell {
-  height: 100%;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  background: #ffffff !important;
-}
-html.build-m6 .andos-shell[data-page="wallet"] { background: #2e1065 !important; }
-html.build-m6 main.andos-main:has(#pageSlider) {
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow: hidden !important;
-}
-html.build-m6 #pageSlider.page-slider {
-  display: flex;
-  height: 100%;
-  width: 100%;
-  overflow-x: auto;
-  overflow-y: hidden;
-  scroll-snap-type: x mandatory;
-  overscroll-behavior-x: contain;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-}
-html.build-m6 .page-section {
-  flex: 0 0 100%;
-  min-width: 100%;
-  width: 100%;
-  height: 100%;
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden !important;
-  box-sizing: border-box;
-  position: relative;
-}
-html.build-m6 .tab-header, html.build-m6 .home-tab-header, html.build-m6 .page-section[data-sec="home"] > #topNavSlot {
-  display: block !important;
-  flex: 0 0 auto;
-  pointer-events: auto;
-}
-html.build-m6 .page-section[data-sec="home"] > #topNavSlot,
-html.build-m6 .page-section[data-sec="home"] > .tab-header {
-  position: absolute !important;
-  top: 0; left: 0; right: 0;
-  z-index: 60;
-}
-html.build-m6 .andos-shell:not([data-page="home"]) #topNavSlot { display: block !important; }
-html.build-m6 .tab-body {
-  flex: 1 1 auto;
-  min-height: 0;
-  height: 100%;
-  overflow-y: auto;
-  overflow-x: hidden;
-  overscroll-behavior-y: contain;
-  -webkit-overflow-scrolling: touch;
-  box-sizing: border-box;
-}
-html.build-m6 .tab-body:not(.home-tab-body) {
-  padding-bottom: 0;
-}
-html.build-m6 .home-tab-body { position: relative; isolation: isolate; }
-html.build-m6 .home-tab-body::before {
-  content: '';
-  position: absolute;
-  top: -72px; left: 0; right: 0;
-  height: 72px;
-  background: #F9A8D4;
-  z-index: -1;
-}
-html.build-m6 .page-section[data-sec="home"] > nav.glass-nav,
-html.build-m6 .page-section[data-sec="home"] nav.glass-nav,
-html.build-m6 .page-section[data-sec="home"] nav.home-topbar,
-html.build-m6 .page-section[data-sec="home"] nav.glass-nav.enterprise-nav.hero-over-image {
-  background: transparent !important;
-  background-image: none !important;
-  border: none !important;
-  box-shadow: none !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  padding-top: max(16px, env(safe-area-inset-top, 0px)) !important;
-}
-html.build-m6 .page-section[data-sec="home"] nav.glass-nav.is-scrolled,
-html.build-m6 .page-section[data-sec="home"] nav.glass-nav.enterprise-nav.hero-over-image.is-scrolled {
-  background: rgba(255,255,255,.58) !important;
-  backdrop-filter: blur(16px) saturate(160%) !important;
-  -webkit-backdrop-filter: blur(16px) saturate(160%) !important;
-}
-html.build-m6 nav.glass-nav, html.build-m6 nav.home-topbar, html.build-m6 .xplore-head, html.build-m6 .catd-bar, html.build-m6 .odd-bar, html.build-m6 .txn-bar, html.build-m6 .sp-bar, html.build-m6 .pf-title, html.build-m6 .wal-hero, html.build-m6 .wal-m-hero, html.build-m6 .od-title {
-  padding-top: max(16px, env(safe-area-inset-top, 0px)) !important;
-  box-sizing: border-box;
-}
-html.build-m6 .tab-body .xplore-head,
-html.build-m6 .tab-body .pf-title {
-  position: sticky;
-  top: 0;
-  z-index: 20;
-  background: #ffffff;
-}
-html.build-m6 .page-section[data-sec="categories"] .tab-body .xplore-head { background: #f7f7f7; }
-html.build-m6 .page-section[data-sec="wallet"] > .tab-body {
-  overflow: hidden !important;
-  display: flex;
-  flex-direction: column;
-}
-html.build-m .page-section[data-sec="wallet"] > .tab-body,
-html.build-m .page-section[data-sec="wallet"] > .tab-body > .page-enter.wal-m {
-  min-height: 100% !important;
-  height: 100% !important;
-  overflow: hidden !important;
-}
-html.build-m6 .tab-body > .xplore-stack { min-height: 100%; }
-@media (display-mode: standalone), (display-mode: fullscreen) {
-  html.build-m6, html.build-m6 body, html.build-m6 #app { height: 100dvh; }
 }
 
 </style>
