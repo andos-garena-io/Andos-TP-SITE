@@ -169,7 +169,7 @@
     <meta name="theme-color" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0f19">
-    <meta name="andos-build" content="andos-v3-20261027c">
+    <meta name="andos-build" content="andos-v3-20261027d">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -192,7 +192,7 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261027c';
+        var HTML_BUILD_ID = 'andos-v3-20261027d';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
@@ -24848,32 +24848,29 @@ html, body, #app { background-color: #0b0f19 !important; background-image: none 
   backdrop-filter: blur(16px) saturate(160%) !important;
   -webkit-backdrop-filter: blur(16px) saturate(160%) !important;
 }
-/* scroll unlock: page-enter leftover transform locks iOS/PWA overflow */
+/* one scroller only: inner pages must NOT trap touch (overflow-x:hidden => overflow-y:auto trap) */
 .page-enter, main.andos-main, .andos-main.page-enter {
   animation: none !important;
   transform: none !important;
   filter: none !important;
 }
-.andos-main {
-  overflow-y: auto !important;
-  -webkit-overflow-scrolling: touch;
-}
+/* slider tabs: section scrolls; main must not compete */
+main.andos-main:has(#pageSlider) { overflow: hidden !important; }
 .page-section {
   overflow-y: auto !important;
   overflow-x: hidden !important;
-  -webkit-overflow-scrolling: touch;
-  touch-action: pan-y;
-  padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px));
-}
-.pf-page, .wal-page {
-  overflow-y: visible !important;
+  overscroll-behavior-y: contain;
   -webkit-overflow-scrolling: touch;
 }
-.payx-page {
+/* payment (no slider): main is the scroller */
+main.andos-main:not(:has(#pageSlider)) {
   overflow-y: auto !important;
   overflow-x: hidden !important;
+  overscroll-behavior-y: contain;
   -webkit-overflow-scrolling: touch;
-  padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px)) !important;
+}
+.pf-page, .wal-page, .payx-page {
+  overflow: visible !important;
 }
 </style>
 </body>
