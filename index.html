@@ -169,7 +169,7 @@
     <meta name="theme-color" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0f19">
-    <meta name="andos-build" content="andos-v3-20261027h">
+    <meta name="andos-build" content="andos-v3-20261027i">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -192,7 +192,7 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261027h';
+        var HTML_BUILD_ID = 'andos-v3-20261027i';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
@@ -13257,13 +13257,23 @@ const PLANS = {
         // so tapping "Continue with Google" opens Google's Native Account Picker Bottom Sheet ("Continue as...")!
         function lockGoogleCta() {
             var btn = document.getElementById('btn-google-auth') || document.getElementById('mainGoogleBtn') || mainGbtn;
-            if (!btn) return;
-            try {
-                var idle = btn.querySelector('.txt-idle');
-                if (idle && idle.textContent !== 'Continue with Google') idle.textContent = 'Continue with Google';
-                btn.setAttribute('id', 'btn-google-auth');
-                btn.setAttribute('data-andos-cta', 'google');
-            } catch (e) {}
+            if (btn) {
+                try {
+                    var idle = btn.querySelector('.txt-idle');
+                    if (idle && idle.textContent !== 'Continue with Google') idle.textContent = 'Continue with Google';
+                    btn.setAttribute('id', 'btn-google-auth');
+                    btn.setAttribute('data-andos-cta', 'google');
+                    if (btn.parentElement) btn.parentElement.style.display = '';
+                } catch (e) {}
+            }
+            var gb = document.getElementById('guestBtn');
+            if (gb) {
+                try {
+                    var gIdle = gb.querySelector('.txt-idle');
+                    if (gIdle && gIdle.textContent !== 'Continue as Guest') gIdle.textContent = 'Continue as Guest';
+                    if (gb.parentElement) gb.parentElement.style.display = '';
+                } catch (e2) {}
+            }
         }
         function saveLastAuthProvider(rec) {
             try {
@@ -13512,6 +13522,7 @@ const PLANS = {
                 return;
             }
             lockGoogleCta();
+            try { unmountGoogleOneTap(); } catch (eOt) {}
             setGoogleBusy(true);
             var params = { prompt: 'select_account' };
             if (hintEmail) params.login_hint = String(hintEmail).trim();
@@ -14537,8 +14548,11 @@ const PLANS = {
         var lastGuest = '';
         try { lastGuest = localStorage.getItem('andos_guest_profile') || ''; } catch (e) {}
         try {
-            if ((!lastProv || lastProv === 'null') && user && user.isGuest && user.uid) {
+            if (user && user.isGuest && user.uid) {
                 lastProv = JSON.stringify({ type: 'guest', identifier: user.publicId || user.uid, displayName: user.name || '', timestamp: Date.now(), uid: user.uid, photo: user.photoURL || '' });
+                if (!lastGuest || lastGuest === 'null') {
+                    lastGuest = JSON.stringify({ uid: user.uid, name: user.name || '', username: user.username || '', publicId: user.publicId || '', photo: user.photoURL || '', verifiedAt: Date.now() });
+                }
             } else if ((!lastProv || lastProv === 'null') && user && user.email) {
                 lastProv = JSON.stringify({ type: 'google', identifier: user.email, displayName: user.name || '', timestamp: Date.now(), uid: user.uid || '', photo: user.photoURL || '' });
             }
