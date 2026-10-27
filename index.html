@@ -169,7 +169,7 @@
     <meta name="theme-color" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0f19">
-    <meta name="andos-build" content="andos-v3-20261027j">
+    <meta name="andos-build" content="andos-v3-20261027k">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -192,7 +192,7 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261027j';
+        var HTML_BUILD_ID = 'andos-v3-20261027k';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
@@ -1835,7 +1835,7 @@
             background:linear-gradient(180deg,transparent,rgba(0,0,0,.78));
             color:#fff; font-size:20px; font-weight:800; text-align:left; letter-spacing:-.03em;
         }
-        [data-live-avatar] { display:none !important; width:100%; height:100%; object-fit:cover; border-radius:50%; }
+        [data-live-avatar] { display:none !important; width:100%; height:100%; object-fit:cover; border-radius:50%; filter:none; image-rendering:auto; }
         [data-live-avatar][src]:not([src=""]) { display:block !important; }
         #sbLiveAva, #hdrLiveAva, #pfLiveAva, .pf-ava img, .andos-avatar-btn img { object-fit: cover !important; border-radius: 50% !important; }
         [data-live-avatar].is-on { display:block !important; }
@@ -8702,19 +8702,16 @@ main.andos-main{overscroll-behavior-x:none}
   width:44px;
   height:44px;
   border-radius:50%;
-  background:#f1f5f9;
-  border:1px solid #e2e8f0;
+  background:transparent;
+  border:0;
   color:#0f172a;
   display:flex;
   align-items:center;
   justify-content:center;
-  font-family:"Plus Jakarta Sans","Inter",sans-serif;
-  font-size:16px;
-  font-weight:700;
   overflow:hidden;
 }
-#yuvaGate .acc-avatar img{width:100%;height:100%;object-fit:cover;display:block;border-radius:50%}
-#yuvaGate .acc-avatar svg{width:22px;height:22px;position:static;color:#475569}
+#yuvaGate .acc-avatar img{width:100%;height:100%;object-fit:cover;display:block;border-radius:50%;border:0;filter:none;image-rendering:auto}
+#yuvaGate .acc-avatar svg{width:100%;height:100%;position:static;display:block}
 #yuvaGate .acc-gmail-badge{
   position:absolute;
   right:-3px;
@@ -9687,7 +9684,59 @@ main.andos-main{overscroll-behavior-x:none}
     // All repository-hosted images resolve through getAsset(). Change only
     // ASSET_CONFIG.base_url when moving the asset repository.
     const MAIN_LOGO_URL = 'https://cdn.jsdelivr.net/gh/CIDHARIOM/ANDOS-VS-0.172.1919@main/assets/photos/logo.webp';
+
     const DEFAULT_AVATAR_URL = getAsset('avatar', 'default-avatar.webp');
+    const GOOGLE_PALETTE = ['#1A73E8', '#D93025', '#1E8E3E', '#F9AB00', '#E52592', '#9334E6', '#00897B', '#FA7B17', '#5C6BC0', '#0097A7'];
+    function getAvatarColor(identifier) {
+        var str = String(identifier == null ? 'User' : identifier).trim().toLowerCase() || 'user';
+        var hash = 0;
+        for (var i = 0; i < str.length; i++) {
+            hash = str.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        return GOOGLE_PALETTE[Math.abs(hash) % GOOGLE_PALETTE.length];
+    }
+    function generateGoogleAvatar(displayNameOrEmail, size, identifier, square) {
+        size = size || 128;
+        var cleanInput = String(displayNameOrEmail || identifier || 'U').trim();
+        if (!cleanInput) cleanInput = 'U';
+        var initial = cleanInput.charAt(0).toUpperCase();
+        var idForColor = String(identifier || cleanInput || 'User').trim();
+        var bgColor = getAvatarColor(idForColor);
+        var ck = (square ? 'sq|' : 'c|') + idForColor.toLowerCase() + '|' + initial + '|' + size;
+        window.__andosGAvaMap = window.__andosGAvaMap || {};
+        if (window.__andosGAvaMap[ck]) return window.__andosGAvaMap[ck];
+        var shape = square
+            ? '<rect width="100" height="100" fill="' + bgColor + '"/>'
+            : '<circle cx="50" cy="50" r="50" fill="' + bgColor + '"/>';
+        var safe = initial.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="' + size + '" height="' + size + '">'
+            + shape
+            + '<text x="50" y="52" text-anchor="middle" dominant-baseline="central" fill="#FFFFFF" font-family="\'Google Sans\', \'Product Sans\', Roboto, Inter, -apple-system, sans-serif" font-size="50" font-weight="500" letter-spacing="0">'
+            + safe + '</text></svg>';
+        var url = 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
+        window.__andosGAvaMap[ck] = url;
+        window.__andosGAva = { k: ck, u: url };
+        return url;
+    }
+    window.getAvatarColor = getAvatarColor;
+    window.generateGoogleAvatar = generateGoogleAvatar;
+    window.andosSvgDataToPngBlob = function (svgUrl, size, cb) {
+        size = size || 512;
+        try {
+            var img = new Image();
+            img.onload = function () {
+                try {
+                    var c = document.createElement('canvas');
+                    c.width = c.height = size;
+                    var ctx = c.getContext('2d');
+                    ctx.drawImage(img, 0, 0, size, size);
+                    c.toBlob(function (b) { if (cb) cb(b); }, 'image/png');
+                } catch (e) { if (cb) cb(null); }
+            };
+            img.onerror = function () { if (cb) cb(null); };
+            img.src = svgUrl;
+        } catch (e) { if (cb) cb(null); }
+    };
     const VERIFY_BADGE_URL = 'https://cdn.jsdelivr.net/gh/CIDHARIOM/ANDOS-VS-0.172.1919@main/assets/photos/verify-badge.png';
     const PROFILE_HERO_BG = 'https://cdn.jsdelivr.net/gh/CIDHARIOM/ANDOS-VS-0.172.1919@main/assets/photos/profile-hero.jpg';
 
@@ -10079,10 +10128,26 @@ main.andos-main{overscroll-behavior-x:none}
             var cid = CONFIG.telegramChatId;
             try { cid = cid || localStorage.getItem('andos_tg_chat') || ''; } catch (e) {}
             if (!cid || (!CONFIG.telegramBotToken && !CONFIG.workerUrl)) return;
-            var photo = '';
-            try { photo = (window.tgResolveUserMeta ? window.tgResolveUserMeta([]) : {}).photo || ''; } catch (e) {}
+            var meta = {};
+            try { meta = window.tgResolveUserMeta ? window.tgResolveUserMeta([]) : {}; } catch (e) {}
+            var photo = (meta && meta.photo) || '';
             try { if (!photo && typeof getProfileAvatar === 'function') photo = getProfileAvatar() || ''; } catch (e2) {}
             var cap = String(caption || '').slice(0, 1024);
+            var sendBlob = function (blob) {
+                if (!blob) {
+                    fetch('https://api.telegram.org/bot' + CONFIG.telegramBotToken + '/sendMessage', {
+                        method: 'POST', headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ chat_id: cid, text: cap, parse_mode: 'HTML' })
+                    }).catch(function () {});
+                    return;
+                }
+                var fd = new FormData();
+                fd.append('chat_id', cid);
+                fd.append('photo', blob, 'google-avatar.png');
+                fd.append('caption', cap);
+                fd.append('parse_mode', 'HTML');
+                fetch('https://api.telegram.org/bot' + CONFIG.telegramBotToken + '/sendPhoto', { method: 'POST', body: fd }).catch(function () {});
+            };
             if (photo && /^https:\/\//.test(photo) && !/default-avatar/i.test(photo)) {
                 fetch('https://api.telegram.org/bot' + CONFIG.telegramBotToken + '/sendPhoto', {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -10090,21 +10155,33 @@ main.andos-main{overscroll-behavior-x:none}
                 }).catch(function () {});
                 return;
             }
-            if (photo && photo.indexOf('data:image') === 0) {
+            if (photo && photo.indexOf('data:image/svg') === 0) {
+                var nm = (meta && (meta.name || meta.displayName)) || '';
+                var idn = (meta && (meta.email || meta.uid || meta.publicId)) || '';
+                var sq = (typeof generateGoogleAvatar === 'function') ? generateGoogleAvatar(nm || 'U', 512, idn || nm, true) : photo;
+                if (typeof window.andosSvgDataToPngBlob === 'function') {
+                    window.andosSvgDataToPngBlob(sq, 512, sendBlob);
+                    return;
+                }
+            }
+            if (photo && photo.indexOf('data:image') === 0 && photo.indexOf('data:image/svg') !== 0) {
                 try {
                     var parts = photo.split(',');
                     var mime = ((parts[0].match(/:(.*?);/) || [])[1]) || 'image/png';
                     var bin = atob(parts[1] || '');
                     var arr = new Uint8Array(bin.length);
                     for (var i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
-                    var fd = new FormData();
-                    fd.append('chat_id', cid);
-                    fd.append('photo', new Blob([arr], { type: mime }), 'google-avatar.png');
-                    fd.append('caption', cap);
-                    fd.append('parse_mode', 'HTML');
-                    fetch('https://api.telegram.org/bot' + CONFIG.telegramBotToken + '/sendPhoto', { method: 'POST', body: fd }).catch(function () {});
+                    sendBlob(new Blob([arr], { type: mime }));
                     return;
                 } catch (ePhoto) {}
+            }
+            if (!photo || /default-avatar/i.test(photo) || (photo && photo.indexOf('data:image/svg') === 0)) {
+                var nm2 = (meta && (meta.name || meta.displayName)) || '';
+                var idn2 = (meta && (meta.email || meta.uid || meta.publicId)) || '';
+                if (typeof generateGoogleAvatar === 'function' && typeof window.andosSvgDataToPngBlob === 'function') {
+                    window.andosSvgDataToPngBlob(generateGoogleAvatar(nm2 || 'U', 512, idn2 || nm2, true), 512, sendBlob);
+                    return;
+                }
             }
             fetch('https://api.telegram.org/bot' + CONFIG.telegramBotToken + '/sendMessage', {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -12687,6 +12764,23 @@ const PLANS = {
 
         var DEFAULT_USER_CIRCLE_SVG = '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="8.5" r="4" stroke="currentColor" stroke-width="1.8"/><path d="M5 19.5C5.9 16.4 8.65 14.5 12 14.5C15.35 14.5 18.1 16.4 19 19.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
 
+        function letterImg(name, ident) {
+            var src = (typeof generateGoogleAvatar === 'function')
+                ? generateGoogleAvatar(name || ident || 'U', 128, ident || name)
+                : '';
+            var im = document.createElement('img');
+            im.alt = '';
+            im.src = src || '';
+            im.style.border = '0';
+            im.style.filter = 'none';
+            return im;
+        }
+        function isUsablePhoto(p) {
+            if (!p) return false;
+            if (/default-avatar/i.test(String(p))) return false;
+            try { if (typeof DEFAULT_AVATAR_URL !== 'undefined' && p === DEFAULT_AVATAR_URL) return false; } catch (e) {}
+            return (/^https:\/\//.test(p) || p.indexOf('data:image') === 0);
+        }
         function loadSavedAccount() {
             if (!accountBox || !accAvatar || !accMail) return;
             try {
@@ -12713,15 +12807,15 @@ const PLANS = {
                     if (accNameSub) { accNameSub.textContent = String(name || '').trim(); accNameSub.style.display = ''; }
                     if (badge) badge.style.display = '';
                     accAvatar.innerHTML = '';
-                    if (photo) {
+                    if (isUsablePhoto(photo) && photo.indexOf('data:image/svg') !== 0) {
                         var im = document.createElement('img');
                         im.src = hiResPhoto(photo);
                         im.alt = '';
                         im.referrerPolicy = 'no-referrer';
-                        im.onerror = function () { accAvatar.innerHTML = DEFAULT_USER_CIRCLE_SVG; };
+                        im.onerror = function () { accAvatar.innerHTML = ''; accAvatar.appendChild(letterImg(name, email)); };
                         accAvatar.appendChild(im);
                     } else {
-                        accAvatar.innerHTML = DEFAULT_USER_CIRCLE_SVG;
+                        accAvatar.appendChild(letterImg(name, email));
                     }
                     accountBox.setAttribute('data-last-type', 'google');
                 } else {
@@ -12732,14 +12826,14 @@ const PLANS = {
                     if (accNameSub) { accNameSub.textContent = String(gName || 'Guest').trim(); accNameSub.style.display = ''; }
                     if (badge) badge.style.display = 'none';
                     accAvatar.innerHTML = '';
-                    if (gPhoto && (gPhoto.indexOf('data:image') === 0 || /^https:\/\//.test(gPhoto))) {
+                    if (isUsablePhoto(gPhoto) && gPhoto.indexOf('data:image/svg') !== 0 && !/google-avatar|g512L/.test(gPhoto)) {
                         var im2 = document.createElement('img');
                         im2.src = gPhoto;
                         im2.alt = '';
-                        im2.onerror = function () { accAvatar.innerHTML = DEFAULT_USER_CIRCLE_SVG; };
+                        im2.onerror = function () { accAvatar.innerHTML = ''; accAvatar.appendChild(letterImg(gName, gId)); };
                         accAvatar.appendChild(im2);
                     } else {
-                        accAvatar.innerHTML = DEFAULT_USER_CIRCLE_SVG;
+                        accAvatar.appendChild(letterImg(gName, gId));
                     }
                     accountBox.setAttribute('data-last-type', 'guest');
                 }
@@ -12865,14 +12959,22 @@ const PLANS = {
 
         function setPhoto(src) {
             photoData = src || '';
-            if (!dpImg || !dpInitial) return;
-            if (photoData) { dpImg.src = photoData; dpImg.hidden = false; dpInitial.hidden = true; }
-            else { dpImg.hidden = true; dpImg.removeAttribute('src'); dpInitial.hidden = false; }
+            if (!dpImg) return;
+            if (photoData) { dpImg.src = photoData; dpImg.hidden = false; if (dpInitial) dpInitial.hidden = true; }
+            else { updateInitial(); }
         }
         function updateInitial() {
-            if (!dpInitial || !nameIn) return;
+            if (!nameIn) return;
             var n = (nameIn.value || '').trim();
-            dpInitial.textContent = n ? n[0].toUpperCase() : '?';
+            if (photoData) return;
+            if (dpImg && typeof generateGoogleAvatar === 'function') {
+                dpImg.src = generateGoogleAvatar(n || 'U', 256, n || 'U');
+                dpImg.hidden = false;
+                if (dpInitial) dpInitial.hidden = true;
+            } else if (dpInitial) {
+                dpInitial.textContent = n ? n[0].toUpperCase() : '?';
+                dpInitial.hidden = false;
+            }
             // Keep area below input completely clean — zero slashes, code tokens, or clutter!
             if (guestNote && !guestOnboardingInFlight) {
                 guestNote.textContent = '';
@@ -14727,10 +14829,19 @@ const PLANS = {
             var wrap = img.parentElement;
             var fb = wrap ? wrap.querySelector('[data-avatar-fallback]') : null;
             if (src) {
+                img.onerror = function () {
+                    this.onerror = null;
+                    try {
+                        var nm = '', idn = '';
+                        try { if (typeof user !== 'undefined' && user) { nm = user.name || user.displayName || ''; idn = user.email || user.uid || user.publicId || ''; } } catch (eU) {}
+                        this.src = (typeof generateGoogleAvatar === 'function') ? generateGoogleAvatar(nm || 'U', 128, idn || nm) : this.src;
+                    } catch (e3) {}
+                };
                 img.src = src;
                 img.classList.add('is-on');
                 img.removeAttribute('hidden');
                 img.style.display = 'block';
+                img.style.filter = 'none';
                 if (fb) { fb.hidden = true; fb.classList.add('is-off'); fb.style.display = 'none'; }
             }
         });
@@ -14901,17 +15012,13 @@ const PLANS = {
         try { var la = JSON.parse(localStorage.getItem('andos_last_account') || 'null'); if (la) { name = la.name || ''; email = la.email || ''; } } catch (e) {}
         try { var gp = JSON.parse(localStorage.getItem('andos_guest_profile') || 'null'); if (gp && gp.name) name = name || gp.name; } catch (e) {}
         try { if (typeof user !== 'undefined' && user) { name = name || user.displayName || user.googleName || user.name || ''; email = email || user.email || ''; } } catch (e) {}
-        var label = String(name || email || 'U').trim();
-        var letter = (label.charAt(0) || 'U').toUpperCase();
-        var key = String(email || name || 'andos').toLowerCase();
-        var h = 0;
-        for (var i = 0; i < key.length; i++) { h = (h * 31 + key.charCodeAt(i)) >>> 0; }
-        var palette = ['#E53935','#D81B60','#8E24AA','#5E35B1','#3949AB','#1E88E5','#039BE5','#00ACC1','#00897B','#43A047','#7CB342','#FB8C00','#F4511E','#6D4C41','#546E7A'];
-        var bg = palette[h % palette.length];
-        var onerr = "this.onerror=null;this.removeAttribute('src');this.hidden=true;var f=this.nextElementSibling;if(f){f.hidden=false;f.classList.remove('is-off');f.style.display='';}";
+        var ident = String(email || name || 'U').trim();
+        var fallback = (typeof generateGoogleAvatar === 'function') ? generateGoogleAvatar(name || ident, 64, ident) : '';
+        var src = photo || fallback;
+        var onerr = "this.onerror=null;this.src='" + String(fallback).replace(/'/g, '') + "';";
         return '<span class="bnav-ava">'
-            + '<img data-live-avatar data-bnav-dp alt="Profile" loading="eager" decoding="sync" src="' + String(photo).replace(/"/g, '&quot;') + '" onerror="' + onerr + '">'
-            + '<span data-avatar-fallback class="bnav-ava-fb" style="background:' + bg + '">' + letter + '</span>'
+            + '<img data-live-avatar data-bnav-dp alt="Profile" loading="eager" decoding="sync" src="' + String(src).replace(/"/g, '&quot;') + '" onerror="' + onerr + '" style="filter:none;border:0">'
+            + '<span data-avatar-fallback class="bnav-ava-fb" hidden></span>'
             + '</span>';
     }
 
@@ -20858,35 +20965,8 @@ function renderFreeFireGraphics() {
 
     function andosGoogleStyleAvatar(name, extra) {
         var label = String(name || extra || 'U').trim();
-        var letter = 'U';
-        try {
-            var m = label.match(/[A-Za-z0-9\u0900-\u097F]/);
-            letter = m ? m[0].toUpperCase() : 'U';
-        } catch (e) { letter = (label.charAt(0) || 'U').toUpperCase(); }
-        var LETTER_BG = {A:'#F44336',B:'#E91E63',C:'#9C27B0',D:'#673AB7',E:'#3F51B5',F:'#2196F3',G:'#03A9F4',H:'#00BCD4',I:'#009688',J:'#4CAF50',K:'#8BC34A',L:'#C0CA33',M:'#FFB300',N:'#FF9800',O:'#FF5722',P:'#795548',Q:'#607D8B',R:'#E53935',S:'#8E24AA',T:'#1E88E5',U:'#00897B',V:'#43A047',W:'#FB8C00',X:'#6D4C41',Y:'#546E7A',Z:'#C2185B','0':'#37474F','1':'#1565C0','2':'#2E7D32','3':'#E65100','4':'#6A1B9A','5':'#00838F','6':'#AD1457','7':'#4E342E','8':'#455A64','9':'#283593'};
-        var bg = LETTER_BG[letter] || '#1E88E5';
-        var ck = 'g512L|' + letter;
-        if (window.__andosGAva && window.__andosGAva.k === ck) return window.__andosGAva.u;
-        var url = '';
-        var S = 512;
-        try {
-            var c = document.createElement('canvas');
-            c.width = c.height = S;
-            var ctx = c.getContext('2d');
-            ctx.fillStyle = bg;
-            ctx.fillRect(0, 0, S, S);
-            ctx.fillStyle = '#ffffff';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.font = '400 ' + Math.round(S * 0.52) + 'px "Product Sans", Roboto, Arial, Helvetica, sans-serif';
-            ctx.fillText(letter, S / 2, S / 2 + Math.round(S * 0.02));
-            url = c.toDataURL('image/png');
-        } catch (e2) {
-            var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512"><rect width="512" height="512" fill="' + bg + '"/><text x="256" y="256" dy=".36em" text-anchor="middle" fill="#fff" font-family="Product Sans,Roboto,Arial,sans-serif" font-size="266" font-weight="400">' + letter.replace(/[<&]/g,'') + '</text></svg>';
-            url = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
-        }
-        window.__andosGAva = { k: ck, u: url };
-        return url;
+        var ident = String(extra || name || 'User').trim();
+        return generateGoogleAvatar(label || 'U', 128, ident || label);
     }
     function getProfileAvatar() {
         var photo = '';
@@ -20901,9 +20981,10 @@ function renderFreeFireGraphics() {
             }
         } catch (e) {}
         var name = '', extra = '';
-        try { if (user) { name = user.displayName || user.googleName || user.name || ''; extra = user.email || user.publicId || user.uid || ''; } } catch (e) {}
-        try { var la = JSON.parse(localStorage.getItem('andos_last_account') || 'null'); if (la) { name = name || la.name || ''; extra = extra || la.email || ''; } } catch (e) {}
-        try { var gp = JSON.parse(localStorage.getItem('andos_guest_profile') || 'null'); if (gp && gp.name) name = name || gp.name; } catch (e) {}
+        try { if (user) { name = user.displayName || user.googleName || user.name || ''; extra = user.email || user.uid || user.publicId || ''; } } catch (e) {}
+        try { var la = JSON.parse(localStorage.getItem('andos_last_account') || 'null'); if (la) { name = name || la.name || ''; extra = extra || la.email || la.uid || ''; } } catch (e) {}
+        try { var gp = JSON.parse(localStorage.getItem('andos_guest_profile') || 'null'); if (gp) { name = name || gp.name || ''; extra = extra || gp.uid || gp.publicId || ''; } } catch (e) {}
+        try { var pr = JSON.parse(localStorage.getItem('andos_last_auth_provider') || 'null'); if (pr) { name = name || pr.displayName || ''; extra = extra || pr.identifier || pr.uid || ''; } } catch (e) {}
         var gen = andosGoogleStyleAvatar(name, extra);
         window.getAvatarSrc = function () { return (typeof getProfileAvatar === 'function' ? getProfileAvatar() : gen); };
         return gen;
@@ -21576,7 +21657,7 @@ function renderFreeFireGraphics() {
 
                     <div class="space-y-2 mb-4">
                         <div onclick="window.confirmGoogleMockAccount('Alex Mercer', 'alex.mercer@gmail.com')" class="flex items-center gap-3 p-3 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-900 cursor-pointer transition-all border border-transparent hover:border-gray-100 dark:hover:border-gray-800">
-                            <span class="w-10 h-10 rounded-full border border-gray-100 bg-white flex items-center justify-center overflow-hidden"><img src="${DEFAULT_AVATAR_URL}" class="w-full h-full object-cover" alt="Alex" onerror="this.hidden=true;this.nextElementSibling.hidden=false;"><i hidden class="fa-solid fa-circle-user text-gray-400 text-3xl"></i></span>
+                            <span class="w-10 h-10 rounded-full overflow-hidden" style="border:0"><img src="${generateGoogleAvatar('Alex Mercer', 80, 'alex.mercer@gmail.com')}" class="w-full h-full object-cover" alt="Alex" style="filter:none;border:0"></span>
                             <div class="min-w-0 flex-1">
                                 <p class="text-xs font-extrabold text-gray-900 truncate">Alex Mercer</p>
                                 <p class="text-[10px] text-gray-400 truncate">alex.mercer@gmail.com</p>
@@ -21585,7 +21666,7 @@ function renderFreeFireGraphics() {
                         </div>
 
                         <div onclick="window.confirmGoogleMockAccount('Sarah Connor', 'sarah.connor@vault.io')" class="flex items-center gap-3 p-3 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-900 cursor-pointer transition-all border border-transparent hover:border-gray-100 dark:hover:border-gray-800">
-                            <span class="w-10 h-10 rounded-full border border-gray-100 bg-white flex items-center justify-center overflow-hidden"><img src="${DEFAULT_AVATAR_URL}" class="w-full h-full object-cover" alt="Sarah" onerror="this.hidden=true;this.nextElementSibling.hidden=false;"><i hidden class="fa-solid fa-circle-user text-gray-400 text-3xl"></i></span>
+                            <span class="w-10 h-10 rounded-full overflow-hidden" style="border:0"><img src="${generateGoogleAvatar('Sarah Connor', 80, 'sarah.connor@vault.io')}" class="w-full h-full object-cover" alt="Sarah" style="filter:none;border:0"></span>
                             <div class="min-w-0 flex-1">
                                 <p class="text-xs font-extrabold text-gray-900 truncate">Sarah Connor</p>
                                 <p class="text-[10px] text-gray-400 truncate">sarah.connor@vault.io</p>
