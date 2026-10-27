@@ -169,7 +169,7 @@
     <meta name="theme-color" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0f19">
-    <meta name="andos-build" content="andos-v3-20261027i">
+    <meta name="andos-build" content="andos-v3-20261027j">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -192,7 +192,7 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261027i';
+        var HTML_BUILD_ID = 'andos-v3-20261027j';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
@@ -15176,11 +15176,37 @@ const PLANS = {
             sl.scrollLeft = idx * window.innerWidth; // pre-paint instant — no glide on full builds
             window.__sliderIdx = idx;
             window.__andosBindSlider(sl);
+            try { if (window.__andosSyncTabSwipeLock) window.__andosSyncTabSwipeLock(); } catch (eLk) {}
             setTimeout(function () {
                 try { __fillMainSection(secs[idx - 1]); } catch (e) {}
                 try { __fillMainSection(secs[idx + 1]); } catch (e) {}
             }, 80);
         } catch (e) {}
+    };
+    window.__andosIsRootTabView = function () {
+        try {
+            var drill = document.getElementById('exploreDrill');
+            var onExplore = (typeof currentPage === 'undefined') || currentPage === 'categories';
+            var drillOpen = !!(onExplore && drill && !drill.hidden && drill.innerHTML);
+            var activeSubView = drillOpen ? ((typeof selectedCategory !== 'undefined' && selectedCategory) ? selectedCategory : 'drill') : null;
+            var currentDepth = (typeof navStack !== 'undefined' && navStack && navStack.length) ? navStack.length : 0;
+            var isRootView = activeSubView === null && currentDepth === 0;
+            return isRootView;
+        } catch (eR) { return true; }
+    };
+    window.__andosSyncTabSwipeLock = function () {
+        try {
+            var sl = document.getElementById('pageSlider');
+            var sh = document.querySelector('.andos-shell');
+            var isRootView = window.__andosIsRootTabView();
+            if (sh) sh.classList.toggle('is-subview', !isRootView);
+            if (!sl) return;
+            sl.classList.toggle('is-drill-lock', !isRootView);
+            if (!isRootView) {
+                var ix = (typeof window.__sliderIdx === 'number' && window.__sliderIdx > -1) ? window.__sliderIdx : 0;
+                sl.scrollLeft = ix * (window.innerWidth || 0);
+            }
+        } catch (eL) {}
     };
     window.__andosBindSlider = function (sl) {
         try {
@@ -15193,6 +15219,7 @@ const PLANS = {
                 for (var i = 0; i < entries.length; i++) {
                     var e = entries[i];
                     if (!e.isIntersecting) continue; // FIX-S: center-strip hit (ratio tall pages par kabhi 0.55 nahi bharta)
+                    if (sl.classList.contains('is-drill-lock') || (window.__andosIsRootTabView && !window.__andosIsRootTabView())) continue;
                     var sec = e.target.getAttribute('data-sec');
                     var ix = secs.indexOf(sec);
                     if (ix === -1 || ix === window.__sliderIdx) continue;
@@ -15227,6 +15254,59 @@ const PLANS = {
                     } catch (e) {}
                 });
             }
+            if (!sl.__andosSwipeBound) {
+                sl.__andosSwipeBound = 1;
+                sl.__swipeLife = null;
+                var onSlScroll = function () {
+                    var life = sl.__swipeLife; if (!life) return;
+                    var w = window.innerWidth || 1;
+                    var min = Math.max(0, life.idx - 1) * w;
+                    var max = Math.min(secs.length - 1, life.idx + 1) * w;
+                    if (sl.scrollLeft < min) sl.scrollLeft = min;
+                    if (sl.scrollLeft > max) sl.scrollLeft = max;
+                };
+                var endLife = function () {
+                    var life = sl.__swipeLife; sl.__swipeLife = null;
+                    if (!life) return;
+                    var w = window.innerWidth || 1;
+                    if (!life.root) { sl.scrollLeft = life.sl; return; }
+                    var dest = life.idx + (Math.sign(sl.scrollLeft - life.sl) * 1);
+                    if (Math.abs(sl.scrollLeft - life.sl) < w * 0.22) dest = life.idx;
+                    dest = Math.max(0, Math.min(secs.length - 1, dest));
+                    var left = dest * w;
+                    if (Math.abs(sl.scrollLeft - left) > 1) sl.scrollTo({ left: left });
+                };
+                sl.addEventListener('scroll', onSlScroll, { passive: true });
+                sl.addEventListener('touchstart', function (e) {
+                    try { if (window.__andosSyncTabSwipeLock) window.__andosSyncTabSwipeLock(); } catch (eS) {}
+                    var isRootView = window.__andosIsRootTabView ? window.__andosIsRootTabView() : true;
+                    if (!e.touches || !e.touches[0]) return;
+                    sl.__swipeLife = { x: e.touches[0].clientX, y: e.touches[0].clientY, sl: sl.scrollLeft, idx: (typeof window.__sliderIdx === 'number' && window.__sliderIdx > -1) ? window.__sliderIdx : 0, root: isRootView };
+                    if (!isRootView) return;
+                }, { passive: true });
+                sl.addEventListener('touchmove', function (e) {
+                    var life = sl.__swipeLife; if (!life || !e.touches || !e.touches[0]) return;
+                    var isRootView = life.root;
+                    var dx = e.touches[0].clientX - life.x;
+                    var dy = e.touches[0].clientY - life.y;
+                    if (!isRootView) {
+                        if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 6) {
+                            sl.scrollLeft = life.sl;
+                            if (e.cancelable) e.preventDefault();
+                        }
+                        return;
+                    }
+                    if (Math.abs(dx) <= Math.abs(dy)) return;
+                    var w = window.innerWidth || 1;
+                    var min = Math.max(0, life.idx - 1) * w;
+                    var max = Math.min(secs.length - 1, life.idx + 1) * w;
+                    if (sl.scrollLeft < min) sl.scrollLeft = min;
+                    if (sl.scrollLeft > max) sl.scrollLeft = max;
+                }, { passive: false });
+                sl.addEventListener('touchend', endLife, { passive: true });
+                sl.addEventListener('touchcancel', endLife, { passive: true });
+            }
+            try { if (window.__andosSyncTabSwipeLock) window.__andosSyncTabSwipeLock(); } catch (eLock) {}
         } catch (e) {}
     };
 
@@ -15256,6 +15336,7 @@ const PLANS = {
                     try { __fillMainSection(__secsF[__idxF + 1]); } catch (eF) {}
                     try { __slF.scrollLeft = __idxF * window.innerWidth; } catch (eF) { try { __slF.scrollTo({ left: __idxF * window.innerWidth }); } catch (eF2) {} } // FIX-T: INSTANT tap — beech ka page kabhi ghista nahi
                     try { if (typeof window.__andosApplyStatus === 'function') window.__andosApplyStatus(); } catch (eF) {}
+                    try { if (window.__andosSyncTabSwipeLock) window.__andosSyncTabSwipeLock(); } catch (eLk) {}
                     requestAnimationFrame(function () { try { applyLiveAvatars(); } catch (e) {} });
                     window.__swipeDir = ''; window.__navDir = '';
                     window.__andosRenderQueued = false;
@@ -20530,7 +20611,8 @@ function renderFreeFireGraphics() {
             return `<div class="catd-page">
                 <div class="catd-bar">
                     <button type="button" onclick="closeExploreCat()" aria-label="Back">${backSvg}</button>
-                    <div><h1>Category</h1><p>0 items</p></div>
+                    <h1>Category</h1>
+                    <span class="catd-count">0 items</span>
                 </div>
                 <div class="catd-empty">This category is not available.</div>
             </div>`;
@@ -20542,10 +20624,8 @@ function renderFreeFireGraphics() {
             <div class="catd-page">
                 <div class="catd-bar">
                     <button type="button" onclick="closeExploreCat()" aria-label="Back">${backSvg}</button>
-                    <div>
-                        <h1>${escapeHtml(category.name)}</h1>
-                        <p>${count} ${count===1?'item':'items'}</p>
-                    </div>
+                    <h1>${escapeHtml(category.name)}</h1>
+                    <span class="catd-count">${count} ${count===1?'item':'items'}</span>
                 </div>
                 <div class="catd-list">
                     ${ordered.length ? ordered.map(s => `
@@ -20570,6 +20650,7 @@ function renderFreeFireGraphics() {
         drill.hidden = false;
         drill.innerHTML = CategoryDetailPage();
         try { if (pane) pane.scrollTop = 0; } catch (e2) {}
+        try { if (window.__andosSyncTabSwipeLock) window.__andosSyncTabSwipeLock(); } catch (eLk) {}
         return true;
     };
     window.closeExploreCat = function () {
@@ -20582,9 +20663,11 @@ function renderFreeFireGraphics() {
             root.style.display = '';
             selectedCategory = null;
             try { if (pane) pane.scrollTop = window.__exploreScroll || 0; } catch (e) {}
+            try { if (window.__andosSyncTabSwipeLock) window.__andosSyncTabSwipeLock(); } catch (eLk) {}
             return;
         }
         selectedCategory = null;
+        try { if (window.__andosSyncTabSwipeLock) window.__andosSyncTabSwipeLock(); } catch (eLk2) {}
         navigate('categories', { _back: true });
     };
 
@@ -25113,6 +25196,7 @@ nav.glass-nav, .xplore-head, .od-title, .wal-hero, .txn-bar, .sp-bar, .odd-bar, 
   width: 100vw;
   flex-shrink: 0;
   scroll-snap-align: start;
+  scroll-snap-stop: always;
 }
 .page-section[data-sec="home"], .page-section[data-sec="orders"], .page-section[data-sec="account"] { background: #fff; }
 .page-section[data-sec="categories"] { background: #f7f7f7; }
@@ -25191,6 +25275,69 @@ main.andos-main:not(:has(#pageSlider)) {
 .pf-page, .wal-page, .payx-page {
   overflow: visible !important;
 }
+/* FIX-J: single-tab snap + drill-down tab-swipe lock + compact Explore sub-header */
+.page-slider { scroll-snap-type: x mandatory; }
+.page-section { scroll-snap-align: start; scroll-snap-stop: always; }
+.andos-shell.is-subview #pageSlider,
+#pageSlider.is-drill-lock {
+  overflow-x: hidden !important;
+  touch-action: pan-y !important;
+  overscroll-behavior-x: none;
+}
+.andos-shell.is-subview .page-section,
+#pageSlider.is-drill-lock .page-section,
+#exploreDrill:not([hidden]) { touch-action: pan-y !important; }
+.catd-page {
+  padding-top: env(safe-area-inset-top, 0px) !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+.catd-bar {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  height: 56px !important;
+  min-height: 56px !important;
+  margin-bottom: 0 !important;
+  padding: 0 16px !important;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: #f7f7f7;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-sizing: border-box;
+}
+.catd-bar h1 {
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.catd-bar .catd-count {
+  margin-left: auto;
+  flex: 0 0 auto;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  letter-spacing: 0 !important;
+  color: #64748b !important;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 999px;
+  padding: 6px 10px;
+}
+.catd-bar button {
+  width: 40px !important;
+  height: 40px !important;
+  min-width: 40px !important;
+  min-height: 40px !important;
+  flex: 0 0 40px !important;
+  border-radius: 12px !important;
+}
+.catd-list { padding: 12px 16px 20px; }
 </style>
 </body>
 </html>
