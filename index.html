@@ -169,7 +169,7 @@
     <meta name="theme-color" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0f19">
-    <meta name="andos-build" content="andos-v3-20261022w">
+    <meta name="andos-build" content="andos-v3-20261022x">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -192,7 +192,7 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261022w';
+        var HTML_BUILD_ID = 'andos-v3-20261022x';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
@@ -1235,9 +1235,16 @@
             z-index: 2; pointer-events: none;
         }
         nav.home-topbar, .home-topbar {
-            height: calc(52px + env(safe-area-inset-top, 0px)) !important;
-            min-height: calc(52px + env(safe-area-inset-top, 0px)) !important;
-            max-height: calc(52px + env(safe-area-inset-top, 0px)) !important;
+            height: 52px !important;
+            min-height: 52px !important;
+            max-height: 52px !important;
+        }
+        @media (display-mode: standalone), (display-mode: fullscreen) {
+            nav.home-topbar, .home-topbar {
+                height: calc(52px + env(safe-area-inset-top, 0px)) !important;
+                min-height: calc(52px + env(safe-area-inset-top, 0px)) !important;
+                max-height: calc(52px + env(safe-area-inset-top, 0px)) !important;
+            }
         }
         .home-hero-bleed {
             position: relative;
@@ -2655,8 +2662,14 @@
         }
         .home-topbar {
             box-sizing: border-box !important;
-            height: calc(52px + env(safe-area-inset-top, 0px)) !important;
-            padding: env(safe-area-inset-top, 0px) 16px 0 !important;
+            height: 52px !important;
+            padding: 0 16px !important;
+        }
+        @media (display-mode: standalone), (display-mode: fullscreen) {
+            .home-topbar {
+                height: calc(52px + env(safe-area-inset-top, 0px)) !important;
+                padding: env(safe-area-inset-top, 0px) 16px 0 !important;
+            }
         }
         .ann-ribbon {
             height: 28px;
@@ -2821,7 +2834,12 @@
             padding: 8px 4px calc(8px + env(safe-area-inset-bottom)) 4px;
         }
         html.dark #bottomNav { background: rgba(15,20,34,0.95); border-top-color: rgba(255,255,255,0.06); }
-        .bnav-item { position: relative; z-index: 0; display: flex; flex-direction: column; align-items: center; gap: 3px; flex: 1; cursor: pointer; height: 48px; padding: 0; justify-content: center; border-radius: 14px; color: #7C8BA1; -webkit-tap-highlight-color: transparent; overflow: visible; touch-action: manipulation; /* FIX-U(3): tap transition HATAO + instant tap */ }
+        .bnav-item { position: relative; z-index: 0; display: flex; flex-direction: column; align-items: center; gap: 3px; flex: 1; cursor: pointer; height: 48px; padding: 0; justify-content: center; border-radius: 14px; color: #7C8BA1; -webkit-tap-highlight-color: transparent; overflow: visible; touch-action: manipulation; transform: none; }
+        #bottomNav .bnav-item, #bottomNav .bnav-item:active, #bottomNav .bnav-item:focus {
+            transform: none !important; filter: none !important; opacity: 1;
+            -webkit-tap-highlight-color: transparent !important;
+        }
+        #bottomNav .bnav-item.ripple-surface { overflow: visible !important; }
         .bnav-item.active { color: #4F46E5; }
         .bnav-item i { font-size: 22px; }
         /* boss directive: icon lift/grow HATAO — icon sirf outline->fill swap kare, size/position static */
@@ -24411,6 +24429,7 @@ function renderFreeFireGraphics() {
     function attachRipple(e) {
         const target = e.target.closest('button, .nav-item, .service-card, .ripple-surface, a.social-btn, [onclick]');
         if (!target) return;
+        if (target.closest && target.closest('#bottomNav, .bnav-item')) return; // FIX-X: nav tap ripple/scale hatao
         target.classList.add('ripple-surface');
         const wave = document.createElement('span');
         const size = Math.max(target.offsetWidth, target.offsetHeight) * 1.4;
