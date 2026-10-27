@@ -169,7 +169,7 @@
     <meta name="theme-color" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0f19">
-    <meta name="andos-build" content="andos-v3-20261027m3">
+    <meta name="andos-build" content="andos-v3-20261027m4">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -192,7 +192,7 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261027m3';
+        var HTML_BUILD_ID = 'andos-v3-20261027m4';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
         (function () {
           try {
@@ -12450,8 +12450,7 @@ const PLANS = {
             txs.forEach(function (t) { if (t.reference === d.reference || t.requestId === d.id) { t.status = ok ? 'approved' : 'failed'; t.desc = ok ? 'Wallet Recharge - Approved' : 'Wallet Recharge - Failed'; t.approvedAt = Date.now(); } });
             localStorage.setItem('andos_transactions', JSON.stringify(txs.slice(0, 50)));
             if (ok) {
-                unlockWalletAfterApprovedDeposit(Number(d.amount || 0)); // check against balance BEFORE credit
-                saveWallet((Number(wallet) || 0) + Number(d.amount || 0));
+                unlockWalletAfterApprovedDeposit(Number(d.amount || 0));
                 try { addLoyaltyPoints(Math.max(5, Math.floor(Number(d.amount || 0) / 20))); } catch (e) {}
                 try { triggerConfetti(); } catch (e) {}
                 showToast('✅ ₹' + d.amount + ' wallet me add ho gaye!' + (isWalletDepositUnlocked() ? ' Wallet unlocked.' : ''), 'success');
@@ -12481,6 +12480,84 @@ const PLANS = {
                 snap.docChanges().forEach(function (ch) { try { self.applyRequest(ch.doc.data()); } catch (e) { console.warn(e); } });
             }, function (e) { console.warn('FB watchRequests', e); });
         } catch (e) {}
+    };
+    ANDOS_FB.ingestCloudTx = function (fid, x) {
+        if (!x) return false;
+        var txs = readLocalJSON('andos_transactions', []);
+        var ref = String(x.reference || fid || '');
+        var exists = txs.some(function (t) {
+            return (fid && t.fid === fid) || (ref && t.reference && String(t.reference) === ref);
+        });
+        if (exists) return false;
+        var when = Number(x.createdAt || Date.now());
+        var dateStr = '';
+        try {
+            dateStr = x.date && String(x.date).indexOf('T') === -1 ? String(x.date) : new Date(when).toLocaleDateString('en-IN');
+        } catch (e0) { dateStr = new Date().toLocaleDateString('en-IN'); }
+        var desc = String(x.desc || (x.source === 'admin' ? 'Admin se wallet credit' : 'Wallet credit'));
+        txs.unshift({
+            fid: fid || '',
+            type: x.type === 'debit' ? 'debit' : 'credit',
+            amount: Number(x.amount || 0),
+            desc: desc,
+            source: x.source || 'admin',
+            status: x.status || 'approved',
+            date: dateStr,
+            createdAt: when,
+            reference: ref
+        });
+        try { localStorage.setItem('andos_transactions', JSON.stringify(txs.slice(0, 80))); } catch (e1) {}
+        return true;
+    };
+    ANDOS_FB.watchMoney = function () {
+        if (!this.ready() || this._unsubMoney) return;
+        this._unsubMoney = 1;
+        var uid = this.uid();
+        var self = this;
+        try {
+            this._unsubWal = db.collection('wallets').doc(uid).onSnapshot(function (doc) {
+                try {
+                    if (!doc.exists) return;
+                    var b = Number((doc.data() || {}).balance);
+                    if (!isFinite(b)) return;
+                    if (Number(wallet) === b) return;
+                    wallet = Math.max(0, b);
+                    try { localStorage.setItem('andos_wallet', String(wallet)); } catch (e) {}
+                    try {
+                        var header = document.getElementById('headerWalletBalance');
+                        if (header) header.textContent = '₹' + Number(wallet || 0).toFixed(0);
+                    } catch (e2) {}
+                    try { if (currentPage === 'wallet' || currentPage === 'account' || currentPage === 'profile') render(); } catch (e3) {}
+                } catch (e4) {}
+            }, function (e) { console.warn('FB watchWallet', e); });
+        } catch (eW) {}
+        try {
+            this._unsubTx = db.collection('transactions').where('uid', '==', uid).onSnapshot(function (snap) {
+                var added = false;
+                var last = null;
+                snap.docChanges().forEach(function (ch) {
+                    if (ch.type === 'removed') return;
+                    var x = ch.doc.data() || {};
+                    if (self.ingestCloudTx(ch.doc.id, x)) { added = true; last = x; }
+                });
+                if (added) {
+                    try {
+                        if (last) showToast((last.type === 'debit' ? '−' : '+') + '₹' + Number(last.amount || 0).toLocaleString('en-IN') + ' · ' + String(last.desc || 'Wallet'), 'success');
+                    } catch (eT) {}
+                    try { if (currentPage === 'wallet' || currentPage === 'transactions' || currentPage === 'account') render(); } catch (eR) {}
+                }
+            }, function (e) { console.warn('FB watchTx', e); });
+        } catch (eX) {}
+        try {
+            this._unsubNote = db.collection('notifications').where('uid', '==', uid).onSnapshot(function (snap) {
+                snap.docChanges().forEach(function (ch) {
+                    if (ch.type !== 'added') return;
+                    var n = ch.doc.data() || {};
+                    if (n.read) return;
+                    try { if (n.title) showToast(String(n.title) + (n.body ? ' — ' + n.body : ''), 'info'); } catch (eN) {}
+                });
+            }, function (e) { console.warn('FB watchNote', e); });
+        } catch (eN2) {}
     };
 
     // ---- User profile cloud sync (users/{uid}) ----
@@ -13195,7 +13272,7 @@ const PLANS = {
                         name: verified.name
                     });
                 }
-                try { ANDOS_FB.watchOrders(); ANDOS_FB.watchRequests(); applyLiveAvatars(); } catch (e) {}
+                try { ANDOS_FB.watchOrders(); ANDOS_FB.watchRequests(); ANDOS_FB.watchMoney && ANDOS_FB.watchMoney(); applyLiveAvatars(); } catch (e) {}
 
                 guestOnboardingInFlight = false;
                 setGuestSetupBusy(false);
@@ -13894,7 +13971,7 @@ const PLANS = {
                         applyVerifiedServerIdentity(fbUser, minted, '', '');
                     }
                     firstAuthEvent = false;
-                    try { ANDOS_FB.watchOrders(); ANDOS_FB.watchRequests(); applyLiveAvatars(); } catch (e) {}
+                    try { ANDOS_FB.watchOrders(); ANDOS_FB.watchRequests(); ANDOS_FB.watchMoney && ANDOS_FB.watchMoney(); applyLiveAvatars(); } catch (e) {}
                     hideLoginGate();
                     markAuthBootResolved();
                 } catch (err) {
@@ -13944,7 +14021,7 @@ const PLANS = {
                 var isTrulyNew = (cloud === null) && isNewMeta;
 
                 try { ANDOS_FB.applyCloud(fbUser, cloud, isTrulyNew); } catch (e) { console.warn('applyCloud', e); }
-                try { ANDOS_FB.watchOrders(); ANDOS_FB.watchRequests(); ANDOS_SYNC.syncNotifications(); } catch (e) {}
+                try { ANDOS_FB.watchOrders(); ANDOS_FB.watchRequests(); ANDOS_FB.watchMoney && ANDOS_FB.watchMoney(); ANDOS_SYNC.syncNotifications(); } catch (e) {}
                 try { if (typeof render === 'function') render(); } catch (e) {}
 
                 try {
@@ -20915,6 +20992,10 @@ function renderFreeFireGraphics() {
                         <button type="button" class="wal-add" onclick="addMoney(${walletUnlocked?500:getFirstDepositMin()})">Add money</button>
                         <button type="button" class="wal-hist" onclick="navigate('transactions')">History</button>
                     </div>
+                    <div class="wal-custom wal-m-custom">
+                        <input type="number" id="customAmount" placeholder="Custom ₹10 – ₹50,000" inputmode="numeric" min="10" max="50000">
+                        <button type="button" onclick="addCustomMoney()">Transfer</button>
+                    </div>
                     ${unlock}
                 </header>
                 <div class="wal-m-sheet">${txHtml}</div>
@@ -24814,10 +24895,12 @@ function renderFreeFireGraphics() {
     };
 
     window.addCustomMoney = () => {
-        const amount = parseInt(document.getElementById('customAmount')?.value);
-        const minimumDeposit = isWalletDepositUnlocked() ? 10 : getFirstDepositMin();
-        if (!isWalletDepositUnlocked() && (!amount || amount < minimumDeposit)) { showToast('Wallet locked — minimum ₹' + minimumDeposit + ' deposit karna hoga.', 'warning'); openWalletLockModal(); return; }
-        if (!amount || amount < minimumDeposit) { showToast('Enter a valid amount (minimum ₹' + minimumDeposit + ').', 'error'); return; }
+        var raw = document.getElementById('customAmount');
+        var amount = Math.floor(Number(raw && raw.value));
+        var minimumDeposit = isWalletDepositUnlocked() ? 10 : getFirstDepositMin();
+        if (!isFinite(amount) || amount <= 0) { showToast('Custom amount daalo (₹10 – ₹50,000).', 'error'); if (raw) raw.focus(); return; }
+        if (!isWalletDepositUnlocked() && amount < minimumDeposit) { showToast('Wallet locked — minimum ₹' + minimumDeposit + ' deposit karna hoga.', 'warning'); openWalletLockModal(); return; }
+        if (amount < minimumDeposit) { showToast('Minimum ₹' + minimumDeposit + '.', 'error'); return; }
         if (amount > 50000) { showToast('Ek baar me max ₹50,000.', 'error'); return; }
         walletRechargeAmount = amount;
         paymentContext = 'wallet';
@@ -26000,6 +26083,23 @@ html.build-m #btn-filter-trigger,
 #btn-filter-trigger:hover { background: #f8fafc; }
 #btn-filter-trigger:active { transform: scale(.95); }
 #btn-filter-trigger svg { width: 16px; height: 16px; display: block; }
+
+
+html.build-m .wal-m-custom { display:flex; gap:8px; margin-top:12px; min-width:0; }
+html.build-m .wal-m-custom input {
+  flex:1; min-width:0; height:42px; border-radius:16px; border:1px solid rgba(255,255,255,.28);
+  background:rgba(255,255,255,.12); color:#fff; padding:0 12px; font-weight:700;
+  transition: border-color 150ms ease;
+}
+html.build-m .wal-m-custom input::placeholder { color:rgba(255,255,255,.55); }
+html.build-m .wal-m-custom input:focus {
+  outline:none !important; box-shadow:none !important;
+  border:1.5px solid #4F46E5 !important; background:rgba(255,255,255,.18);
+}
+html.build-m .wal-m-custom button {
+  flex:0 0 auto; height:42px; border:0; border-radius:16px; padding:0 14px;
+  background:#fff; color:#2e1065; font-weight:800; cursor:pointer;
+}
 
 </style>
 </body>
