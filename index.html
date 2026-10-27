@@ -169,7 +169,7 @@
     <meta name="theme-color" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0f19">
-    <meta name="andos-build" content="andos-v3-20261027k">
+    <meta name="andos-build" content="andos-v3-20261027l">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -192,7 +192,7 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261027k';
+        var HTML_BUILD_ID = 'andos-v3-20261027l';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
@@ -8847,6 +8847,8 @@ main.andos-main{overscroll-behavior-x:none}
   font-size:calc(80 * var(--u));font-weight:700;color:#94a3b8;
   pointer-events:none;
 }
+#yuvaGate #dpInitial{display:flex;align-items:center;justify-content:center;width:100%;height:100%;background:transparent;color:#94a3b8}
+#yuvaGate #dpInitial svg{width:46%;height:46%;display:block}
 #yuvaGate .dp-in::after{
   content:"";position:absolute;inset:0;border-radius:50%;pointer-events:none;
   box-shadow:inset 0 0 0 1px rgba(13,27,42,.28);
@@ -10198,23 +10200,13 @@ main.andos-main{overscroll-behavior-x:none}
     window.tgActions = function (type, id, ctx) {
         if (!id) return [];
         var k = String(id).replace(/[^A-Za-z0-9]/g, '').toUpperCase(); ctx = ctx || {};
-        if (type === 'deposit') return [
-            ['🔎', '/info_' + k, 'Poori detail'],
-            ['✅', '/ok_' + k, 'Approve — ₹' + ctx.amount + ' wallet me credit' + (ctx.unlock ? ' + UNLOCK' : '')],
-            ['❌', '/no_' + k, 'Reject — seedha reject'],
-            ['⚠️', '/fail_' + k, 'Failed — reject + amount wallet me wapas']
+        var p = (type === 'deposit') ? 'deposit' : 'order';
+        return [
+            ['✅', p + '_approve:' + k, 'Approve / Success'],
+            ['❌', p + '_reject:' + k, 'Reject'],
+            ['⚠️', p + '_fail:' + k, 'Mark Failed'],
+            ['🔍', p + '_view:' + k, 'View Details']
         ];
-        if (type === 'order' || type === 'payment') {
-            var a = [
-                ['🔎', '/info_' + k, 'Poori detail'],
-                ['✅', '/ok_' + k, 'Approve / SUCCESS'],
-                ['❌', '/no_' + k, 'Reject — seedha reject'],
-                ['⚠️', '/fail_' + k, 'Failed — reject + wallet me balance wapas']
-            ];
-            if (ctx.redeem) a.push(['🎟', '/code_' + k, 'Redeem code bhejo']);
-            return a;
-        }
-        return [];
     };
     window.tgResolveUserMeta = function (rows) {
         var meta = { uid: '', publicId: '', name: '', username: '', photo: '' };
@@ -10271,12 +10263,6 @@ main.andos-main{overscroll-behavior-x:none}
         });
         if (!hasUidRow && meta.uid) lines.push('▫ <b>UID:</b> <code>' + tgEsc(meta.uid) + '</code>');
         if (footer) lines.push('▫ <i>' + tgEsc(footer) + '</i>');
-        if (actions && actions.length) {
-            lines.push(D);
-            actions.forEach(function (a) {
-                lines.push(a[0] + ' ' + a[1] + (a[2] ? ' — ' + tgEsc(a[2]) : ''));
-            });
-        }
         lines.push(D);
         lines.push('');
         var who = meta.name ? tgEsc(meta.name) : 'Guest';
@@ -10290,32 +10276,28 @@ main.andos-main{overscroll-behavior-x:none}
     window.tgKeyboard = function (actions) {
         try {
             if (!actions || !actions.length) return null;
-            var btn = function (a) {
-                var c = String(a[1] || '');
-                var tx = c;
-                if (c.indexOf('/ok_') === 0) tx = '✅ Approve';
-                else if (c.indexOf('/no_') === 0) tx = '❌ Reject';
-                else if (c.indexOf('/fail_') === 0) tx = '⚠️ Failed';
-                else if (c.indexOf('/info_') === 0) tx = '🔎 Details';
-                else if (c.indexOf('/proc_') === 0) tx = '🔄 Processing';
-                else if (c.indexOf('/code_') === 0) tx = '🎟 Code';
-                return { text: tx, callback_data: c.slice(0, 64) };
+            var label = function (c, fallback) {
+                c = String(c || '');
+                if (/_approve:/.test(c) || c.indexOf('/ok_') === 0) return '✅ Approve / Success';
+                if (/_reject:/.test(c) || c.indexOf('/no_') === 0) return '❌ Reject';
+                if (/_fail:/.test(c) || c.indexOf('/fail_') === 0) return '⚠️ Mark Failed';
+                if (/_view:/.test(c) || c.indexOf('/info_') === 0) return '🔍 View Details';
+                return fallback || c;
             };
-            var info = [], ok = [], no = [], fail = [], rest = [];
+            var approve = [], reject = [], fail = [], view = [];
             actions.forEach(function (a) {
                 var c = String(a[1] || '');
-                if (c.indexOf('/info_') === 0) info.push(btn(a));
-                else if (c.indexOf('/ok_') === 0) ok.push(btn(a));
-                else if (c.indexOf('/no_') === 0) no.push(btn(a));
-                else if (c.indexOf('/fail_') === 0) fail.push(btn(a));
-                else rest.push(btn(a));
+                var b = { text: label(c, a[0] || c), callback_data: c.slice(0, 64) };
+                if (/_approve:/.test(c) || c.indexOf('/ok_') === 0) approve.push(b);
+                else if (/_reject:/.test(c) || c.indexOf('/no_') === 0) reject.push(b);
+                else if (/_fail:/.test(c) || c.indexOf('/fail_') === 0) fail.push(b);
+                else view.push(b);
             });
             var kb = [];
-            if (info.length) kb.push(info);
-            var row = ok.concat(no);
-            if (row.length) kb.push(row);
-            if (fail.length) kb.push(fail);
-            if (rest.length) kb.push(rest);
+            var r1 = approve.concat(reject);
+            if (r1.length) kb.push(r1);
+            var r2 = fail.concat(view);
+            if (r2.length) kb.push(r2);
             return kb.length ? { inline_keyboard: kb } : null;
         } catch (e) { return null; }
     };
@@ -12964,16 +12946,11 @@ const PLANS = {
             else { updateInitial(); }
         }
         function updateInitial() {
-            if (!nameIn) return;
-            var n = (nameIn.value || '').trim();
             if (photoData) return;
-            if (dpImg && typeof generateGoogleAvatar === 'function') {
-                dpImg.src = generateGoogleAvatar(n || 'U', 256, n || 'U');
-                dpImg.hidden = false;
-                if (dpInitial) dpInitial.hidden = true;
-            } else if (dpInitial) {
-                dpInitial.textContent = n ? n[0].toUpperCase() : '?';
+            if (dpImg) { dpImg.hidden = true; try { dpImg.removeAttribute('src'); } catch (e) {} }
+            if (dpInitial) {
                 dpInitial.hidden = false;
+                dpInitial.innerHTML = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="8.2" r="3.6" stroke="#94a3b8" stroke-width="1.7"/><path d="M5 18.6c.85-3.15 3.55-5 7-5s6.15 1.85 7 5" stroke="#94a3b8" stroke-width="1.7" stroke-linecap="round"/></svg>';
             }
             // Keep area below input completely clean — zero slashes, code tokens, or clutter!
             if (guestNote && !guestOnboardingInFlight) {
@@ -15052,7 +15029,7 @@ const PLANS = {
 
     function Footer() {
         return `
-            <footer class="w-full leading-none" style="padding-bottom:92px;background:#ffffff;">
+            <footer class="w-full leading-none home-foot" style="background:#ffffff;">
                 <div class="andos-trust-video-strip">
                     <img src="https://cdn.jsdelivr.net/gh/CIDHARIOM/ANDOS-VS-0.172.1919@main/assets/photos/trust-video-1.png" alt="Trusted by over 3 Cr Indians" draggable="false">
                     <button type="button" class="andos-trust-video-hit" onclick="openTrustVideo()" aria-label="Play trusted video"></button>
@@ -25418,7 +25395,23 @@ main.andos-main:not(:has(#pageSlider)) {
   flex: 0 0 40px !important;
   border-radius: 12px !important;
 }
-.catd-list { padding: 12px 16px 20px; }
+.catd-list { padding: 16px 16px 28px; margin-top: 16px; }
+:root { --bottom-nav-height: calc(64px + env(safe-area-inset-bottom, 0px)); }
+.page-section[data-sec="home"] {
+  min-height: 100%;
+  padding-bottom: 0;
+}
+.page-section[data-sec="home"] > .page-enter,
+.page-section[data-sec="home"] .page-enter {
+  min-height: 0 !important;
+  height: auto !important;
+  overflow: visible !important;
+  overscroll-behavior-y: auto;
+}
+.page-section[data-sec="home"] footer,
+.andos-shell[data-page="home"] footer {
+  padding-bottom: calc(var(--bottom-nav-height) + 16px) !important;
+}
 </style>
 </body>
 </html>
