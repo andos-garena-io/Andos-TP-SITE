@@ -12533,6 +12533,8 @@ const PLANS = {
         } catch (eW) {}
         try {
             this._unsubTx = db.collection('transactions').where('uid', '==', uid).onSnapshot(function (snap) {
+                var first = !self._txReady;
+                self._txReady = 1;
                 var added = false;
                 var last = null;
                 snap.docChanges().forEach(function (ch) {
@@ -12541,15 +12543,20 @@ const PLANS = {
                     if (self.ingestCloudTx(ch.doc.id, x)) { added = true; last = x; }
                 });
                 if (added) {
-                    try {
-                        if (last) showToast((last.type === 'debit' ? '−' : '+') + '₹' + Number(last.amount || 0).toLocaleString('en-IN') + ' · ' + String(last.desc || 'Wallet'), 'success');
-                    } catch (eT) {}
+                    if (!first) {
+                        try {
+                            if (last) showToast((last.type === 'debit' ? '−' : '+') + '₹' + Number(last.amount || 0).toLocaleString('en-IN') + ' · ' + String(last.desc || 'Wallet'), 'success');
+                        } catch (eT) {}
+                    }
                     try { if (currentPage === 'wallet' || currentPage === 'transactions' || currentPage === 'account') render(); } catch (eR) {}
                 }
             }, function (e) { console.warn('FB watchTx', e); });
         } catch (eX) {}
         try {
             this._unsubNote = db.collection('notifications').where('uid', '==', uid).onSnapshot(function (snap) {
+                var boot = !self._noteReady;
+                self._noteReady = 1;
+                if (boot) return;
                 snap.docChanges().forEach(function (ch) {
                     if (ch.type !== 'added') return;
                     var n = ch.doc.data() || {};
