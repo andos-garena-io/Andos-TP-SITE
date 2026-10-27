@@ -169,7 +169,7 @@
     <meta name="theme-color" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0f19">
-    <meta name="andos-build" content="andos-v3-20261027a">
+    <meta name="andos-build" content="andos-v3-20261027b">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -192,7 +192,7 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261027a';
+        var HTML_BUILD_ID = 'andos-v3-20261027b';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
@@ -333,8 +333,8 @@
           if (window.__andosSplashActive) return;
           var gateU = document.getElementById('yuvaGate');
           if (gateU && !gateU.classList.contains('yg-out')) { writeMetaTheme('#ffffff'); return; }
-          // header top hex 1:1 — always #F9A8D4 (no white jump, no mix)
-          writeMetaTheme('#F9A8D4');
+          // rest: theme-color = hero-top #F9A8D4 (status bar continues gradient). scrolled: white glass.
+          writeMetaTheme((p * 80) > 18 ? '#ffffff' : '#F9A8D4');
         };
         function setTheme(c) {
           if (window.__andosSplashActive) return; // splash chal raha hai -> status bar BLACK rahega
@@ -393,7 +393,9 @@
             var hsU = document.querySelector('.page-section[data-sec="home"]');
             var yU = hsU ? (hsU.scrollTop || 0) : (window.scrollY || 0);
             if (nav) { try { nav.style.removeProperty('--hdr-p'); } catch (eH) {} }
-            setTheme(baseColor()); // home header top #F9A8D4 1:1, scroll pe white nahi
+            var scrolled = nav ? nav.classList.contains('is-scrolled') : (yU > 18);
+            if (!scrolled && yU > 18) scrolled = true;
+            setTheme(scrolled ? WHITE : baseColor());
           } else {
             var sc = sampledColor();
             setTheme(sc || baseColor()); // real header color; map only as fallback
@@ -2641,10 +2643,9 @@
             will-change: transform;
         }
 
-        .andos-shell[data-page="home"] nav.glass-nav.enterprise-nav.hero-over-image,
-        .andos-shell[data-page="home"] nav.glass-nav.enterprise-nav.hero-over-image.is-scrolled {
-            /* seam fix: header top = exact hero hex, no glass/blur/inset hairline */
-            background: #F9A8D4 !important;
+        .andos-shell[data-page="home"] nav.glass-nav.enterprise-nav.hero-over-image {
+            /* ORIGINAL PINK MERGE (git FIX-T): rest = transparent — hero image/gradient shows through to status bar */
+            background: transparent !important;
             background-image: none !important;
             border: none !important;
             border-bottom: none !important;
@@ -2652,6 +2653,16 @@
             box-shadow: none !important;
             backdrop-filter: none !important;
             -webkit-backdrop-filter: none !important;
+        }
+        .andos-shell[data-page="home"] nav.glass-nav.enterprise-nav.hero-over-image.is-scrolled {
+            /* scroll: light glass only — no inset hairline */
+            background: rgba(255,255,255,.58) !important;
+            border: none !important;
+            border-bottom: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+            backdrop-filter: blur(16px) saturate(160%) !important;
+            -webkit-backdrop-filter: blur(16px) saturate(160%) !important;
         }
         .home-topbar {
             box-sizing: border-box !important;
@@ -24813,15 +24824,13 @@ html, body, #app { background-color: #0b0f19 !important; background-image: none 
 /* FIX-U(2): horizontal strips ka swipe strip ke andar reh — tab-switch chain band */
 [data-hswipe] { touch-action: pan-x pan-y; overscroll-behavior-x: contain; } /* F2: pan-x isolate + pan-y so vertical scroll na ruke */
 .page-enter { overscroll-behavior-y: contain; } /* FIX-U(6): .pf-page overflow-x:hidden -> computed overflow-y auto */
-/* status-bar seam: late kill-rule — home header opaque exact #F9A8D4 to screen top, no blur/border/shadow */
+/* beat later .enterprise-nav nv-glass: home REST = transparent so hero blends into status bar */
 .andos-shell[data-page="home"] nav.glass-nav,
 .andos-shell[data-page="home"] nav.home-topbar,
 .andos-shell[data-page="home"] nav.glass-nav.enterprise-nav,
-.andos-shell[data-page="home"] nav.glass-nav.enterprise-nav.hero-over-image,
-.andos-shell[data-page="home"] nav.glass-nav.enterprise-nav.hero-over-image.is-scrolled {
-  background: #F9A8D4 !important;
+.andos-shell[data-page="home"] nav.glass-nav.enterprise-nav.hero-over-image {
+  background: transparent !important;
   background-image: none !important;
-  background-clip: border-box !important;
   border: none !important;
   border-bottom: none !important;
   outline: none !important;
@@ -24830,7 +24839,15 @@ html, body, #app { background-color: #0b0f19 !important; background-image: none 
   -webkit-backdrop-filter: none !important;
   padding-top: env(safe-area-inset-top, 0px) !important;
 }
-html:has(.andos-shell[data-page="home"]):not(.yg-lock) { background: #F9A8D4 !important; }
+.andos-shell[data-page="home"] nav.glass-nav.is-scrolled,
+.andos-shell[data-page="home"] nav.glass-nav.enterprise-nav.hero-over-image.is-scrolled {
+  background: rgba(255,255,255,.58) !important;
+  background-image: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  backdrop-filter: blur(16px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(160%) !important;
+}
 </style>
 </body>
 </html>
