@@ -169,7 +169,7 @@
     <meta name="theme-color" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0f19">
-    <meta name="andos-build" content="andos-v3-20261027b">
+    <meta name="andos-build" content="andos-v3-20261027c">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -192,7 +192,7 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261027b';
+        var HTML_BUILD_ID = 'andos-v3-20261027c';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
@@ -14509,8 +14509,8 @@ const PLANS = {
         setTimeout(function(){ try { applyLiveAvatars(); } catch (e) {} }, 40);
     };
 
-    function Navbar() {
-        const heroHome = (currentPage === 'home' && typeof HERO_ANNIVERSARY !== 'undefined' && HERO_ANNIVERSARY);
+    function Navbar(forcePage) {
+        const heroHome = ((forcePage || currentPage) === 'home' && typeof HERO_ANNIVERSARY !== 'undefined' && HERO_ANNIVERSARY);
         const garenaLogo = `<a href="garena.html" aria-label="Open Garena corporate portal" title="Garena Corporate Portal" class="inline-flex items-center justify-center">
                             <img src="https://cdn.jsdelivr.net/gh/CIDHARIOM/ANDOS-VS-0.172.1919@main/assets/brand-logos/garena_logo.png" class="h-7 md:h-8 w-auto object-contain" alt="Garena" loading="eager" onerror="this.onerror=null;this.src=getAsset('logo','freefire_logo.png');">
                         </a>`;
@@ -15089,7 +15089,7 @@ const PLANS = {
             <div class="min-h-screen andos-shell" data-page="${currentPage}" data-dark="${window.__andosDarkPage ? 'true' : 'false'}">
                 <div class="evt-page-sparks" id="evtPageSparks" aria-hidden="true"></div>
                 <div id="toastContainer" class="fixed top-4 inset-x-0 z-[400] flex flex-col items-center gap-2.5 pointer-events-none px-4"></div>
-                ${__isMain5 ? (currentPage === 'home' ? `<div id="topNavSlot">${Navbar()}</div>` : /* FIX-U(4): HomeHeader route-level sirf HOME */ '') : (showNav ? Navbar() : '')}
+                ${__isMain5 ? `<div id="topNavSlot">${Navbar('home')}</div>` : (showNav ? Navbar() : '')}
                 ${__isMain5 ? `<main class="page-enter andos-main" data-dark="${window.__andosDarkPage ? 'true' : 'false'}" style="${showBottomNav ? 'padding-bottom:0;' : ''}"><div class="page-slider" id="pageSlider">${__ANDOS_MAIN_SECS.map(function (s) { return `<div class="page-section" data-sec="${s}" data-filled="${s === currentPage ? '1' : '0'}">${s === currentPage ? content : ''}</div>`; }).join('')}</div></main>` : `<main class="page-enter andos-main" data-dark="${window.__andosDarkPage ? 'true' : 'false'}" style="${showBottomNav ? 'padding-bottom:0;' : ''}">${content}</main>`}
                 ${(!__isMain5) && showFooter ? Footer() : ''}
                 ${showBottomNav ? BottomNav() : ''}
@@ -24803,9 +24803,9 @@ nav.glass-nav, .xplore-head, .od-title, .wal-hero, .txn-bar, .sp-bar, .odd-bar, 
 <style id="andos-fixt-arch">
 /* FIX-T(3b): home header ORIGINAL overlay — topNavSlot absolute on home (hero y0, nav upar transparent);
    baaki tabs par slot flow (persistent chrome strip) */
-#topNavSlot { flex: none; }
+#topNavSlot { flex: none; pointer-events: auto; }
 .andos-shell { position: relative; }
-.andos-shell[data-page="home"] #topNavSlot { position: absolute; top: 0; left: 0; right: 0; z-index: 44; }
+.andos-shell[data-page="home"] #topNavSlot { position: absolute; top: 0; left: 0; right: 0; z-index: 60; }
 /* FIX-U(4): HomeHeader SIRF Home — fast-path (no rebuild) me bhi baaki tabs par slot band */
 .andos-shell:not([data-page="home"]) #topNavSlot { display: none; }
 /* FIX-T(4,5): EXACT viewport boundaries + dark base html/body/#app — pull par WHITE frame impossible,
@@ -24847,6 +24847,33 @@ html, body, #app { background-color: #0b0f19 !important; background-image: none 
   box-shadow: none !important;
   backdrop-filter: blur(16px) saturate(160%) !important;
   -webkit-backdrop-filter: blur(16px) saturate(160%) !important;
+}
+/* scroll unlock: page-enter leftover transform locks iOS/PWA overflow */
+.page-enter, main.andos-main, .andos-main.page-enter {
+  animation: none !important;
+  transform: none !important;
+  filter: none !important;
+}
+.andos-main {
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+}
+.page-section {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+}
+.pf-page, .wal-page {
+  overflow-y: visible !important;
+  -webkit-overflow-scrolling: touch;
+}
+.payx-page {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px)) !important;
 }
 </style>
 </body>
