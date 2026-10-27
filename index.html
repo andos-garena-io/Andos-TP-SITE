@@ -169,7 +169,7 @@
     <meta name="theme-color" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0f19">
-    <meta name="andos-build" content="andos-v3-20261027l">
+    <meta name="andos-build" content="andos-v3-20261027m">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -192,8 +192,23 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261027l';
+        var HTML_BUILD_ID = 'andos-v3-20261027m';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
+        (function () {
+          try {
+            var q = new URLSearchParams(location.search || '');
+            var prev = String(q.get('preview') || '').toLowerCase();
+            var v = String(q.get('v') || '').toLowerCase();
+            var h = String(location.hostname || '');
+            var sticky = false;
+            try { sticky = localStorage.getItem('andos_preview') === '1'; } catch (e0) {}
+            var on = prev === 'true' || prev === '1' || prev === 'm' || v === 'm' || sticky
+              || (h && h !== 'andostosites.vercel.app' && /vercel\.app$/i.test(h));
+            window.__ANDOS_BUILD_M = !!on;
+            if (on) document.documentElement.classList.add('build-m');
+            else document.documentElement.classList.remove('build-m');
+          } catch (e) { window.__ANDOS_BUILD_M = false; }
+        })();
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
 
@@ -16234,7 +16249,7 @@ const PLANS = {
         var inp = document.getElementById('orderSearchInput');
         if (inp && inp.value !== String(orderSearchQuery || '')) inp.value = orderSearchQuery || '';
         var panel = document.getElementById('orderFilterPanel');
-        if (panel) panel.hidden = !orderFiltersOpen;
+        if (panel) panel.hidden = isAndosBuildM() ? false : !orderFiltersOpen;
         return true;
     }
 
@@ -20409,9 +20424,37 @@ function renderFreeFireGraphics() {
         if (id === 'instagram' || id === 'facebook' || id === 'youtube') return 'social';
         return 'others';
     }
+
+    function isAndosBuildM() { return window.__ANDOS_BUILD_M === true; }
+    window.isAndosBuildM = isAndosBuildM;
+    function odFilterIcon() {
+        return '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 14 14" aria-hidden="true" class="od-chip-svg"><path fill="currentColor" fill-rule="evenodd" d="M.5 0a.5.5 0 0 0-.407.79L5 7.66v5.84a.5.5 0 0 0 .777.416l3-2A.5.5 0 0 0 9 11.5V7.66L13.907.79A.5.5 0 0 0 13.5 0z" clip-rule="evenodd"/></svg>';
+    }
+    function odCopySvg() {
+        return '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+    }
+    function walGroupTx(transactions) {
+        var groups = [];
+        var map = {};
+        (transactions || []).forEach(function (t) {
+            var key = String(t.date || '').trim() || 'Earlier';
+            if (!map[key]) { map[key] = { label: key, items: [] }; groups.push(map[key]); }
+            map[key].items.push(t);
+        });
+        return groups;
+    }
+    window.togglePfEditor = function () {
+        var el = document.getElementById('pfMForm');
+        if (!el) return;
+        el.hidden = !el.hidden;
+    };
+
     function getFilteredOrders() {
         var list = orders.slice();
-        if (orderFilter && orderFilter !== 'all') list = list.filter(function(o) { return o.status === orderFilter; });
+        if (orderFilter && orderFilter !== 'all') list = list.filter(function(o) {
+            if (isAndosBuildM() && orderFilter === 'pending') return o.status === 'pending' || o.status === 'processing';
+            return o.status === orderFilter;
+        });
         if (orderCatFilter && orderCatFilter !== 'all') list = list.filter(function(o) { return orderServiceBucket(o.serviceId) === orderCatFilter; });
         var q = String(orderSearchQuery || '').trim().toLowerCase();
         if (q) list = list.filter(function(o) {
@@ -20440,7 +20483,17 @@ function renderFreeFireGraphics() {
     window.copyOrderId = function(id, ev) {
         if (ev) { ev.stopPropagation(); ev.preventDefault(); }
         const t = String(id || '');
-        const done = function() { if (typeof showToast === 'function') showToast('Order ID copied', 'success'); };
+        const btn = ev && (ev.currentTarget || ev.target);
+        const done = function() {
+            try {
+                var b = btn && btn.closest ? (btn.closest('.od-copy') || btn) : btn;
+                if (b && b.classList) {
+                    b.classList.add('is-copied');
+                    setTimeout(function(){ try { b.classList.remove('is-copied'); } catch (e2) {} }, 1200);
+                }
+            } catch (e1) {}
+            if (typeof showToast === 'function') showToast('Copied', 'success');
+        };
         try {
             if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(done).catch(done);
             else done();
@@ -20475,7 +20528,7 @@ function renderFreeFireGraphics() {
                 + orderThumb(order)
                 + '<div class="od-mid"><h3>'+escapeHtml(order.service || 'Service')+'</h3>'
                 + '<p>'+escapeHtml(order.plan || '')+'</p>' + window.ddBadge(order, true)
-                + '<div class="od-id">Order ID: '+escapeHtml(order.id || '')+' <i class="fa-regular fa-copy" onclick="copyOrderId(\''+String(order.id||'').replace(/'/g,'')+'\', event)"></i></div>'+(order.refBy ? '<div style="margin-top:4px"><span style="display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:999px;background:#eef2ff;color:#4338ca;font-size:8.5px;font-weight:900"><i class="fa-solid fa-user-group"></i>REF: '+escapeHtml(order.refBy)+'</span></div>' : '')+'</div>'
+                + '<div class="od-id">Order ID: '+escapeHtml(order.id || '')+' '+(isAndosBuildM() ? '<span role="button" tabindex="0" class="od-copy" aria-label="Copy order ID" onclick="copyOrderId(\''+String(order.id||'').replace(/'/g,'')+'\', event)">'+odCopySvg()+'</span>' : '<i class="fa-regular fa-copy" onclick="copyOrderId(\''+String(order.id||'').replace(/'/g,'')+'\', event)"></i>')+'</div>'+(order.refBy ? '<div style="margin-top:4px"><span style="display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:999px;background:#eef2ff;color:#4338ca;font-size:8.5px;font-weight:900"><i class="fa-solid fa-user-group"></i>REF: '+escapeHtml(order.refBy)+'</span></div>' : '')+'</div>'
                 + '<div class="od-right"><div class="amt">'+formatPrice(order.amount)+'</div>'
                 + '<span class="od-pill '+st.cls+'"><i class="fa-solid '+st.icon+'"></i> '+st.label+'</span>'
                 + '<span class="when">'+when+'</span></div>'
@@ -20492,7 +20545,51 @@ function renderFreeFireGraphics() {
         if (id === 'failed') return '<svg class="od-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="'+color+'" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>';
         return '<svg class="od-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2.2"><rect x="3" y="3" width="7" height="7" rx="1.2"/><rect x="14" y="3" width="7" height="7" rx="1.2"/><rect x="3" y="14" width="7" height="7" rx="1.2"/><rect x="14" y="14" width="7" height="7" rx="1.2"/></svg>';
     }
+
+    function OrdersPageM() {
+        const cats = [
+            { id:'all', label:'All' },
+            { id:'gaming', label:'Game' },
+            { id:'mobile', label:'Mobile' },
+            { id:'dth', label:'DTH' },
+            { id:'ott', label:'OTT' },
+            { id:'giftcard', label:'Gift Cards' }
+        ];
+        const statuses = [
+            { id:'all', label:'All' },
+            { id:'completed', label:'Success' },
+            { id:'pending', label:'Pending' },
+            { id:'failed', label:'Failed' }
+        ];
+        var n = getFilteredOrders().length;
+        var qEsc = String(orderSearchQuery || '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+        var ico = odFilterIcon();
+        return `
+            <div class="page-enter od-page od-m">
+                <h1 class="od-title">Orders</h1>
+                <p class="od-sub" id="ordersCountLabel">${n} ${n===1?'order':'orders'}</p>
+                <div class="od-searchbar">
+                    <label class="od-searchwrap">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#94a3b8" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.2-3.2"/></svg>
+                        <input id="orderSearchInput" type="search" placeholder="Search orders..." value="${qEsc}" oninput="onOrderSearchInput(this)" autocomplete="off">
+                    </label>
+                </div>
+                <div id="orderFilterPanel" class="od-filters">
+                <div class="od-scroller" id="orderCatTabs" data-hswipe>
+                    ${cats.map(c => `<button type="button" class="od-chip ${orderCatFilter === c.id ? 'on' : ''}" data-cat="${c.id}" onclick="setOrderCatFilter('${c.id}')">${ico}<span>${c.label}</span></button>`).join('')}
+                </div>
+                <div class="od-scroller od-status" id="orderTabs" data-hswipe>
+                    ${statuses.map(c => `<button type="button" class="od-chip ${orderFilter === c.id ? 'on' : ''}" data-filter="${c.id}" onclick="setOrderFilter('${c.id}')">${ico}<span>${c.label}</span></button>`).join('')}
+                </div>
+                </div>
+                <div id="ordersList">${renderOrdersList()}</div>
+            </div>
+        `;
+    }
+
     function OrdersPage() {
+        if (isAndosBuildM()) return OrdersPageM();
+
         const cats = [
             { id:'all', label:'All' },
             { id:'gaming', label:'Game' },
@@ -20658,6 +20755,33 @@ function renderFreeFireGraphics() {
     }
 
     function CategoriesPage() {
+        if (isAndosBuildM()) {
+            const cats = getExploreCatalog();
+            return `
+            <div class="xplore-stack">
+            <div class="page-enter xplore-page" id="xploreRoot" ${selectedCategory ? 'style="display:none"' : ''}>
+                <div class="xplore-head">
+                    <div>
+                        <h1>Explore</h1>
+                        <p>Every category, ready to open</p>
+                    </div>
+                </div>
+                ${exqStripHTML()}
+                <div class="xplore-grid">
+                    ${cats.map(function(cat) {
+                        const art = cat.img
+                            ? '<img src="'+cat.img+'" alt="" draggable="false">'
+                            : '<span class="xplore-fa" style="background:'+cat.tone+'"><i class="fa-solid '+cat.icon+'"></i></span>';
+                        return '<button type="button" class="xplore-tile" onclick="navigate(\'category\', {category:\''+cat.id+'\'})">'
+                            + art + '<b>'+cat.name+'</b></button>';
+                    }).join('')}
+                </div>
+            </div>
+            <div id="exploreDrill" ${selectedCategory ? '' : 'hidden'}>${selectedCategory ? CategoryDetailPage() : ''}</div>
+            </div>
+        `;
+        }
+
         const cats = getExploreCatalog();
         return `
             <div class="xplore-stack">
@@ -20711,7 +20835,7 @@ function renderFreeFireGraphics() {
                     <h1>${escapeHtml(category.name)}</h1>
                     <span class="catd-count">${count} ${count===1?'item':'items'}</span>
                 </div>
-                <div class="catd-list">
+                <div class="catd-list${isAndosBuildM() ? ' catd-list-2' : ''}">
                     ${ordered.length ? ordered.map(s => `
                         <button type="button" class="catd-svc" onclick="navigate('plans', {service:'${s.id}'})">
                             <span class="andos-logo-rank-wrap"><span class="icon-box andos-logo-container">${s.icon || ''}</span></span>
@@ -20755,7 +20879,50 @@ function renderFreeFireGraphics() {
         navigate('categories', { _back: true });
     };
 
+
+    function WalletPageM() {
+        const transactions = readLocalJSON('andos_transactions', []);
+        const walletUnlocked = isWalletDepositUnlocked();
+        const hideBal = localStorage.getItem('andos_hide_wallet') === '1';
+        const balTxt = hideBal ? '₹••••' : formatPrice(wallet);
+        const groups = walGroupTx(transactions);
+        const txHtml = groups.length ? groups.map(function(g) {
+            var rows = g.items.map(function(t) {
+                const pending = t.status === 'pending';
+                const credit = t.type === 'credit';
+                const src = String(t.source || t.desc || '').toLowerCase();
+                const ico = pending ? 'fa-hourglass-half' : (/spin/.test(src) ? 'fa-trophy' : (/streak/.test(src) ? 'fa-fire' : (credit ? 'fa-plus' : 'fa-minus')));
+                const bg = pending ? 'wait' : (credit ? 'in' : 'out');
+                const amt = pending ? formatPrice(t.amount) : ((credit?'+':'−') + formatPrice(t.amount));
+                const amtCls = pending ? 'pend' : (credit ? 'plus' : 'minus');
+                return '<div class="wal-tx"><span class="wal-tx-ico '+bg+'"><i class="fa-solid '+ico+'"></i></span><div class="wal-tx-mid"><b>'+escapeHtml(t.desc||'Transaction')+'</b><small>'+escapeHtml(t.date||'')+'</small></div><span class="wal-tx-amt '+amtCls+'">'+amt+'</span></div>';
+            }).join('');
+            return '<div class="wal-m-day">'+escapeHtml(g.label)+'</div>'+rows;
+        }).join('') : '<p class="wal-empty">No transactions yet</p>';
+        const unlock = !walletUnlocked ? ('<button type="button" class="wu-btn" style="margin-top:12px;width:100%" onclick="addMoney('+getFirstDepositMin()+')">Unlock with ₹'+getFirstDepositMin().toLocaleString('en-IN')+'</button>') : '';
+        return `
+            <div class="page-enter wal-m">
+                <header class="wal-m-hero">
+                    <h1>Wallet</h1>
+                    <p class="wal-m-cap">ANDOS Cash</p>
+                    <div class="wal-m-balrow">
+                        <div class="wal-bal">${balTxt}</div>
+                        <button type="button" class="wal-eye" onclick="toggleWalletHide()" aria-label="Hide balance"><i class="fa-solid fa-eye${hideBal?'-slash':''}"></i></button>
+                    </div>
+                    <div class="wal-m-pills">
+                        <button type="button" class="wal-add" onclick="addMoney(${walletUnlocked?500:getFirstDepositMin()})">Add money</button>
+                        <button type="button" class="wal-hist" onclick="navigate('transactions')">History</button>
+                    </div>
+                    ${unlock}
+                </header>
+                <div class="wal-m-sheet">${txHtml}</div>
+            </div>
+        `;
+    }
+
     function WalletPage() {
+        if (isAndosBuildM()) return WalletPageM();
+
         const transactions = readLocalJSON('andos_transactions', []);
         const walletUnlocked = isWalletDepositUnlocked();
         const quickDepositAmounts = [200, 500, 1000, 2000];
@@ -21204,7 +21371,60 @@ function renderFreeFireGraphics() {
         { name:'Kabir A.', points:2190 }
     ]);
 
+
+    function AccountPageM() {
+        const photo = getProfileAvatar();
+        const name = escapeHtml(user.name || 'ANDOS Member');
+        const uname = escapeHtml(user.username || '');
+        const bio = escapeHtml(user.bio || '');
+        const pts = Number(loyaltyPoints || 0);
+        const orderCount = Array.isArray(orders) ? orders.length : 0;
+        const uid = escapeHtml(String(user.publicId || ''));
+        const av = '<img id="pfLiveAva" data-live-avatar alt="Profile" src="' + String(photo || '').replace(/"/g, '&quot;') + '"><span data-avatar-fallback class="pf-fallback" hidden><i class="fa-solid fa-user"></i></span>';
+        const email = escapeHtml(user.email || '');
+        const mobile = escapeHtml(user.mobile || '');
+        return `
+            <div class="page-enter pf-page pf-m">
+                <div class="pf-title"><h1>Profile</h1></div>
+                <div class="pf-m-ava" role="button" onclick="var src=(window.getAvatarSrc?window.getAvatarSrc():''); if(src){ if(window.openProfilePhotoViewer) window.openProfilePhotoViewer(); } else { var f=document.getElementById('pfAvaFile'); if(f) f.click(); }">
+                    ${av}
+                    <input id="pfAvaFile" type="file" accept="image/png,image/jpeg,image/webp,image/*" class="hidden" onchange="handleProfileAvatarUpload(this)">
+                    <button type="button" class="pf-cam" aria-label="Change photo" onclick="event.stopPropagation(); var f=document.getElementById('pfAvaFile'); if(f) f.click();"><i class="fa-solid fa-camera"></i></button>
+                </div>
+                <h2 class="pf-m-name">${name}</h2>
+                <p class="pf-m-user">${uname ? ('@' + uname) : '@username'}</p>
+                ${uid ? '<button type="button" class="pf-m-uid" onclick="copyOrderId(\'' + uid.replace(/'/g,'') + '\', event)"><span>UID ' + uid + '</span>' + odCopySvg() + '</button>' : ''}
+                ${bio ? '<p class="pf-m-bio">' + bio + '</p>' : ''}
+                <div class="pf-m-stats">
+                    <div><b>${orderCount}</b><small>Orders</small></div>
+                    <div><b>${pts.toLocaleString('en-IN')}</b><small>Points</small></div>
+                    <div><b>${formatPrice(wallet)}</b><small>Wallet</small></div>
+                </div>
+                <div class="pf-m-group">
+                    <button type="button" class="pf-m-row" onclick="togglePfEditor()"><i class="fa-solid fa-pen lead"></i><b>Edit profile</b><i class="fa-solid fa-chevron-right"></i></button>
+                    <button type="button" class="pf-m-row" onclick="navigate('activity')"><i class="fa-solid fa-bolt lead"></i><b>Activity</b><i class="fa-solid fa-chevron-right"></i></button>
+                    <button type="button" class="pf-m-row out" onclick="confirmSignOut()"><i class="fa-solid fa-arrow-right-from-bracket lead"></i><b>Sign out</b><i class="fa-solid fa-chevron-right"></i></button>
+                </div>
+                <div class="pf-m-group">
+                    <button type="button" class="pf-m-row" onclick="navigate('loyalty')"><i class="fa-solid fa-star lead"></i><b>Loyalty</b><i class="fa-solid fa-chevron-right"></i></button>
+                    <button type="button" class="pf-m-row" onclick="navigate('wallet')"><i class="fa-solid fa-wallet lead"></i><b>Wallet</b><i class="fa-solid fa-chevron-right"></i></button>
+                    <button type="button" class="pf-m-row" onclick="navigate('support')"><i class="fa-solid fa-life-ring lead"></i><b>Support</b><i class="fa-solid fa-chevron-right"></i></button>
+                </div>
+                <div id="pfMForm" class="pf-m-form pf-form" hidden>
+                    <label>Name<input id="pfName" type="text" value="${name}" maxlength="40" autocomplete="off" spellcheck="false"></label>
+                    <label>Username (@)<input id="pfUsername" type="text" value="${uname}" maxlength="28" placeholder="username" autocomplete="off" spellcheck="false"></label>
+                    <label>Mobile<input id="pfMobile" type="tel" value="${mobile}" maxlength="10" inputmode="numeric" autocomplete="off"></label>
+                    <label>Email<input id="pfEmail" type="email" value="${email}" maxlength="80" autocomplete="off"></label>
+                    <button type="button" class="pf-save" onclick="saveProfileDetails()">Save profile</button>
+                </div>
+                ${user.isGuest ? '<div style="margin-top:10px;"><button type="button" onclick="andosLinkGoogle()" class="pf-m-row" style="border:1px solid #0f172a;border-radius:14px;justify-content:center"><i class="fa-brands fa-google lead"></i><b>Link with Google</b></button></div>' : ''}
+            </div>
+        `;
+    }
+
     function AccountPage() {
+        if (isAndosBuildM()) return AccountPageM();
+
         const photo = getProfileAvatar();
         const name = escapeHtml(user.name || 'ANDOS Member');
         const mobile = escapeHtml(user.mobile || '');
@@ -25412,6 +25632,226 @@ main.andos-main:not(:has(#pageSlider)) {
 .andos-shell[data-page="home"] footer {
   padding-bottom: calc(var(--bottom-nav-height) + 16px) !important;
 }
+
+/* ===== BUILD M (gated: html.build-m) ===== */
+html.build-m #app button:focus-visible,
+html.build-m #app [onclick]:focus-visible,
+html.build-m #app a:focus-visible,
+html.build-m #app input:focus-visible,
+html.build-m #app textarea:focus-visible,
+html.build-m #app select:focus-visible,
+html.build-m #app [tabindex]:focus-visible {
+  outline: 2px solid #6366f1 !important;
+  outline-offset: 2px !important;
+  box-shadow: none !important;
+  animation: none !important;
+}
+html.build-m #app input[type="text"]:focus,
+html.build-m #app input[type="tel"]:focus,
+html.build-m #app input[type="email"]:focus,
+html.build-m #app input[type="number"]:focus,
+html.build-m #app input[type="search"]:focus,
+html.build-m #app input[type="password"]:focus,
+html.build-m #app textarea:focus,
+html.build-m #app .input-field:focus {
+  outline: 2px solid #6366f1 !important;
+  outline-offset: 1px !important;
+  border-color: #6366f1 !important;
+  box-shadow: 0 0 0 3px rgba(99,102,241,.16) !important;
+  animation: none !important;
+}
+html.build-m #bottomNav .bnav-item:focus,
+html.build-m #bottomNav .bnav-item:focus-visible,
+html.build-m #bottomNav .bnav-item:active {
+  outline: none !important;
+  box-shadow: none !important;
+}
+html.build-m .xplore-grid,
+html.build-m .xplore-grid-all {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0,1fr)) !important;
+  gap: 16px !important;
+}
+html.build-m .xplore-grid-all .xplore-tile {
+  min-height: 0;
+  padding: 16px 12px 14px;
+}
+html.build-m .catd-list,
+html.build-m .catd-list-2 {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0,1fr)) !important;
+  gap: 16px !important;
+  margin-top: 16px !important;
+  padding: 16px 16px 28px !important;
+}
+html.build-m .catd-bar {
+  height: 56px !important;
+  min-height: 56px !important;
+}
+html.build-m .catd-page,
+html.build-m #exploreDrill:not([hidden]),
+html.build-m #exploreDrill .catd-page {
+  touch-action: pan-y !important;
+}
+html.build-m .page-section[data-sec="orders"] {
+  overflow-x: hidden !important;
+}
+html.build-m .od-page.od-m {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+html.build-m .od-m .od-title,
+html.build-m .od-m .od-sub,
+html.build-m .od-m .od-searchbar,
+html.build-m .od-m #ordersList {
+  padding-left: 16px;
+  padding-right: 16px;
+}
+html.build-m #orderFilterPanel,
+html.build-m .od-filters {
+  display: block !important;
+  overflow: visible !important;
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  position: sticky;
+  top: 0;
+  z-index: 15;
+  background: #fff;
+}
+html.build-m .od-scroller {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  max-width: none;
+  box-sizing: border-box;
+  overflow-x: auto !important;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  padding: 8px 16px 10px !important;
+  pointer-events: auto;
+}
+html.build-m .od-scroller::-webkit-scrollbar { display: none; }
+html.build-m .od-chip {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+html.build-m .od-chip-svg { width: 12px; height: 12px; flex: 0 0 12px; display: block; }
+html.build-m .od-chip.on { color: #5b21b6; }
+html.build-m .od-copy {
+  border: 0;
+  background: #f1f5f9;
+  color: #64748b;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  cursor: pointer;
+  flex: 0 0 28px;
+  pointer-events: auto;
+}
+html.build-m .od-copy.is-copied { background: #ecfdf5; color: #059669; }
+html.build-m .od-id { display: flex; align-items: center; gap: 8px; }
+html.build-m .page-section[data-sec="wallet"] {
+  background: #2e1065 !important;
+  overflow: hidden !important;
+}
+html.build-m .wal-m {
+  height: 100%;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden !important;
+  background: #2e1065;
+  padding-bottom: 0 !important;
+  color: #fff;
+}
+html.build-m .wal-m-hero {
+  flex: 0 0 auto;
+  padding: calc(12px + env(safe-area-inset-top,0px)) 16px 18px;
+  background: #2e1065;
+}
+html.build-m .wal-m-hero h1 { margin: 0; font-size: 20px; font-weight: 900; letter-spacing: -.03em; color: #fff; }
+html.build-m .wal-m-hero .wal-m-cap { margin: 4px 0 0; font-size: 12px; font-weight: 600; color: rgba(255,255,255,.65); }
+html.build-m .wal-m-balrow { display: flex; align-items: center; gap: 10px; margin-top: 14px; }
+html.build-m .wal-m .wal-bal { font-size: 34px; font-weight: 900; letter-spacing: -.04em; padding-right: 0; color: #fff; }
+html.build-m .wal-m .wal-eye { border: 0; background: rgba(255,255,255,.12); color: #fff; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; }
+html.build-m .wal-m-pills { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 16px; }
+html.build-m .wal-m-pills button {
+  min-height: 42px; border: 0; border-radius: 999px; font-size: 13px; font-weight: 800; cursor: pointer;
+}
+html.build-m .wal-m-pills .wal-add { background: #fff; color: #2e1065; }
+html.build-m .wal-m-pills .wal-hist { background: rgba(255,255,255,.12); color: #fff; }
+html.build-m .wal-m-sheet {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  background: #fff;
+  border-radius: 24px 24px 0 0;
+  padding: 16px 16px calc(var(--bottom-nav-height) + 20px);
+  color: #0f172a;
+}
+html.build-m .wal-m-day { margin: 12px 0 6px; font-size: 11px; font-weight: 800; color: #94a3b8; letter-spacing: .06em; text-transform: uppercase; }
+html.build-m .wal-m-day:first-child { margin-top: 0; }
+html.build-m .pf-m { padding: 12px 16px calc(var(--bottom-nav-height) + 16px) !important; background: #fff !important; }
+html.build-m .pf-m-ava {
+  width: 96px; height: 96px; border-radius: 50%; margin: 8px auto 0; position: relative;
+  overflow: visible; background: #f1f5f9;
+}
+html.build-m .page-section[data-sec="wallet"] > .page-enter.wal-m {
+  min-height: 100% !important;
+  height: 100% !important;
+  overflow: hidden !important;
+}
+html.build-m .pf-m-ava img, html.build-m .pf-m-ava .pf-fallback {
+  width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 50%;
+}
+html.build-m .pf-m-ava .pf-cam {
+  position: absolute; right: 2px; bottom: 2px; width: 28px; height: 28px; border-radius: 50%;
+  border: 2px solid #fff; background: #4f46e5; color: #fff; display: flex; align-items: center; justify-content: center;
+}
+html.build-m .pf-m-name { margin: 12px 0 0; text-align: center; font-size: 22px; font-weight: 900; color: #0f172a; }
+html.build-m .pf-m-user { margin: 4px 0 0; text-align: center; font-size: 14px; font-weight: 700; color: #64748b; }
+html.build-m .pf-m-uid {
+  margin: 10px auto 0; display: flex; align-items: center; justify-content: center; gap: 8px;
+  font-size: 12px; font-weight: 800; color: #0f172a; background: #f8fafc; border: 1px solid #eef2ff;
+  border-radius: 999px; padding: 6px 12px; width: fit-content; max-width: 100%; cursor: pointer;
+}
+html.build-m .pf-m-bio { margin: 10px 8px 0; text-align: center; font-size: 13px; font-weight: 600; color: #475569; }
+html.build-m .pf-m-stats {
+  display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 8px; margin: 16px 0;
+}
+html.build-m .pf-m-stats div {
+  background: #f8fafc; border: 1px solid #eef2ff; border-radius: 14px; padding: 10px 6px; text-align: center;
+}
+html.build-m .pf-m-stats b { display: block; font-size: 14px; font-weight: 900; color: #0f172a; }
+html.build-m .pf-m-stats small { display: block; margin-top: 2px; font-size: 10px; font-weight: 700; color: #94a3b8; }
+html.build-m .pf-m-group {
+  background: #fff; border: 1px solid #eef2ff; border-radius: 16px; overflow: hidden; margin-bottom: 12px;
+}
+html.build-m .pf-m-row {
+  width: 100%; display: flex; align-items: center; gap: 12px; padding: 14px 14px; border: 0; background: #fff;
+  text-align: left; cursor: pointer; border-bottom: 1px solid #f1f5f9;
+}
+html.build-m .pf-m-row:last-child { border-bottom: 0; }
+html.build-m .pf-m-row i.lead { width: 20px; color: #6366f1; }
+html.build-m .pf-m-row b { flex: 1; font-size: 14px; font-weight: 800; color: #0f172a; }
+html.build-m .pf-m-row.out b { color: #dc2626; }
+html.build-m .pf-m-row.out i.lead { color: #dc2626; }
+html.build-m .pf-m-form { margin-top: 8px; }
+
 </style>
 </body>
 </html>
