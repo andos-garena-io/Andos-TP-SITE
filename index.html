@@ -387,7 +387,8 @@
           var shell = document.querySelector('.andos-shell');
           var pg = shell ? shell.getAttribute('data-page') : '';
           var isHome = (pg === 'home' || !pg);
-          // FIX-T: pull par WHITE theme nahi — page ka original header color bana rahe
+          // index.txt ORIGINAL: white blur barrier = WHITE status bar (header + status bar merge)
+          if (pulling && isHome) { setTheme(WHITE); return; }
           if (isHome) {
             var nav = document.querySelector('nav.glass-nav');
             var hsU = document.querySelector('.page-section[data-sec="home"]');
@@ -395,7 +396,7 @@
             if (nav) { try { nav.style.removeProperty('--hdr-p'); } catch (eH) {} }
             var scrolled = nav ? nav.classList.contains('is-scrolled') : (yU > 18);
             if (!scrolled && yU > 18) scrolled = true;
-            setTheme(PINK); // never WHITE on home — status bar stays #F9A8D4
+            setTheme(scrolled ? WHITE : baseColor()); // rest = PINK, scrolled = WHITE (index.txt)
           } else {
             var sc = sampledColor();
             setTheme(sc || baseColor()); // real header color; map only as fallback
@@ -418,12 +419,16 @@
             __psTop = __ps ? (__ps.scrollTop || 0) : 0;
           }
           if ((window.scrollY || 0) <= 0 && __psTop <= 0 && e.touches[0].clientY - startY > 24) {
-            pulling = true; // FIX-T: sirf flag — WHITE flash band, theme-color BANA rahe (point 5)
+            pulling = true; setTheme(WHITE); // index.txt: white blur barrier
+            var nU = document.querySelector('nav.glass-nav'); // white blur barrier ko top tak le jao
+            if (nU) nU.classList.add('is-scrolled');
           }
         }, { passive: true });
         document.addEventListener('touchend', function () {
           if (pulling) {
             pulling = false;
+            var nU = document.querySelector('nav.glass-nav');
+            if (nU && (window.scrollY || 0) <= 18) nU.classList.remove('is-scrolled');
             try { onScroll(); } catch (e) {} // resync — theme color page par wapas
           }
         }, { passive: true });
@@ -2295,12 +2300,10 @@
         }
         .andos-avatar-ring {
             position: absolute;
-            inset: -2px;
+            inset: 0;
             border-radius: 50%;
-            background: conic-gradient(from 0deg, #c4b5fd, #f0abfc, #fda4af, #c4b5fd);
-            animation: avatarSpin 4s linear infinite;
-            -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 2px));
-            mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 2px));
+            background: conic-gradient(from 145deg at 50% 50%, #2A75FF 0deg, #4F46E5 120deg, #7C3AED 240deg, #2A75FF 360deg);
+            box-shadow: 0 0 12px rgba(42, 117, 255, 0.4), 0 0 6px rgba(124, 58, 237, 0.25);
         }
         @keyframes avatarSpin { to { transform: rotate(360deg); } }
 
@@ -2669,16 +2672,17 @@
             box-shadow: none !important;
             backdrop-filter: none !important;
             -webkit-backdrop-filter: none !important;
+            transition: background .28s ease, box-shadow .28s ease, border-color .28s ease, backdrop-filter .28s ease;
         }
         .andos-shell[data-page="home"] nav.glass-nav.enterprise-nav.hero-over-image.is-scrolled {
-            /* git-l scroll glass: content hides behind blur */
+            /* ORIGINAL GLASS (index.txt): content hides behind blur */
             background: rgba(255,255,255,.58) !important;
             border: none !important;
-            border-bottom: none !important;
+            border-bottom-color: rgba(15,23,42,0.06) !important;
             outline: none !important;
-            box-shadow: none !important;
-            backdrop-filter: blur(12px) !important;
-            -webkit-backdrop-filter: blur(12px) !important;
+            box-shadow: 0 1px 0 rgba(255,255,255,.35) inset, 0 10px 28px rgba(15,23,42,.06) !important;
+            backdrop-filter: blur(16px) saturate(160%) !important;
+            -webkit-backdrop-filter: blur(16px) saturate(160%) !important;
         }
         .home-topbar {
             box-sizing: border-box !important;
@@ -25490,14 +25494,15 @@ main.andos-main:not(:has(#pageSlider)) {
   right: 0 !important;
   width: 100% !important;
   z-index: 50 !important;
-  --nv-glass: rgba(255,255,255,.28) !important;
-  background: rgba(255,255,255,.28) !important;
-  background-color: rgba(255,255,255,.28) !important;
+  --nv-glass: rgba(255,255,255,.58) !important;
+  background: rgba(255,255,255,.58) !important;
+  background-color: rgba(255,255,255,.58) !important;
   background-image: none !important;
   border: none !important;
-  box-shadow: none !important;
-  backdrop-filter: blur(20px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border-bottom: 1px solid rgba(15,23,42,0.06) !important;
+  box-shadow: 0 1px 0 rgba(255,255,255,.35) inset, 0 10px 28px rgba(15,23,42,.06) !important;
+  backdrop-filter: blur(16px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(160%) !important;
 }
 .andos-shell[data-page="home"] .andos-main {
   padding-top: 0 !important;
@@ -25511,9 +25516,9 @@ main.andos-main:not(:has(#pageSlider)) {
 
 nav.home-topbar .andos-avatar-btn {
   position: relative !important;
-  width: 40px !important;
-  height: 40px !important;
-  flex: 0 0 40px !important;
+  width: 44px !important;
+  height: 44px !important;
+  flex: 0 0 44px !important;
   padding: 0 !important;
   margin: 0 !important;
   border: 0 !important;
@@ -25530,11 +25535,12 @@ nav.home-topbar .andos-avatar-ring {
   inset: 0 !important;
   border-radius: 50% !important;
   pointer-events: none !important;
-  background: linear-gradient(to bottom left, #b8b1ff 0%, #7d92ff 38%, #2f7cf6 78%, #2b76f5 100%) !important;
+  background: conic-gradient(from 145deg at 50% 50%, #2A75FF 0deg, #4F46E5 120deg, #7C3AED 240deg, #2A75FF 360deg) !important;
   animation: none !important;
-  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px)) !important;
-  mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px)) !important;
-  filter: drop-shadow(0 0 6px rgba(47, 124, 246, .65)) !important;
+  -webkit-mask: none !important;
+  mask: none !important;
+  filter: none !important;
+  box-shadow: 0 0 12px rgba(42, 117, 255, 0.4), 0 0 6px rgba(124, 58, 237, 0.25) !important;
 }
 nav.home-topbar .andos-avatar-btn img,
 nav.home-topbar .andos-avatar-btn #hdrLiveAva {
