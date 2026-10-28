@@ -169,7 +169,7 @@
     <meta name="theme-color" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0f19">
-    <meta name="andos-build" content="andos-v3-20261028l22">
+    <meta name="andos-build" content="andos-v3-20261029l23">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -192,7 +192,7 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261028l22';
+        var HTML_BUILD_ID = 'andos-v3-20261029l23';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
@@ -342,13 +342,22 @@
           var bl = Math.round(A[2] + (B[2] - A[2]) * t);
           return '#' + [r, g, bl].map(function (x) { return ('0' + x.toString(16)).slice(-2); }).join('');
         }
+        function homeScrollY() {
+          var hs = document.querySelector('.page-section[data-sec="home"]');
+          if (hs && document.getElementById('pageSlider')) return hs.scrollTop || 0;
+          var mainH = document.querySelector('main.andos-main');
+          if (mainH) return mainH.scrollTop || 0;
+          return window.scrollY || document.documentElement.scrollTop || 0;
+        }
+        window.__andosHomeY = homeScrollY;
         window.__andosHomeMetaP = function (p) {
           if (window.__andosSplashActive) return;
           var gateU = document.getElementById('yuvaGate');
           if (gateU && !gateU.classList.contains('yg-out')) { writeMetaTheme('#ffffff'); return; }
           p = Number(p) || 0;
           if (p < 0) p = 0; if (p > 1) p = 1;
-          writeMetaTheme(p < 0.02 ? PINK : mixHex(PINK, WHITE, p));
+          // rest (y=0) = PINK; pehla uthan = turant mix — koi 0.02 jump / flicker nahi
+          writeMetaTheme(p <= 0 ? PINK : mixHex(PINK, WHITE, p));
         };
         function setTheme(c) {
           if (window.__andosSplashActive) return; // splash chal raha hai -> status bar BLACK rahega
@@ -405,14 +414,11 @@
           if (pulling && isHome) { setTheme(baseColor()); return; }
           if (isHome) {
             var nav = document.querySelector('nav.glass-nav');
-            var hsU = document.querySelector('.page-section[data-sec="home"]');
-            var mainU = document.querySelector('main.andos-main');
-            var yU = (hsU && document.getElementById('pageSlider')) ? (hsU.scrollTop || 0)
-              : (mainU ? (mainU.scrollTop || 0) : (window.scrollY || 0));
+            var yU = homeScrollY();
             var pU = yU / 80; if (pU < 0) pU = 0; if (pU > 1) pU = 1;
             if (nav) { try { nav.style.setProperty('--hdr-p', String(pU)); } catch (eH) {} }
             if (typeof window.__andosHomeMetaP === 'function') window.__andosHomeMetaP(pU);
-            else setTheme(pU < 0.02 ? PINK : mixHex(PINK, WHITE, pU));
+            else setTheme(pU <= 0 ? PINK : mixHex(PINK, WHITE, pU));
           } else {
             var sc = sampledColor();
             setTheme(sc || baseColor()); // real header color; map only as fallback
@@ -434,7 +440,7 @@
             var __ps = document.querySelector('.page-section[data-sec="' + (__pg ? __pg.getAttribute('data-page') : '') + '"]');
             __psTop = __ps ? (__ps.scrollTop || 0) : 0;
           }
-          if ((window.scrollY || 0) <= 0 && __psTop <= 0 && e.touches[0].clientY - startY > 24) {
+          if ((window.scrollY || 0) <= 0 && __psTop <= 0 && homeScrollY() <= 0 && e.touches[0].clientY - startY > 24) {
             pulling = true; setTheme(baseColor()); // PULL = PINK lock, no white flip
             var nU = document.querySelector('nav.glass-nav');
             if (nU) {
@@ -447,7 +453,7 @@
           if (pulling) {
             pulling = false;
             var nU = document.querySelector('nav.glass-nav');
-            if (nU && (window.scrollY || 0) <= 18) nU.classList.remove('is-scrolled');
+            if (nU && homeScrollY() <= 18) nU.classList.remove('is-scrolled');
             try { onScroll(); } catch (e) {} // resync — theme color page par wapas
           }
         }, { passive: true });
@@ -2745,7 +2751,7 @@
             from { transform: translate3d(0,0,0); }
             to { transform: translate3d(-50%,0,0); }
         }
-        .home-topbar-inner {
+        .home-topbar-inner { position: relative; z-index: 1;
             display: flex; align-items: center; justify-content: space-between;
             width: 100%; height: 52px;
             overflow: visible;
@@ -22913,10 +22919,15 @@ function renderFreeFireGraphics() {
         }
         if (sidebarOpen) return;
         nav.classList.add('hero-over-image');
-        const y = (typeof yArg === 'number') ? yArg : (function () {
-            var hs = document.querySelector('.page-section[data-sec="home"]');
-            return (hs && document.getElementById('pageSlider')) ? (hs.scrollTop || 0) : (window.scrollY || document.documentElement.scrollTop || 0);
-        })();
+        const y = (typeof yArg === 'number') ? yArg : (typeof window.__andosHomeY === 'function'
+            ? window.__andosHomeY()
+            : (function () {
+                var hs = document.querySelector('.page-section[data-sec="home"]');
+                if (hs && document.getElementById('pageSlider')) return hs.scrollTop || 0;
+                var mainH = document.querySelector('main.andos-main');
+                if (mainH) return mainH.scrollTop || 0;
+                return window.scrollY || document.documentElement.scrollTop || 0;
+            })());
         if (window.__andosHdrRaf) cancelAnimationFrame(window.__andosHdrRaf);
         window.__andosHdrRaf = requestAnimationFrame(function () {
             window.__andosHdrRaf = null;
@@ -25469,7 +25480,7 @@ main.andos-main:not(:has(#pageSlider)) {
 
 /* l19: restore git-l header WITH verify tick. */
 /* l20: rest transparent. */
-/* l21: overlay banner under nav. l22: scroll bleed — status interpolates pink→white; white ONLY inside header. */
+/* l21: overlay banner under nav. l22: scroll bleed. l23: fade slab nahi — status se dheere khatm, niche transparent. */
 .andos-shell[data-page="home"] {
   position: relative !important;
 }
@@ -25487,19 +25498,46 @@ main.andos-main:not(:has(#pageSlider)) {
   width: 100% !important;
   z-index: 60 !important;
   --nv-glass: transparent !important;
-  /* l22: --hdr-p 0 = rest transparent; uthate hue status-white bleed SIRF header height */
-  background: linear-gradient(
-    to bottom,
-    rgba(255,255,255, var(--hdr-p, 0)) 0%,
-    rgba(255,255,255, calc(var(--hdr-p, 0) * 0.42)) 55%,
-    rgba(255,255,255, calc(var(--hdr-p, 0) * 0.12)) 100%
-  ) !important;
+  /* l23: nav khud transparent; bleed ::before par — is-scrolled 0.58 slab ko harao */
+  background: transparent !important;
+  background-image: none !important;
   background-color: transparent !important;
   border: none !important;
   border-bottom-color: transparent !important;
   box-shadow: none !important;
-  backdrop-filter: blur(calc(var(--hdr-p, 0) * 18px)) saturate(calc(100% + var(--hdr-p, 0) * 80%)) !important;
-  -webkit-backdrop-filter: blur(calc(var(--hdr-p, 0) * 18px)) saturate(calc(100% + var(--hdr-p, 0) * 80%)) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  overflow: visible !important;
+}
+.andos-shell[data-page="home"] > nav.glass-nav::before,
+.andos-shell[data-page="home"] > nav.home-topbar::before,
+.andos-shell[data-page="home"] nav.glass-nav.enterprise-nav.home-topbar::before,
+.andos-shell[data-page="home"] nav.glass-nav.enterprise-nav.hero-over-image::before,
+.andos-shell[data-page="home"] nav.glass-nav.is-scrolled::before,
+.andos-shell[data-page="home"] nav.home-topbar.is-scrolled::before,
+.andos-shell[data-page="home"] nav.glass-nav.enterprise-nav.hero-over-image.is-scrolled::before {
+  content: "" !important;
+  position: absolute !important;
+  left: 0 !important;
+  right: 0 !important;
+  top: 0 !important;
+  bottom: 0 !important;
+  pointer-events: none !important;
+  z-index: 0 !important;
+  /* upar status-match white; neeche 0 — solid bar nahi, content mein milna */
+  background: linear-gradient(
+    to bottom,
+    rgba(255,255,255, calc(var(--hdr-p, 0) * 0.96)) 0%,
+    rgba(255,255,255, calc(var(--hdr-p, 0) * 0.58)) 32%,
+    rgba(255,255,255, calc(var(--hdr-p, 0) * 0.22)) 62%,
+    rgba(255,255,255, calc(var(--hdr-p, 0) * 0.06)) 84%,
+    rgba(255,255,255, 0) 100%
+  ) !important;
+  box-shadow: 0 12px 18px -14px rgba(255,255,255, calc(var(--hdr-p, 0) * 0.5)) !important;
+  backdrop-filter: blur(calc(var(--hdr-p, 0) * 14px)) saturate(calc(100% + var(--hdr-p, 0) * 50%)) !important;
+  -webkit-backdrop-filter: blur(calc(var(--hdr-p, 0) * 14px)) saturate(calc(100% + var(--hdr-p, 0) * 50%)) !important;
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 36%, rgba(0,0,0,0.45) 68%, transparent 100%) !important;
+  mask-image: linear-gradient(to bottom, #000 0%, #000 36%, rgba(0,0,0,0.45) 68%, transparent 100%) !important;
 }
 .andos-shell[data-page="home"] .andos-main {
   padding-top: 0 !important;
