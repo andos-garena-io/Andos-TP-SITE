@@ -169,7 +169,7 @@
     <meta name="theme-color" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0f19">
-    <meta name="andos-build" content="andos-v3-20261029l27">
+    <meta name="andos-build" content="andos-v3-20261029l28">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -192,7 +192,7 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261029l27';
+        var HTML_BUILD_ID = 'andos-v3-20261029l28';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
@@ -364,14 +364,14 @@
           if (gateU && !gateU.classList.contains('yg-out')) { writeMetaTheme('#ffffff'); return; }
           p = Number(p) || 0;
           if (p < 0) p = 0; if (p > 1) p = 1;
-          // Chrome address-bar / status: har-frame mixHex = glitch. Sirf 2 states + hysteresis.
-          var last = window.__andosHomeTc || 'pink';
-          var next = last;
-          if (p <= 0.03) next = 'pink';
-          else if (p >= 0.18) next = 'white';
-          if (next === last) return;
-          window.__andosHomeTc = next;
-          writeMetaTheme(next === 'pink' ? PINK : WHITE);
+          // Header + status SAME mix. 8 steps (~har 20px) — combination hai, Chrome har-frame nahi.
+          var q = Math.round(p * 8) / 8;
+          var c = q <= 0 ? PINK : mixHex(PINK, WHITE, q);
+          var navC = document.querySelector('nav.glass-nav');
+          if (navC) { try { navC.style.setProperty('--hdr-c', p <= 0 ? PINK : mixHex(PINK, WHITE, p)); } catch (eC) {} }
+          if (window.__andosHomeTcQ === q) return;
+          window.__andosHomeTcQ = q;
+          writeMetaTheme(c);
         };
         function setTheme(c) {
           if (window.__andosSplashActive || document.getElementById('appSplashOverlay')) return;
@@ -429,13 +429,16 @@
           if (isHome) {
             var nav = document.querySelector('nav.glass-nav');
             var yU = homeScrollY();
-            var pU = yU / 80; if (pU < 0) pU = 0; if (pU > 1) pU = 1;
+            var pU = yU / 160; if (pU < 0) pU = 0; if (pU > 1) pU = 1;
             if (nav) {
-              try { nav.style.setProperty('--hdr-p', String(pU)); } catch (eH) {}
+              try {
+                nav.style.setProperty('--hdr-p', String(pU));
+                nav.style.setProperty('--hdr-c', pU <= 0 ? PINK : mixHex(PINK, WHITE, pU));
+              } catch (eH) {}
               if (pU > 0) nav.classList.add('hdr-bleed'); else nav.classList.remove('hdr-bleed');
             }
             if (typeof window.__andosHomeMetaP === 'function') window.__andosHomeMetaP(pU);
-            else setTheme(pU <= 0.03 ? PINK : WHITE);
+            else setTheme(pU <= 0 ? PINK : mixHex(PINK, WHITE, pU));
           } else {
             var sc = sampledColor();
             setTheme(sc || baseColor()); // real header color; map only as fallback
@@ -458,11 +461,11 @@
             __psTop = __ps ? (__ps.scrollTop || 0) : 0;
           }
           if ((window.scrollY || 0) <= 0 && __psTop <= 0 && homeScrollY() <= 0 && e.touches[0].clientY - startY > 24) {
-            pulling = true; window.__andosHomeTc = 'pink'; setTheme(baseColor()); // PULL = PINK lock, no white flip
+            pulling = true; window.__andosHomeTcQ = 0; setTheme(baseColor()); // PULL = PINK lock
             var nU = document.querySelector('nav.glass-nav');
             if (nU) {
               nU.classList.remove('is-scrolled', 'hdr-bleed');
-              try { nU.style.setProperty('--hdr-p', '0'); } catch (eP) {}
+              try { nU.style.setProperty('--hdr-p', '0'); nU.style.setProperty('--hdr-c', '#F9A8D4'); } catch (eP) {}
             }
           }
         }, { passive: true });
@@ -22955,7 +22958,7 @@ function renderFreeFireGraphics() {
         if (window.__andosHdrRaf) cancelAnimationFrame(window.__andosHdrRaf);
         window.__andosHdrRaf = requestAnimationFrame(function () {
             window.__andosHdrRaf = null;
-            var p = y / 80; if (p < 0) p = 0; if (p > 1) p = 1;
+            var p = y / 160; if (p < 0) p = 0; if (p > 1) p = 1;
             try { nav.style.setProperty('--hdr-p', String(p)); } catch (eH) {}
             nav.classList.toggle('is-scrolled', y > 18);
             if (p > 0) nav.classList.add('hdr-bleed'); else nav.classList.remove('hdr-bleed');
@@ -25543,7 +25546,7 @@ main.andos-main:not(:has(#pageSlider)) {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 }
-/* uthate: upar solid white (chrome/status match). Niche shadow-fade — koi backdrop-filter nahi (grey doodh band). */
+/* uthate: --hdr-c = status mix (pink→white). Header zyada cover, dheere solid, niche fade. */
 .andos-shell[data-page="home"] nav.glass-nav.hdr-bleed::before,
 .andos-shell[data-page="home"] nav.home-topbar.hdr-bleed::before {
   content: "" !important;
@@ -25557,14 +25560,14 @@ main.andos-main:not(:has(#pageSlider)) {
   z-index: 0 !important;
   background: linear-gradient(
     to bottom,
-    #ffffff 0%,
-    #ffffff 28%,
-    rgba(255,255,255, 0.72) 55%,
-    rgba(255,255,255, 0.28) 78%,
-    rgba(255,255,255, 0) 100%
+    var(--hdr-c, #ffffff) 0%,
+    color-mix(in srgb, var(--hdr-c, #ffffff) 88%, transparent) 38%,
+    color-mix(in srgb, var(--hdr-c, #ffffff) 48%, transparent) 68%,
+    color-mix(in srgb, var(--hdr-c, #ffffff) 16%, transparent) 90%,
+    transparent 100%
   ) !important;
-  opacity: var(--hdr-p, 0) !important;
-  box-shadow: inset 0 -18px 16px -12px rgba(255,255,255, calc(var(--hdr-p, 0) * 0.55)) !important;
+  opacity: 1 !important;
+  box-shadow: none !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
   -webkit-mask-image: none !important;
