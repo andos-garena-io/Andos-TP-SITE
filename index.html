@@ -169,7 +169,7 @@
     <meta name="theme-color" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0f19">
-    <meta name="andos-build" content="andos-v3-20261028l15">
+    <meta name="andos-build" content="andos-v3-20261028l16">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -192,7 +192,7 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261028l15';
+        var HTML_BUILD_ID = 'andos-v3-20261028l16';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
@@ -25444,7 +25444,8 @@ main.andos-main:not(:has(#pageSlider)) {
 }
 
 /* l4: frost header, no swipe, clean DP ring, funnel filter */
-/* l15: header EXACT from ANDOS-no-login.html — nothing else */
+/* l15: header EXACT from ANDOS-no-login.html — sticky + frost + hero pull-up */
+/* l16: DP ring RESTORED from l14 (Gemini padding conic). Do not restyle ring from the HTML file. */
 .andos-shell[data-page="home"] nav.glass-nav.enterprise-nav.hero-over-image,
 .andos-shell[data-page="home"] nav.home-topbar {
   position: sticky !important;
@@ -25477,44 +25478,41 @@ main.andos-main:not(:has(#pageSlider)) {
 
 nav.home-topbar .andos-avatar-btn {
   position: relative !important;
-  overflow: visible !important;
   width: 40px !important;
   height: 40px !important;
   flex: 0 0 40px !important;
-  padding: 0 !important;
+  padding: 3px !important;
   margin: 0 !important;
   border: 0 !important;
-  background: transparent !important;
-  background-image: none !important;
   border-radius: 50% !important;
+  overflow: hidden !important;
+  display: block !important;
+  background: conic-gradient(from 200deg, #1A73E8 0%, #669DF6 18%, #8B7CFF 42%, #4285F4 68%, #1A73E8 100%) !important;
   box-shadow: none !important;
 }
-nav.home-topbar .andos-avatar-ring {
-  display: block !important;
-  position: absolute !important;
-  inset: -2px !important;
-  border-radius: 50% !important;
-  background: conic-gradient(from 0deg, #c4b5fd, #f0abfc, #fda4af, #c4b5fd) !important;
-  animation: avatarSpin 4s linear infinite !important;
-  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 2px)) !important;
-  mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 2px)) !important;
-}
+nav.home-topbar .andos-avatar-ring { display: none !important; }
 nav.home-topbar .andos-avatar-btn img,
 nav.home-topbar .andos-avatar-btn #hdrLiveAva {
-  position: absolute !important;
-  inset: 0 !important;
-  width: 40px !important;
-  height: 40px !important;
-  object-fit: cover !important;
+  position: relative !important;
+  inset: auto !important;
+  width: 100% !important;
+  height: 100% !important;
   border-radius: 50% !important;
+  object-fit: cover !important;
   display: block !important;
   box-shadow: none !important;
-  background: transparent !important;
+  outline: none !important;
   border: 0 !important;
+  background: transparent !important;
+  z-index: 1 !important;
 }
 nav.home-topbar .andos-avatar-fallback {
-  position: absolute !important;
-  inset: 0 !important;
+  position: relative !important;
+  inset: auto !important;
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 50% !important;
+  box-shadow: none !important;
 }
 nav.home-topbar .andos-verified { display: none !important; }
 
