@@ -2666,8 +2666,7 @@
             /* ORIGINAL PINK MERGE (git FIX-T): rest = transparent — hero image/gradient shows through to status bar */
             background: transparent !important;
             background-image: none !important;
-            border: none !important;
-            border-bottom: none !important;
+            border-bottom-color: transparent !important;
             outline: none !important;
             box-shadow: none !important;
             backdrop-filter: none !important;
@@ -25326,8 +25325,7 @@ html, body, #app { background-color: #0b0f19 !important; background-image: none 
 .andos-shell[data-page="home"] nav.glass-nav.enterprise-nav.hero-over-image {
   background: transparent !important;
   background-image: none !important;
-  border: none !important;
-  border-bottom: none !important;
+  border-bottom-color: transparent !important;
   outline: none !important;
   box-shadow: none !important;
   backdrop-filter: none !important;
@@ -25447,6 +25445,21 @@ main.andos-main:not(:has(#pageSlider)) {
   padding-bottom: calc(var(--bottom-nav-height) + 16px) !important;
 }
 
+/* index.txt wala PWA header chrome — poster top fade + white frame (PWA/standalone) */
+html.is-pwa, html.is-pwa body { background: #ffffff !important; }
+html.is-pwa nav.glass-nav,
+html.is-pwa nav.home-topbar,
+html.is-pwa .enterprise-nav,
+html.is-pwa .home-topbar {
+  background: #ffffff !important;
+  padding-top: env(safe-area-inset-top, 0px) !important;
+  border-bottom-color: rgba(15,23,42,.06) !important;
+}
+html.is-pwa .home-hero-bleed::before { background: linear-gradient(to bottom, #ffffff 0%, rgba(255,255,255,.45) 55%, transparent 100%) !important; }
+@media (display-mode: standalone) {
+  html, body { background: #ffffff !important; }
+}
+
 /* l4: frost header, no swipe, clean DP ring, funnel filter */
 /* l18: V04 see-through frost; Home DP = mini login #yuvaGate .dp (bright gradient + white gap). */
 .andos-shell:not([data-page="home"]) nav.glass-nav.enterprise-nav {
@@ -25472,8 +25485,7 @@ main.andos-main:not(:has(#pageSlider)) {
   background: transparent !important;
   background-color: transparent !important;
   background-image: none !important;
-  border: none !important;
-  border-bottom: none !important;
+  border-bottom-color: transparent !important;
   box-shadow: none !important;
   outline: none !important;
   backdrop-filter: none !important;
@@ -25498,8 +25510,7 @@ main.andos-main:not(:has(#pageSlider)) {
   background: rgba(255,255,255,.58) !important;
   background-color: rgba(255,255,255,.58) !important;
   background-image: none !important;
-  border: none !important;
-  border-bottom: 1px solid rgba(15,23,42,0.06) !important;
+  border-bottom-color: rgba(15,23,42,0.06) !important;
   box-shadow: 0 1px 0 rgba(255,255,255,.35) inset, 0 10px 28px rgba(15,23,42,.06) !important;
   backdrop-filter: blur(16px) saturate(160%) !important;
   -webkit-backdrop-filter: blur(16px) saturate(160%) !important;
