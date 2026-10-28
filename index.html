@@ -169,7 +169,7 @@
     <meta name="theme-color" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0f19">
-    <meta name="andos-build" content="andos-v3-20261028l7">
+    <meta name="andos-build" content="andos-v3-20261028l8">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -192,7 +192,7 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261028l7';
+        var HTML_BUILD_ID = 'andos-v3-20261028l8';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
@@ -25444,22 +25444,33 @@ main.andos-main:not(:has(#pageSlider)) {
 }
 
 /* l4: frost header, no swipe, clean DP ring, funnel filter */
-/* l7: sticky seamless header — frost always, content scrolls behind */
+/* l8 = git 04dded6/445dc5c: rest TRANSPARENT so status bar + header + hero = one pink. sticky still. */
 .andos-shell[data-page="home"] nav.home-topbar,
-.andos-shell[data-page="home"] nav.glass-nav.enterprise-nav.hero-over-image,
+.andos-shell[data-page="home"] nav.glass-nav.enterprise-nav.hero-over-image {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 50 !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  border: none !important;
+  border-bottom: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
 .andos-shell[data-page="home"] nav.home-topbar.is-scrolled,
 .andos-shell[data-page="home"] nav.glass-nav.enterprise-nav.hero-over-image.is-scrolled {
   position: sticky !important;
   top: 0 !important;
   z-index: 50 !important;
-  padding-top: env(safe-area-inset-top, 0px) !important;
   background: rgba(249, 168, 212, 0.75) !important;
   background-color: rgba(249, 168, 212, 0.75) !important;
   background-image: none !important;
   border: none !important;
   border-bottom: none !important;
   box-shadow: none !important;
-  outline: none !important;
   backdrop-filter: blur(12px) !important;
   -webkit-backdrop-filter: blur(12px) !important;
 }
