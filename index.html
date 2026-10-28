@@ -169,7 +169,7 @@
     <meta name="theme-color" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0f19">
-    <meta name="andos-build" content="andos-v3-20261029l30">
+    <meta name="andos-build" content="andos-v3-20261029l31">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -192,7 +192,7 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261029l30';
+        var HTML_BUILD_ID = 'andos-v3-20261029l31';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
@@ -373,9 +373,9 @@
           var c = p <= 0 ? PINK : mixHex(PINK, WHITE, p);
           var navC = document.querySelector('nav.glass-nav');
           if (navC) {
-            // DP row (~55%) tak almost solid. Transparency DP ke neeche se shuru — kam fog.
-            var ks = [0, 0.18, 0.36, 0.50, 0.62, 0.74, 0.86, 0.94, 1];
-            var as = [1, 0.98, 0.94, 0.86, 0.62, 0.34, 0.12, 0.04, 0];
+            // Status+DP row solid (no milky white over poster). Fade sirf DP ke neeche.
+            var ks = [0, 0.42, 0.58, 0.72, 0.84, 0.93, 1];
+            var as = [1, 1, 1, 0.72, 0.28, 0.06, 0];
             var parts = [];
             for (var i = 0; i < ks.length; i++) {
               parts.push(rgbaHex(c, as[i]) + ' ' + (ks[i] * 100).toFixed(2) + '%');
@@ -14937,7 +14937,7 @@ const PLANS = {
             <nav class="glass-nav enterprise-nav home-topbar sticky top-0 z-40 hero-over-image">
                 <div class="home-topbar-inner">
                     <button type="button" class="andos-avatar-btn" onclick="toggleHdrMenu()" aria-label="Open menu">
-                        <span class="andos-avatar-ring" aria-hidden="true"></span>
+                        <span class="andos-avatar-ring" aria-hidden="true"><svg viewBox="0 0 100 100"><defs><linearGradient id="alg_home_dpGrad" x1="100%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#b8b1ff"/><stop offset="38%" stop-color="#7d92ff"/><stop offset="78%" stop-color="#2f7cf6"/><stop offset="100%" stop-color="#2b76f5"/></linearGradient></defs><circle cx="50" cy="50" r="46" fill="none" stroke="url(#alg_home_dpGrad)" stroke-width="8"/></svg></span>
                         ${avatarInner}
                         <span class="andos-verified" aria-label="Verified"><img class="andos-verified-img" src="${VERIFY_BADGE_URL}" alt=""></span>
                     </button>
@@ -25592,27 +25592,46 @@ main.andos-main:not(:has(#pageSlider)) {
 }
 #pageSlider { overflow-x: hidden !important; touch-action: pan-y !important; scroll-snap-type: none !important; }
 nav.home-topbar .andos-verified { display: none !important; }
-/* login guest DP ring — baahar #b8b1ff…#2b76f5, beech safed gap. Home chhota. */
+/* login guest SVG ring ON the DP circle — stroke #b8b1ff…#2b76f5, andar safed gap. 40px. */
 nav.home-topbar .andos-avatar-btn {
-  width: 44px !important;
-  height: 44px !important;
-  flex: 0 0 44px !important;
+  width: 40px !important;
+  height: 40px !important;
+  flex: 0 0 40px !important;
+  position: relative !important;
+  overflow: visible !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
 }
 nav.home-topbar .andos-avatar-ring {
+  position: absolute !important;
   inset: 0 !important;
-  border-radius: 50% !important;
-  background: linear-gradient(220deg, #b8b1ff 0%, #7d92ff 38%, #2f7cf6 78%, #2b76f5 100%) !important;
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 0 !important;
+  background: none !important;
   box-shadow: none !important;
+  pointer-events: none !important;
+  z-index: 2 !important;
+}
+nav.home-topbar .andos-avatar-ring svg {
+  display: block !important;
+  width: 40px !important;
+  height: 40px !important;
 }
 nav.home-topbar .andos-avatar-btn > img:not(.andos-verified-img),
 nav.home-topbar .andos-avatar-btn #hdrLiveAva,
 nav.home-topbar .andos-avatar-btn .andos-avatar-fallback {
-  inset: 4px !important;
+  position: absolute !important;
+  inset: 6px !important;
   width: auto !important;
   height: auto !important;
   border: 2px solid #ffffff !important;
   box-shadow: none !important;
   background: #eef2f7 !important;
+  border-radius: 50% !important;
+  z-index: 1 !important;
+  box-sizing: border-box !important;
 }
 
 #filter-btn.od-filterbtn {
