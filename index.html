@@ -169,7 +169,7 @@
     <meta name="theme-color" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0f19">
-    <meta name="andos-build" content="andos-v3-20261028l13">
+    <meta name="andos-build" content="andos-v3-20261028l14">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -192,7 +192,7 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261028l13';
+        var HTML_BUILD_ID = 'andos-v3-20261028l14';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
@@ -2671,8 +2671,8 @@
             -webkit-backdrop-filter: none !important;
         }
         .andos-shell[data-page="home"] nav.glass-nav.enterprise-nav.hero-over-image.is-scrolled {
-            /* scroll: pink mix glass — not white */
-            background: rgba(249, 168, 212, 0.85) !important;
+            /* git-l scroll glass: content hides behind blur */
+            background: rgba(255,255,255,.58) !important;
             border: none !important;
             border-bottom: none !important;
             outline: none !important;
@@ -25332,12 +25332,12 @@ html, body, #app { background-color: #0b0f19 !important; background-image: none 
 }
 .andos-shell[data-page="home"] nav.glass-nav.is-scrolled,
 .andos-shell[data-page="home"] nav.glass-nav.enterprise-nav.hero-over-image.is-scrolled {
-  background: rgba(249, 168, 212, 0.85) !important;
+  background: rgba(255,255,255,.58) !important;
   background-image: none !important;
   border: none !important;
   box-shadow: none !important;
-  backdrop-filter: blur(12px) !important;
-  -webkit-backdrop-filter: blur(12px) !important;
+  backdrop-filter: blur(16px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(160%) !important;
 }
 /* one scroller only: inner pages must NOT trap touch (overflow-x:hidden => overflow-y:auto trap) */
 .page-enter, main.andos-main, .andos-main.page-enter {
@@ -25492,11 +25492,11 @@ main.andos-main:not(:has(#pageSlider)) {
   right: 0 !important;
   width: 100% !important;
   z-index: 50 !important;
-  --nv-glass: rgba(249, 168, 212, 0.85) !important;
-  background: rgba(249, 168, 212, 0.85) !important;
-  background-color: rgba(249, 168, 212, 0.85) !important;
-  backdrop-filter: blur(12px) !important;
-  -webkit-backdrop-filter: blur(12px) !important;
+  --nv-glass: rgba(255,255,255,.58) !important;
+  background: rgba(255,255,255,.58) !important;
+  background-color: rgba(255,255,255,.58) !important;
+  backdrop-filter: blur(16px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(160%) !important;
 }
 .andos-shell[data-page="home"] .andos-main {
   padding-top: 0 !important;
@@ -25513,13 +25513,13 @@ nav.home-topbar .andos-avatar-btn {
   width: 40px !important;
   height: 40px !important;
   flex: 0 0 40px !important;
-  padding: 2px !important;
+  padding: 3px !important;
   margin: 0 !important;
   border: 0 !important;
   border-radius: 50% !important;
   overflow: hidden !important;
   display: block !important;
-  background: conic-gradient(from 220deg,#6f8cff,#eaf0ff 30%,#8fa6ff 61%,#e5ecff 82%,#6f8cff) !important;
+  background: conic-gradient(from 200deg, #1A73E8 0%, #669DF6 18%, #8B7CFF 42%, #4285F4 68%, #1A73E8 100%) !important;
   box-shadow: none !important;
 }
 nav.home-topbar .andos-avatar-ring { display: none !important; }
@@ -25533,6 +25533,8 @@ nav.home-topbar .andos-avatar-btn #hdrLiveAva {
   object-fit: cover !important;
   display: block !important;
   box-shadow: none !important;
+  outline: none !important;
+  border: 0 !important;
   background: transparent !important;
   z-index: 1 !important;
 }
