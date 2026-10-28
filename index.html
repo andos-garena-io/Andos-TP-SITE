@@ -169,7 +169,7 @@
     <meta name="theme-color" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0f19">
-    <meta name="andos-build" content="andos-v3-20261029l29">
+    <meta name="andos-build" content="andos-v3-20261029l30">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -192,7 +192,7 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261029l29';
+        var HTML_BUILD_ID = 'andos-v3-20261029l30';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
@@ -373,13 +373,12 @@
           var c = p <= 0 ? PINK : mixHex(PINK, WHITE, p);
           var navC = document.querySelector('nav.glass-nav');
           if (navC) {
-            // 13 stops, top = EXACT status color, smoothstep fade — color-mix band nahi
-            var ks = [0, 0.08, 0.16, 0.24, 0.32, 0.42, 0.52, 0.62, 0.72, 0.82, 0.90, 0.96, 1];
+            // DP row (~55%) tak almost solid. Transparency DP ke neeche se shuru — kam fog.
+            var ks = [0, 0.18, 0.36, 0.50, 0.62, 0.74, 0.86, 0.94, 1];
+            var as = [1, 0.98, 0.94, 0.86, 0.62, 0.34, 0.12, 0.04, 0];
             var parts = [];
             for (var i = 0; i < ks.length; i++) {
-              var k = ks[i], t = 1 - k, a = t * t * (3 - 2 * t);
-              if (k >= 1) a = 0;
-              parts.push(rgbaHex(c, a) + ' ' + (k * 100).toFixed(2) + '%');
+              parts.push(rgbaHex(c, as[i]) + ' ' + (ks[i] * 100).toFixed(2) + '%');
             }
             try {
               navC.style.setProperty('--hdr-grad', 'linear-gradient(to bottom,' + parts.join(',') + ')');
@@ -25592,7 +25591,29 @@ main.andos-main:not(:has(#pageSlider)) {
   margin-top: 0 !important;
 }
 #pageSlider { overflow-x: hidden !important; touch-action: pan-y !important; scroll-snap-type: none !important; }
-nav.home-topbar .andos-verified { display: flex !important; }
+nav.home-topbar .andos-verified { display: none !important; }
+/* login guest DP ring — baahar #b8b1ff…#2b76f5, beech safed gap. Home chhota. */
+nav.home-topbar .andos-avatar-btn {
+  width: 44px !important;
+  height: 44px !important;
+  flex: 0 0 44px !important;
+}
+nav.home-topbar .andos-avatar-ring {
+  inset: 0 !important;
+  border-radius: 50% !important;
+  background: linear-gradient(220deg, #b8b1ff 0%, #7d92ff 38%, #2f7cf6 78%, #2b76f5 100%) !important;
+  box-shadow: none !important;
+}
+nav.home-topbar .andos-avatar-btn > img:not(.andos-verified-img),
+nav.home-topbar .andos-avatar-btn #hdrLiveAva,
+nav.home-topbar .andos-avatar-btn .andos-avatar-fallback {
+  inset: 4px !important;
+  width: auto !important;
+  height: auto !important;
+  border: 2px solid #ffffff !important;
+  box-shadow: none !important;
+  background: #eef2f7 !important;
+}
 
 #filter-btn.od-filterbtn {
   width: 42px;
