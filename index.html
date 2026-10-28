@@ -169,7 +169,7 @@
     <meta name="theme-color" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0f19">
-    <meta name="andos-build" content="andos-v3-20261029l28">
+    <meta name="andos-build" content="andos-v3-20261029l29">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -192,7 +192,7 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261029l28';
+        var HTML_BUILD_ID = 'andos-v3-20261029l29';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
@@ -334,19 +334,25 @@
         }
         window.__andosWriteMetaTheme = writeMetaTheme;
         // FIX-U(1): home glass progress -> status-bar color INTERPOLATE (jump band)
+        function hexRgb(h) {
+          h = String(h || '').replace('#', '');
+          if (h.length === 3) h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
+          return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)];
+        }
         function mixHex(a, b, t) {
           t = t < 0 ? 0 : t > 1 ? 1 : t;
-          function hex(h) {
-            h = String(h || '').replace('#', '');
-            if (h.length === 3) h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
-            return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)];
-          }
-          var A = hex(a), B = hex(b);
+          var A = hexRgb(a), B = hexRgb(b);
           var r = Math.round(A[0] + (B[0] - A[0]) * t);
           var g = Math.round(A[1] + (B[1] - A[1]) * t);
           var bl = Math.round(A[2] + (B[2] - A[2]) * t);
           return '#' + [r, g, bl].map(function (x) { return ('0' + x.toString(16)).slice(-2); }).join('');
         }
+        function rgbaHex(h, a) {
+          var A = hexRgb(h);
+          if (a < 0) a = 0; if (a > 1) a = 1;
+          return 'rgba(' + A[0] + ',' + A[1] + ',' + A[2] + ',' + a + ')';
+        }
+        window.__andosMixHex = mixHex;
         function homeScrollY() {
           var hs = document.querySelector('.page-section[data-sec="home"]');
           if (hs && document.getElementById('pageSlider')) return hs.scrollTop || 0;
@@ -355,7 +361,7 @@
           return window.scrollY || document.documentElement.scrollTop || 0;
         }
         window.__andosHomeY = homeScrollY;
-        window.__andosHomeMetaP = function (p) {
+        window.__andosPaintHomeHdr = function (p) {
           if (window.__andosSplashActive || document.getElementById('appSplashOverlay')) {
             writeMetaTheme('#000000');
             return;
@@ -364,15 +370,26 @@
           if (gateU && !gateU.classList.contains('yg-out')) { writeMetaTheme('#ffffff'); return; }
           p = Number(p) || 0;
           if (p < 0) p = 0; if (p > 1) p = 1;
-          // Header + status SAME mix. 8 steps (~har 20px) — combination hai, Chrome har-frame nahi.
-          var q = Math.round(p * 8) / 8;
-          var c = q <= 0 ? PINK : mixHex(PINK, WHITE, q);
+          var c = p <= 0 ? PINK : mixHex(PINK, WHITE, p);
           var navC = document.querySelector('nav.glass-nav');
-          if (navC) { try { navC.style.setProperty('--hdr-c', p <= 0 ? PINK : mixHex(PINK, WHITE, p)); } catch (eC) {} }
-          if (window.__andosHomeTcQ === q) return;
-          window.__andosHomeTcQ = q;
+          if (navC) {
+            // 13 stops, top = EXACT status color, smoothstep fade — color-mix band nahi
+            var ks = [0, 0.08, 0.16, 0.24, 0.32, 0.42, 0.52, 0.62, 0.72, 0.82, 0.90, 0.96, 1];
+            var parts = [];
+            for (var i = 0; i < ks.length; i++) {
+              var k = ks[i], t = 1 - k, a = t * t * (3 - 2 * t);
+              if (k >= 1) a = 0;
+              parts.push(rgbaHex(c, a) + ' ' + (k * 100).toFixed(2) + '%');
+            }
+            try {
+              navC.style.setProperty('--hdr-grad', 'linear-gradient(to bottom,' + parts.join(',') + ')');
+              navC.style.setProperty('--hdr-p', String(p));
+            } catch (eC) {}
+            if (p > 0.001) navC.classList.add('hdr-bleed'); else navC.classList.remove('hdr-bleed');
+          }
           writeMetaTheme(c);
         };
+        window.__andosHomeMetaP = window.__andosPaintHomeHdr;
         function setTheme(c) {
           if (window.__andosSplashActive || document.getElementById('appSplashOverlay')) return;
           var m = document.querySelector('meta[name="theme-color"]');
@@ -427,17 +444,9 @@
           // PULL-DOWN = PINK lock — koi white flash band nahi (Boss fix)
           if (pulling && isHome) { setTheme(baseColor()); return; }
           if (isHome) {
-            var nav = document.querySelector('nav.glass-nav');
             var yU = homeScrollY();
             var pU = yU / 160; if (pU < 0) pU = 0; if (pU > 1) pU = 1;
-            if (nav) {
-              try {
-                nav.style.setProperty('--hdr-p', String(pU));
-                nav.style.setProperty('--hdr-c', pU <= 0 ? PINK : mixHex(PINK, WHITE, pU));
-              } catch (eH) {}
-              if (pU > 0) nav.classList.add('hdr-bleed'); else nav.classList.remove('hdr-bleed');
-            }
-            if (typeof window.__andosHomeMetaP === 'function') window.__andosHomeMetaP(pU);
+            if (typeof window.__andosPaintHomeHdr === 'function') window.__andosPaintHomeHdr(pU);
             else setTheme(pU <= 0 ? PINK : mixHex(PINK, WHITE, pU));
           } else {
             var sc = sampledColor();
@@ -461,11 +470,14 @@
             __psTop = __ps ? (__ps.scrollTop || 0) : 0;
           }
           if ((window.scrollY || 0) <= 0 && __psTop <= 0 && homeScrollY() <= 0 && e.touches[0].clientY - startY > 24) {
-            pulling = true; window.__andosHomeTcQ = 0; setTheme(baseColor()); // PULL = PINK lock
+            pulling = true; setTheme(baseColor());
             var nU = document.querySelector('nav.glass-nav');
             if (nU) {
               nU.classList.remove('is-scrolled', 'hdr-bleed');
-              try { nU.style.setProperty('--hdr-p', '0'); nU.style.setProperty('--hdr-c', '#F9A8D4'); } catch (eP) {}
+              try {
+                nU.style.setProperty('--hdr-p', '0');
+                nU.style.setProperty('--hdr-grad', 'none');
+              } catch (eP) {}
             }
           }
         }, { passive: true });
@@ -22959,10 +22971,9 @@ function renderFreeFireGraphics() {
         window.__andosHdrRaf = requestAnimationFrame(function () {
             window.__andosHdrRaf = null;
             var p = y / 160; if (p < 0) p = 0; if (p > 1) p = 1;
-            try { nav.style.setProperty('--hdr-p', String(p)); } catch (eH) {}
             nav.classList.toggle('is-scrolled', y > 18);
-            if (p > 0) nav.classList.add('hdr-bleed'); else nav.classList.remove('hdr-bleed');
-            if (typeof window.__andosHomeMetaP === 'function') window.__andosHomeMetaP(p);
+            if (typeof window.__andosPaintHomeHdr === 'function') window.__andosPaintHomeHdr(p);
+            else if (typeof window.__andosHomeMetaP === 'function') window.__andosHomeMetaP(p);
         });
     }
     if (!window.__andosHeroNavBound) {
@@ -25558,15 +25569,9 @@ main.andos-main:not(:has(#pageSlider)) {
   bottom: 0 !important;
   pointer-events: none !important;
   z-index: 0 !important;
-  background: linear-gradient(
-    to bottom,
-    var(--hdr-c, #ffffff) 0%,
-    color-mix(in srgb, var(--hdr-c, #ffffff) 88%, transparent) 38%,
-    color-mix(in srgb, var(--hdr-c, #ffffff) 48%, transparent) 68%,
-    color-mix(in srgb, var(--hdr-c, #ffffff) 16%, transparent) 90%,
-    transparent 100%
-  ) !important;
+  background: var(--hdr-grad, none) !important;
   opacity: 1 !important;
+  will-change: background-image;
   box-shadow: none !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
