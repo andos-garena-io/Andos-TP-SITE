@@ -169,7 +169,7 @@
     <meta name="theme-color" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0f19">
-    <meta name="andos-build" content="andos-v3-20261028l12">
+    <meta name="andos-build" content="andos-v3-20261028l13">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -192,7 +192,7 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261028l12';
+        var HTML_BUILD_ID = 'andos-v3-20261028l13';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
@@ -25510,40 +25510,39 @@ main.andos-main:not(:has(#pageSlider)) {
 
 nav.home-topbar .andos-avatar-btn {
   position: relative !important;
-  width: 44px !important;
-  height: 44px !important;
-  flex: 0 0 44px !important;
+  width: 40px !important;
+  height: 40px !important;
+  flex: 0 0 40px !important;
   padding: 2px !important;
   margin: 0 !important;
   border: 0 !important;
   border-radius: 50% !important;
-  overflow: visible !important;
-  display: grid !important;
-  place-items: center !important;
-  background: conic-gradient(from -90deg, #2A75FF, #4F46E5, #7C3AED, #2A75FF) !important;
-  box-shadow: 0 0 12px rgba(42, 117, 255, 0.4) !important;
+  overflow: hidden !important;
+  display: block !important;
+  background: conic-gradient(from 220deg,#6f8cff,#eaf0ff 30%,#8fa6ff 61%,#e5ecff 82%,#6f8cff) !important;
+  box-shadow: none !important;
 }
 nav.home-topbar .andos-avatar-ring { display: none !important; }
 nav.home-topbar .andos-avatar-btn img,
 nav.home-topbar .andos-avatar-btn #hdrLiveAva {
   position: relative !important;
   inset: auto !important;
-  width: 36px !important;
-  height: 36px !important;
+  width: 100% !important;
+  height: 100% !important;
   border-radius: 50% !important;
   object-fit: cover !important;
   display: block !important;
-  box-shadow: 0 0 0 2px #fff !important;
-  background: #fff !important;
+  box-shadow: none !important;
+  background: transparent !important;
   z-index: 1 !important;
 }
 nav.home-topbar .andos-avatar-fallback {
   position: relative !important;
   inset: auto !important;
-  width: 36px !important;
-  height: 36px !important;
+  width: 100% !important;
+  height: 100% !important;
   border-radius: 50% !important;
-  box-shadow: 0 0 0 2px #fff !important;
+  box-shadow: none !important;
 }
 nav.home-topbar .andos-verified { display: none !important; }
 
