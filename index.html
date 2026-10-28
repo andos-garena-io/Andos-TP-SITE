@@ -169,7 +169,7 @@
     <meta name="theme-color" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0f19">
-    <meta name="andos-build" content="andos-v3-20261028l14">
+    <meta name="andos-build" content="andos-v3-20261028l15">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -192,7 +192,7 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261028l14';
+        var HTML_BUILD_ID = 'andos-v3-20261028l15';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
@@ -25444,107 +25444,77 @@ main.andos-main:not(:has(#pageSlider)) {
 }
 
 /* l4: frost header, no swipe, clean DP ring, funnel filter */
-/* l12 = V03/V07/V15: header TRANSPARENT overlay on banner. NOT full-app pink. */
-.andos-shell:not([data-page="home"]) nav.glass-nav.enterprise-nav {
+/* l15: header EXACT from ANDOS-no-login.html — nothing else */
+.andos-shell[data-page="home"] nav.glass-nav.enterprise-nav.hero-over-image,
+.andos-shell[data-page="home"] nav.home-topbar {
   position: sticky !important;
   top: 0 !important;
   z-index: 50 !important;
-}
-.andos-shell[data-page="home"] {
-  position: relative !important;
-}
-.andos-shell[data-page="home"] > nav.glass-nav,
-.andos-shell[data-page="home"] > nav.home-topbar,
-.andos-shell[data-page="home"] nav.glass-nav,
-.andos-shell[data-page="home"] nav.home-topbar,
-.andos-shell[data-page="home"] nav.glass-nav.enterprise-nav,
-.andos-shell[data-page="home"] nav.glass-nav.enterprise-nav.hero-over-image {
-  position: absolute !important;
-  top: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  width: 100% !important;
-  z-index: 50 !important;
-  padding-top: env(safe-area-inset-top, 0px) !important;
-  --nv-glass: transparent !important;
   background: transparent !important;
   background-color: transparent !important;
   background-image: none !important;
-  border: none !important;
-  border-bottom: none !important;
+  border-bottom-color: transparent !important;
   box-shadow: none !important;
-  outline: none !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
-  pointer-events: none !important;
 }
-.andos-shell[data-page="home"] nav.glass-nav *,
-.andos-shell[data-page="home"] nav.home-topbar * {
-  pointer-events: auto !important;
-}
-.andos-shell[data-page="home"] nav.glass-nav.is-scrolled,
-.andos-shell[data-page="home"] nav.home-topbar.is-scrolled,
-.andos-shell[data-page="home"] nav.glass-nav.enterprise-nav.is-scrolled,
-.andos-shell[data-page="home"] nav.glass-nav.enterprise-nav.hero-over-image.is-scrolled {
-  position: absolute !important;
+.andos-shell[data-page="home"] nav.glass-nav.enterprise-nav.hero-over-image.is-scrolled,
+.andos-shell[data-page="home"] nav.home-topbar.is-scrolled {
+  position: sticky !important;
   top: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  width: 100% !important;
   z-index: 50 !important;
-  --nv-glass: rgba(255,255,255,.58) !important;
   background: rgba(255,255,255,.58) !important;
   background-color: rgba(255,255,255,.58) !important;
+  border-bottom-color: rgba(15, 23, 42, 0.06) !important;
+  box-shadow: 0 1px 0 rgba(255,255,255,.35) inset, 0 10px 28px rgba(15,23,42,.06) !important;
   backdrop-filter: blur(16px) saturate(160%) !important;
   -webkit-backdrop-filter: blur(16px) saturate(160%) !important;
 }
-.andos-shell[data-page="home"] .andos-main {
-  padding-top: 0 !important;
+.andos-shell[data-page="home"] .home-hero-stage {
+  margin: calc(-1 * (52px + env(safe-area-inset-top, 0px))) 0 4px !important;
 }
-.andos-shell[data-page="home"] .home-hero-stage,
-.page-section[data-sec="home"] .home-hero-stage {
-  margin-top: 0 !important;
-}
-.home-hero-bleed { background: #F9A8D4 !important; }
 #pageSlider { overflow-x: hidden !important; touch-action: pan-y !important; scroll-snap-type: none !important; }
 
 nav.home-topbar .andos-avatar-btn {
   position: relative !important;
+  overflow: visible !important;
   width: 40px !important;
   height: 40px !important;
   flex: 0 0 40px !important;
-  padding: 3px !important;
+  padding: 0 !important;
   margin: 0 !important;
   border: 0 !important;
+  background: transparent !important;
+  background-image: none !important;
   border-radius: 50% !important;
-  overflow: hidden !important;
-  display: block !important;
-  background: conic-gradient(from 200deg, #1A73E8 0%, #669DF6 18%, #8B7CFF 42%, #4285F4 68%, #1A73E8 100%) !important;
   box-shadow: none !important;
 }
-nav.home-topbar .andos-avatar-ring { display: none !important; }
+nav.home-topbar .andos-avatar-ring {
+  display: block !important;
+  position: absolute !important;
+  inset: -2px !important;
+  border-radius: 50% !important;
+  background: conic-gradient(from 0deg, #c4b5fd, #f0abfc, #fda4af, #c4b5fd) !important;
+  animation: avatarSpin 4s linear infinite !important;
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 2px)) !important;
+  mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 2px)) !important;
+}
 nav.home-topbar .andos-avatar-btn img,
 nav.home-topbar .andos-avatar-btn #hdrLiveAva {
-  position: relative !important;
-  inset: auto !important;
-  width: 100% !important;
-  height: 100% !important;
-  border-radius: 50% !important;
+  position: absolute !important;
+  inset: 0 !important;
+  width: 40px !important;
+  height: 40px !important;
   object-fit: cover !important;
+  border-radius: 50% !important;
   display: block !important;
   box-shadow: none !important;
-  outline: none !important;
-  border: 0 !important;
   background: transparent !important;
-  z-index: 1 !important;
+  border: 0 !important;
 }
 nav.home-topbar .andos-avatar-fallback {
-  position: relative !important;
-  inset: auto !important;
-  width: 100% !important;
-  height: 100% !important;
-  border-radius: 50% !important;
-  box-shadow: none !important;
+  position: absolute !important;
+  inset: 0 !important;
 }
 nav.home-topbar .andos-verified { display: none !important; }
 
