@@ -169,7 +169,7 @@
     <meta name="theme-color" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0f19">
-    <meta name="andos-build" content="andos-v3-20261029l25">
+    <meta name="andos-build" content="andos-v3-20261029l26">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -192,7 +192,7 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261029l25';
+        var HTML_BUILD_ID = 'andos-v3-20261029l26';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
@@ -25499,8 +25499,7 @@ main.andos-main:not(:has(#pageSlider)) {
 
 /* l19: restore git-l header WITH verify tick. */
 /* l20: rest transparent. */
-/* l21: overlay banner under nav. l25: rest = koi ::before nahi (print/pink original).
-   scroll: header TOP solid white (status se jude), dheere neeche chhota blur. */
+/* l21: overlay banner under nav. l26: uthate — upar solid white (hide), niche jaate blur/shadow. rest print original. */
 .andos-shell[data-page="home"] {
   position: relative !important;
 }
@@ -25538,7 +25537,7 @@ main.andos-main:not(:has(#pageSlider)) {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 }
-/* uthate: TOP = solid white (status jaisa). Neeche header-start par hi chhota blur. */
+/* uthate: content upar jaate hide. Upar = solid white. Niche aate blur/shadow badhta. */
 .andos-shell[data-page="home"] nav.glass-nav.hdr-bleed::before,
 .andos-shell[data-page="home"] nav.home-topbar.hdr-bleed::before {
   content: "" !important;
@@ -25552,13 +25551,14 @@ main.andos-main:not(:has(#pageSlider)) {
   z-index: 0 !important;
   background: linear-gradient(
     to bottom,
-    rgba(255,255,255, calc(var(--hdr-p, 0) * 1)) 0%,
-    rgba(255,255,255, calc(var(--hdr-p, 0) * 1)) 22%,
-    rgba(255,255,255, calc(var(--hdr-p, 0) * 0.62)) 48%,
-    rgba(255,255,255, calc(var(--hdr-p, 0) * 0.18)) 78%,
+    #ffffff 0%,
+    #ffffff 32%,
+    rgba(255,255,255, 0.82) 52%,
+    rgba(255,255,255, 0.38) 74%,
     rgba(255,255,255, 0) 100%
   ) !important;
-  box-shadow: none !important;
+  opacity: var(--hdr-p, 0) !important;
+  box-shadow: 0 14px 22px -10px rgba(255,255,255, calc(var(--hdr-p, 0) * 0.7)) !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
   -webkit-mask-image: none !important;
@@ -25571,16 +25571,17 @@ main.andos-main:not(:has(#pageSlider)) {
   position: absolute !important;
   left: 0 !important;
   right: 0 !important;
+  top: 0 !important;
   bottom: 0 !important;
-  top: auto !important;
-  height: 38% !important;
+  height: auto !important;
   pointer-events: none !important;
   z-index: 0 !important;
   background: transparent !important;
-  backdrop-filter: blur(calc(var(--hdr-p, 0) * 16px)) saturate(140%) !important;
-  -webkit-backdrop-filter: blur(calc(var(--hdr-p, 0) * 16px)) saturate(140%) !important;
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 55%, #000 100%) !important;
-  mask-image: linear-gradient(to bottom, transparent 0%, #000 55%, #000 100%) !important;
+  opacity: var(--hdr-p, 0) !important;
+  backdrop-filter: blur(18px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(160%) !important;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, transparent 24%, rgba(0,0,0,0.45) 58%, #000 100%) !important;
+  mask-image: linear-gradient(to bottom, transparent 0%, transparent 24%, rgba(0,0,0,0.45) 58%, #000 100%) !important;
 }
 .andos-shell[data-page="home"] .andos-main {
   padding-top: 0 !important;
