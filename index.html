@@ -169,7 +169,7 @@
     <meta name="theme-color" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0f19">
-    <meta name="andos-build" content="andos-v3-20261029l32">
+    <meta name="andos-build" content="andos-v3-20261029l33">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -192,7 +192,7 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261029l32';
+        var HTML_BUILD_ID = 'andos-v3-20261029l33';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
@@ -373,15 +373,19 @@
           var c = p <= 0 ? PINK : mixHex(PINK, WHITE, p);
           var navC = document.querySelector('nav.glass-nav');
           if (navC) {
-            // Status+DP row solid (no milky white over poster). Fade sirf DP ke neeche.
-            var ks = [0, 0.42, 0.58, 0.72, 0.84, 0.93, 1];
-            var as = [1, 1, 1, 0.72, 0.28, 0.06, 0];
+            // Header area solid white (kam transparent). Fade header ke thoda neeche — chhota side-effect.
+            var ks = [0, 0.14, 0.28, 0.42, 0.55, 0.66, 0.76, 0.84, 0.90, 0.95, 1];
+            var as = [1, 1, 1, 1, 1, 0.96, 0.82, 0.52, 0.24, 0.08, 0];
             var parts = [];
             for (var i = 0; i < ks.length; i++) {
               parts.push(rgbaHex(c, as[i]) + ' ' + (ks[i] * 100).toFixed(2) + '%');
             }
+            var g = 'linear-gradient(to bottom,' + parts.join(',') + ')';
             try {
-              navC.style.setProperty('--hdr-grad', 'linear-gradient(to bottom,' + parts.join(',') + ')');
+              if (navC.__andosLastGrad !== g) {
+                navC.style.setProperty('--hdr-grad', g);
+                navC.__andosLastGrad = g;
+              }
               navC.style.setProperty('--hdr-p', String(p));
             } catch (eC) {}
             if (p > 0.001) navC.classList.add('hdr-bleed'); else navC.classList.remove('hdr-bleed');
@@ -25565,7 +25569,7 @@ main.andos-main:not(:has(#pageSlider)) {
   left: 0 !important;
   right: 0 !important;
   top: 0 !important;
-  bottom: 0 !important;
+  bottom: -18px !important;
   pointer-events: none !important;
   z-index: 0 !important;
   background: var(--hdr-grad, none) !important;
