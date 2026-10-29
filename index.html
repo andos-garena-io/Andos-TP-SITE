@@ -169,7 +169,7 @@
     <meta name="theme-color" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0f19">
-    <meta name="andos-build" content="andos-v3-20261030l51">
+    <meta name="andos-build" content="andos-v3-20261030l52">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -192,7 +192,7 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261030l51';
+        var HTML_BUILD_ID = 'andos-v3-20261030l52';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
@@ -25603,7 +25603,7 @@ main.andos-main:not(:has(#pageSlider)) {
 #pageSlider { overflow-x: hidden !important; touch-action: pan-y !important; scroll-snap-type: none !important; }
 nav.home-topbar .andos-verified { display: none !important; }
 /* DP 40px original slot. Ring = usi circle ka border (login colours + safed gap). Alag blob nahi. */
-/* l51: DP ring = outer conic + white gap + metal. Photo sirf center. % = har size. */
+/* l52: GH-ref — moti cyan-blue ring, mota white gap, patli chrome, photo cover */
 nav.home-topbar .andos-avatar-btn {
   width: 40px !important;
   height: 40px !important;
@@ -25612,10 +25612,10 @@ nav.home-topbar .andos-avatar-btn {
   position: relative !important;
   box-sizing: border-box !important;
   overflow: hidden !important;
-  padding: 6% !important;
+  padding: 10% !important;
   border: 0 !important;
   border-radius: 50% !important;
-  background: conic-gradient(from 220deg, #0785ff, #168bff, #a5a4ff, #168bff, #0785ff) !important;
+  background: conic-gradient(from 200deg, #00a8ff 0%, #0096ff 22%, #2f8fff 48%, #7aa3ff 72%, #4db8ff 88%, #00a8ff 100%) !important;
   box-shadow: none !important;
 }
 nav.home-topbar .andos-avatar-ring {
@@ -25628,7 +25628,7 @@ nav.home-topbar .andos-dp-gap {
   width: 100% !important;
   height: 100% !important;
   border-radius: 50% !important;
-  padding: 5% !important;
+  padding: 9% !important;
   background: #ffffff !important;
   box-sizing: border-box !important;
   overflow: hidden !important;
@@ -25638,11 +25638,11 @@ nav.home-topbar .andos-dp-metal {
   width: 100% !important;
   height: 100% !important;
   border-radius: 50% !important;
-  padding: 3px !important;
-  background: linear-gradient(135deg, #343b40, #ffffff, #707b82, #00eaff, #252b30) !important;
+  padding: 2px !important;
+  background: linear-gradient(145deg, #f5f7fa 0%, #c5ccd3 18%, #ffffff 40%, #8b959e 58%, #e8edf1 78%, #4a525a 100%) !important;
   box-sizing: border-box !important;
   overflow: hidden !important;
-  box-shadow: 0 0 5px #00dfff !important;
+  box-shadow: inset 0 0 3px 1px rgba(0, 234, 255, 0.85), 0 0 4px rgba(0, 229, 255, 0.55) !important;
 }
 nav.home-topbar .andos-avatar-btn img:not(.andos-verified-img),
 nav.home-topbar .andos-avatar-btn #hdrLiveAva,
