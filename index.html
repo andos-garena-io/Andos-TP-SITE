@@ -169,7 +169,7 @@
     <meta name="theme-color" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0f19">
-    <meta name="andos-build" content="andos-v3-20261029l38">
+    <meta name="andos-build" content="andos-v3-20261029l39">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -192,7 +192,7 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261029l38';
+        var HTML_BUILD_ID = 'andos-v3-20261029l39';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
@@ -25505,7 +25505,14 @@ main.andos-main:not(:has(#pageSlider)) {
 }
 .page-section[data-sec="home"] footer,
 .andos-shell[data-page="home"] footer {
-  padding-bottom: calc(var(--bottom-nav-height) + 16px) !important;
+  padding-bottom: calc(var(--bottom-nav-height) + 48px) !important;
+}
+/* l39: baaki slider tabs — last block bottom-nav ke peeche hide na ho */
+.page-section[data-sec="categories"] .catd-page,
+.page-section[data-sec="orders"] .od-page,
+.page-section[data-sec="wallet"] .wal-page,
+.page-section[data-sec="account"] .pf-page {
+  padding-bottom: calc(var(--bottom-nav-height) + 48px) !important;
 }
 
 /* l19: restore git-l header WITH verify tick. */
