@@ -169,7 +169,7 @@
     <meta name="theme-color" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0f19">
-    <meta name="andos-build" content="andos-v3-20261030l50">
+    <meta name="andos-build" content="andos-v3-20261030l51">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -192,7 +192,7 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261030l50';
+        var HTML_BUILD_ID = 'andos-v3-20261030l51';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
@@ -25603,11 +25603,12 @@ main.andos-main:not(:has(#pageSlider)) {
 #pageSlider { overflow-x: hidden !important; touch-action: pan-y !important; scroll-snap-type: none !important; }
 nav.home-topbar .andos-verified { display: none !important; }
 /* DP 40px original slot. Ring = usi circle ka border (login colours + safed gap). Alag blob nahi. */
-/* l50: user ring CSS as-is, % so har size pe same */
+/* l51: DP ring = outer conic + white gap + metal. Photo sirf center. % = har size. */
 nav.home-topbar .andos-avatar-btn {
   width: 40px !important;
   height: 40px !important;
   flex: 0 0 40px !important;
+  aspect-ratio: 1 / 1 !important;
   position: relative !important;
   box-sizing: border-box !important;
   overflow: hidden !important;
@@ -25637,31 +25638,40 @@ nav.home-topbar .andos-dp-metal {
   width: 100% !important;
   height: 100% !important;
   border-radius: 50% !important;
-  padding: 3% !important;
+  padding: 3px !important;
   background: linear-gradient(135deg, #343b40, #ffffff, #707b82, #00eaff, #252b30) !important;
   box-sizing: border-box !important;
   overflow: hidden !important;
+  box-shadow: 0 0 5px #00dfff !important;
 }
-nav.home-topbar .andos-avatar-btn > img:not(.andos-verified-img),
+nav.home-topbar .andos-avatar-btn img:not(.andos-verified-img),
 nav.home-topbar .andos-avatar-btn #hdrLiveAva,
+nav.home-topbar .andos-avatar-btn [data-live-avatar],
 nav.home-topbar .andos-avatar-btn .andos-avatar-fallback,
-nav.home-topbar .andos-dp-metal > img:not(.andos-verified-img),
+nav.home-topbar .andos-dp-metal > img,
 nav.home-topbar .andos-dp-metal #hdrLiveAva,
 nav.home-topbar .andos-dp-metal .andos-avatar-fallback {
-  position: relative !important;
-  inset: auto !important;
+  position: static !important;
+  inset: unset !important;
+  left: auto !important;
+  top: auto !important;
+  right: auto !important;
+  bottom: auto !important;
   display: block !important;
   width: 100% !important;
   height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
   box-sizing: border-box !important;
   border-radius: 50% !important;
   object-fit: cover !important;
+  object-position: center !important;
   padding: 0 !important;
   border: 0 !important;
-  background: #111820 !important;
+  background: transparent !important;
   background-image: none !important;
   box-shadow: none !important;
-  z-index: 1 !important;
+  z-index: auto !important;
 }
 /* poster top pe white dhund band — hero ::before + top mask. Header fade alag. */
 .andos-shell[data-page="home"] .home-hero-bleed {
