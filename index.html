@@ -169,7 +169,7 @@
     <meta name="theme-color" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0f19">
-    <meta name="andos-build" content="andos-v3-20261029l35">
+    <meta name="andos-build" content="andos-v3-20261029l36">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -192,7 +192,7 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261029l35';
+        var HTML_BUILD_ID = 'andos-v3-20261029l36';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
@@ -370,26 +370,17 @@
           if (gateU && !gateU.classList.contains('yg-out')) { writeMetaTheme('#ffffff'); return; }
           p = Number(p) || 0;
           if (p < 0) p = 0; if (p > 1) p = 1;
-          var up = p > 0;
-          var c = up ? WHITE : PINK;
+          var c = mixHex(PINK, WHITE, p);
           var navC = document.querySelector('nav.glass-nav');
           if (navC) {
-            // Uthate hi status + header dono WHITE. Rest = pink print. Koi mix nahi.
+            // Upar=niche same mix. Top = solid hex (= theme-color) taaki status+header chipke. Fade sirf neeche.
             var g;
-            if (!up) {
+            if (p <= 0) {
               g = 'none';
               navC.classList.remove('hdr-bleed');
             } else {
-              if (!navC.__andosWhiteGrad) {
-                var ks = [0, 0.14, 0.28, 0.42, 0.55, 0.66, 0.76, 0.84, 0.90, 0.95, 1];
-                var asW = [1, 1, 1, 1, 1, 0.96, 0.82, 0.52, 0.24, 0.08, 0];
-                var parts = [];
-                for (var i = 0; i < ks.length; i++) {
-                  parts.push(rgbaHex(WHITE, asW[i]) + ' ' + (ks[i] * 100).toFixed(2) + '%');
-                }
-                navC.__andosWhiteGrad = 'linear-gradient(to bottom,' + parts.join(',') + ')';
-              }
-              g = navC.__andosWhiteGrad;
+              g = 'linear-gradient(to bottom,' + c + ' 0%,' + c + ' 64%,' +
+                rgbaHex(c, 0.7) + ' 78%,' + rgbaHex(c, 0.28) + ' 90%,' + rgbaHex(c, 0) + ' 100%)';
               if (!navC.classList.contains('hdr-bleed')) navC.classList.add('hdr-bleed');
             }
             try {
@@ -397,7 +388,7 @@
                 navC.style.setProperty('--hdr-grad', g);
                 navC.__andosLastGrad = g;
               }
-              navC.style.setProperty('--hdr-p', up ? '1' : '0');
+              navC.style.setProperty('--hdr-p', String(p));
             } catch (eC) {}
           }
           writeMetaTheme(c);
@@ -460,7 +451,7 @@
             var yU = homeScrollY();
             var pU = yU / 160; if (pU < 0) pU = 0; if (pU > 1) pU = 1;
             if (typeof window.__andosPaintHomeHdr === 'function') window.__andosPaintHomeHdr(pU);
-            else setTheme(pU <= 0 ? PINK : WHITE);
+            else setTheme(pU <= 0 ? PINK : mixHex(PINK, WHITE, pU));
           } else {
             var sc = sampledColor();
             setTheme(sc || baseColor()); // real header color; map only as fallback
@@ -25561,6 +25552,7 @@ main.andos-main:not(:has(#pageSlider)) {
   overflow: visible !important;
   transition: none !important;
 }
+html, body { transition: none !important; }
 /* rest: koi overlay layer nahi — original print/pink */
 .andos-shell[data-page="home"] nav.glass-nav::before,
 .andos-shell[data-page="home"] nav.home-topbar::before,
