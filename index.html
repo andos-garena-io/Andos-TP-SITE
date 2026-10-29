@@ -169,7 +169,7 @@
     <meta name="theme-color" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0f19">
-    <meta name="andos-build" content="andos-v3-20261029l39">
+    <meta name="andos-build" content="andos-v3-20261029l40">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -192,7 +192,7 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261029l39';
+        var HTML_BUILD_ID = 'andos-v3-20261029l40';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
@@ -15573,14 +15573,14 @@ const PLANS = {
         requestAnimationFrame(() => { window.__andosRenderQueued = false; });
         window.__andosDarkPage = ['loyalty','paymentverify'].indexOf(currentPage) !== -1;
         const __isMain5 = false; // tab swipe off — bottom nav click only
-        if (__isMain5 && currentPage === 'home') { try { content = content + Footer(); } catch (eF) {} }
+        // Footer Home ke MAIN scroller ke ANDAR — shell sibling par clip/scroll-band
+        if (currentPage === 'home') { try { content = content + Footer(); } catch (eF) {} }
         app.innerHTML = `
             <div class="min-h-screen andos-shell" data-page="${currentPage}" data-dark="${window.__andosDarkPage ? 'true' : 'false'}">
                 <div class="evt-page-sparks" id="evtPageSparks" aria-hidden="true"></div>
                 <div id="toastContainer" class="fixed top-4 inset-x-0 z-[400] flex flex-col items-center gap-2.5 pointer-events-none px-4"></div>
                 ${__isMain5 ? `<div id="topNavSlot">${Navbar('home')}</div>` : (showNav ? Navbar() : '')}
                 ${__isMain5 ? `<main class="page-enter andos-main" data-dark="${window.__andosDarkPage ? 'true' : 'false'}" style="${showBottomNav ? 'padding-bottom:0;' : ''}"><div class="page-slider" id="pageSlider">${__ANDOS_MAIN_SECS.map(function (s) { return `<div class="page-section" data-sec="${s}" data-filled="${s === currentPage ? '1' : '0'}">${s === currentPage ? content : ''}</div>`; }).join('')}</div></main>` : `<main class="page-enter andos-main" data-dark="${window.__andosDarkPage ? 'true' : 'false'}" style="${showBottomNav ? 'padding-bottom:0;' : ''}">${content}</main>`}
-                ${(!__isMain5) && showFooter ? Footer() : ''}
                 ${showBottomNav ? BottomNav() : ''}
                 ${PinLockOverlay()}
                 ${GoogleChooserOverlay()}
