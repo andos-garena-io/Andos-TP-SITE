@@ -169,7 +169,7 @@
     <meta name="theme-color" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0f19">
-    <meta name="andos-build" content="andos-v3-20261029l40">
+    <meta name="andos-build" content="andos-v3-20261029l41">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -192,7 +192,7 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261029l40';
+        var HTML_BUILD_ID = 'andos-v3-20261029l41';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
@@ -25505,14 +25505,21 @@ main.andos-main:not(:has(#pageSlider)) {
 }
 .page-section[data-sec="home"] footer,
 .andos-shell[data-page="home"] footer {
-  padding-bottom: calc(var(--bottom-nav-height) + 48px) !important;
+  padding-bottom: calc(var(--bottom-nav-height) + 16px) !important;
 }
-/* l39: baaki slider tabs — last block bottom-nav ke peeche hide na ho */
-.page-section[data-sec="categories"] .catd-page,
-.page-section[data-sec="orders"] .od-page,
-.page-section[data-sec="wallet"] .wal-page,
-.page-section[data-sec="account"] .pf-page {
-  padding-bottom: calc(var(--bottom-nav-height) + 48px) !important;
+/* l41: swipe-off — Home MAIN hi scroller; inner page-enter 100vh trap mat banao */
+.andos-shell[data-page="home"] main.andos-main {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  min-height: 0 !important;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+}
+.andos-shell[data-page="home"] main.andos-main > .page-enter {
+  min-height: 0 !important;
+  height: auto !important;
+  overflow: visible !important;
+  overscroll-behavior-y: auto;
 }
 
 /* l19: restore git-l header WITH verify tick. */
@@ -25625,9 +25632,13 @@ nav.home-topbar .andos-avatar-btn .andos-avatar-fallback {
   display: none !important;
   background: none !important;
 }
+.andos-shell[data-page="home"] .home-hero-bleed::after {
+  content: none !important;
+  display: none !important;
+}
 .andos-shell[data-page="home"] .home-hero-bleed img {
-  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 78%, rgba(0,0,0,0) 100%) !important;
-  mask-image: linear-gradient(to bottom, #000 0%, #000 78%, rgba(0,0,0,0) 100%) !important;
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
 }
 
 #filter-btn.od-filterbtn {
