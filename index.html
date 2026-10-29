@@ -169,7 +169,7 @@
     <meta name="theme-color" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0f19">
-    <meta name="andos-build" content="andos-v3-20261029l33">
+    <meta name="andos-build" content="andos-v3-20261029l34">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -192,7 +192,7 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261029l33';
+        var HTML_BUILD_ID = 'andos-v3-20261029l34';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
@@ -370,15 +370,16 @@
           if (gateU && !gateU.classList.contains('yg-out')) { writeMetaTheme('#ffffff'); return; }
           p = Number(p) || 0;
           if (p < 0) p = 0; if (p > 1) p = 1;
-          var c = p <= 0 ? PINK : mixHex(PINK, WHITE, p);
+          var c = mixHex(PINK, WHITE, p);
           var navC = document.querySelector('nav.glass-nav');
           if (navC) {
-            // Header area solid white (kam transparent). Fade header ke thoda neeche — chhota side-effect.
+            // Rest = alpha 0 (print). Uthate f 0→1, koi class blink nahi. Header solid, thoda neeche fade.
+            var f = p <= 0 ? 0 : (p >= 0.18 ? 1 : p / 0.18);
             var ks = [0, 0.14, 0.28, 0.42, 0.55, 0.66, 0.76, 0.84, 0.90, 0.95, 1];
-            var as = [1, 1, 1, 1, 1, 0.96, 0.82, 0.52, 0.24, 0.08, 0];
+            var as0 = [1, 1, 1, 1, 1, 0.96, 0.82, 0.52, 0.24, 0.08, 0];
             var parts = [];
             for (var i = 0; i < ks.length; i++) {
-              parts.push(rgbaHex(c, as[i]) + ' ' + (ks[i] * 100).toFixed(2) + '%');
+              parts.push(rgbaHex(c, as0[i] * f) + ' ' + (ks[i] * 100).toFixed(2) + '%');
             }
             var g = 'linear-gradient(to bottom,' + parts.join(',') + ')';
             try {
@@ -388,7 +389,7 @@
               }
               navC.style.setProperty('--hdr-p', String(p));
             } catch (eC) {}
-            if (p > 0.001) navC.classList.add('hdr-bleed'); else navC.classList.remove('hdr-bleed');
+            if (!navC.classList.contains('hdr-bleed')) navC.classList.add('hdr-bleed');
           }
           writeMetaTheme(c);
         };
@@ -25549,6 +25550,7 @@ main.andos-main:not(:has(#pageSlider)) {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
   overflow: visible !important;
+  transition: none !important;
 }
 /* rest: koi overlay layer nahi — original print/pink */
 .andos-shell[data-page="home"] nav.glass-nav::before,
@@ -25622,10 +25624,10 @@ nav.home-topbar .andos-avatar-btn .andos-avatar-fallback {
   box-sizing: border-box !important;
   border-radius: 50% !important;
   object-fit: cover !important;
-  padding: 2px !important;
-  border: 3px solid transparent !important;
+  padding: 0 !important;
+  border: 5px solid transparent !important;
   background-color: #eef2f7 !important;
-  background-image: linear-gradient(#ffffff, #ffffff), linear-gradient(220deg, #b8b1ff 0%, #7d92ff 38%, #2f7cf6 78%, #2b76f5 100%) !important;
+  background-image: linear-gradient(#eef2f7, #eef2f7), linear-gradient(220deg, #b8b1ff 0%, #7d92ff 38%, #2f7cf6 78%, #2b76f5 100%) !important;
   background-origin: border-box !important;
   background-clip: padding-box, border-box !important;
   box-shadow: none !important;
