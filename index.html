@@ -169,7 +169,7 @@
     <meta name="theme-color" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0f19">
-    <meta name="andos-build" content="andos-v3-20261029l46">
+    <meta name="andos-build" content="andos-v3-20261029l47">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -192,7 +192,7 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261029l46';
+        var HTML_BUILD_ID = 'andos-v3-20261029l47';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
@@ -15518,9 +15518,7 @@ const PLANS = {
                         if (document.body) document.body.setAttribute('data-andos-page', currentPage);
                     } catch (ePgF) {}
                     window.__sliderIdx = __idxF;
-                    try { __fillMainSection(__secsF[__idxF - 1]); } catch (eF) {}
-                    try { __fillMainSection(__secsF[__idxF + 1]); } catch (eF) {}
-                    try { __slF.scrollLeft = __idxF * window.innerWidth; } catch (eF) { try { __slF.scrollTo({ left: __idxF * window.innerWidth }); } catch (eF2) {} } // FIX-T: INSTANT tap — beech ka page kabhi ghista nahi
+                    try { __slF.scrollLeft = __idxF * (__slF.clientWidth || window.innerWidth); } catch (eF) { try { __slF.scrollTo({ left: __idxF * (__slF.clientWidth || window.innerWidth) }); } catch (eF2) {} }
                     try { if (typeof window.__andosApplyStatus === 'function') window.__andosApplyStatus(); } catch (eF) {}
                     try { if (window.__andosSyncTabSwipeLock) window.__andosSyncTabSwipeLock(); } catch (eLk) {}
                     requestAnimationFrame(function () { try { applyLiveAvatars(); } catch (e) {} });
@@ -25762,6 +25760,22 @@ nav.home-topbar .andos-avatar-btn .andos-avatar-fallback {
   border: 0 !important;
   box-shadow: none !important;
   outline: none !important;
+}
+
+/* l47: slider mein sirf current tab paint — wallet purple profile pe nahi */
+#pageSlider .page-section {
+  min-width: 100% !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  flex: 0 0 100% !important;
+}
+.andos-shell[data-page="home"] #pageSlider .page-section:not([data-sec="home"]),
+.andos-shell[data-page="categories"] #pageSlider .page-section:not([data-sec="categories"]),
+.andos-shell[data-page="orders"] #pageSlider .page-section:not([data-sec="orders"]),
+.andos-shell[data-page="wallet"] #pageSlider .page-section:not([data-sec="wallet"]),
+.andos-shell[data-page="account"] #pageSlider .page-section:not([data-sec="account"]) {
+  visibility: hidden !important;
+  pointer-events: none !important;
 }
 
 </style>
