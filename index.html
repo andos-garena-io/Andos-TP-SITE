@@ -169,7 +169,7 @@
     <meta name="theme-color" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0f19">
-    <meta name="andos-build" content="andos-v3-20261029l41">
+    <meta name="andos-build" content="andos-v3-20261029l42">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -192,7 +192,7 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261029l41';
+        var HTML_BUILD_ID = 'andos-v3-20261029l42';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
@@ -15311,7 +15311,7 @@ const PLANS = {
             var el = document.querySelector('.page-section[data-sec="' + sec + '"]');
             if (!el || el.getAttribute('data-filled') === '1') return;
             var html = '';
-            if (sec === 'home') { html = HomePage() + Footer(); }
+            if (sec === 'home') { html = HomePage(); }
             else if (sec === 'categories') { html = CategoriesPage(); }
             else if (sec === 'orders') { html = OrdersPage(); }
             else if (sec === 'wallet') { html = WalletPage(); }
@@ -15573,8 +15573,6 @@ const PLANS = {
         requestAnimationFrame(() => { window.__andosRenderQueued = false; });
         window.__andosDarkPage = ['loyalty','paymentverify'].indexOf(currentPage) !== -1;
         const __isMain5 = false; // tab swipe off — bottom nav click only
-        // Footer Home ke MAIN scroller ke ANDAR — shell sibling par clip/scroll-band
-        if (currentPage === 'home') { try { content = content + Footer(); } catch (eF) {} }
         app.innerHTML = `
             <div class="min-h-screen andos-shell" data-page="${currentPage}" data-dark="${window.__andosDarkPage ? 'true' : 'false'}">
                 <div class="evt-page-sparks" id="evtPageSparks" aria-hidden="true"></div>
@@ -18267,6 +18265,7 @@ const PLANS = {
 
                 ${HomeDailyRewardsStreak()}
                 ${HomeTrustNetworkStats()}
+                ${Footer()}
 
             </div>
         `;
@@ -25632,13 +25631,29 @@ nav.home-topbar .andos-avatar-btn .andos-avatar-fallback {
   display: none !important;
   background: none !important;
 }
-.andos-shell[data-page="home"] .home-hero-bleed::after {
-  content: none !important;
-  display: none !important;
-}
 .andos-shell[data-page="home"] .home-hero-bleed img {
-  -webkit-mask-image: none !important;
-  mask-image: none !important;
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 78%, rgba(0,0,0,0) 100%) !important;
+  mask-image: linear-gradient(to bottom, #000 0%, #000 78%, rgba(0,0,0,0) 100%) !important;
+}
+/* last image (trust video + banner) numbers ke BAAD — clip/overlap mat karo */
+.andos-shell[data-page="home"] footer.home-foot {
+  display: block !important;
+  position: relative !important;
+  overflow: visible !important;
+  height: auto !important;
+  visibility: visible !important;
+  background: #ffffff !important;
+}
+.andos-shell[data-page="home"] footer.home-foot .andos-trust-video-strip {
+  margin-top: 8px !important;
+  margin-bottom: 16px !important;
+}
+.andos-shell[data-page="home"] footer.home-foot img {
+  display: block !important;
+  width: 100% !important;
+  height: auto !important;
+  max-width: 100% !important;
+  visibility: visible !important;
 }
 
 #filter-btn.od-filterbtn {
