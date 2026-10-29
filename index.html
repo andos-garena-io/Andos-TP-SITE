@@ -14939,7 +14939,7 @@ const PLANS = {
                 <div class="home-topbar-inner">
                     <button type="button" class="andos-avatar-btn" onclick="toggleHdrMenu()" aria-label="Open menu">
                         <span class="andos-avatar-ring" aria-hidden="true"></span>
-                        ${avatarInner}
+                        <span class="andos-dp-gap"><span class="andos-dp-metal">${avatarInner}</span></span>
                         <span class="andos-verified" aria-label="Verified"><img class="andos-verified-img" src="${VERIFY_BADGE_URL}" alt=""></span>
                     </button>
                     <div class="home-topbar-right">
@@ -25603,7 +25603,7 @@ main.andos-main:not(:has(#pageSlider)) {
 #pageSlider { overflow-x: hidden !important; touch-action: pan-y !important; scroll-snap-type: none !important; }
 nav.home-topbar .andos-verified { display: none !important; }
 /* DP 40px original slot. Ring = usi circle ka border (login colours + safed gap). Alag blob nahi. */
-/* l50: DP ring = user HTML .ring + .inner-ring (photo center, metal demo hole nahi) */
+/* l50: user ring CSS as-is, % so har size pe same */
 nav.home-topbar .andos-avatar-btn {
   width: 40px !important;
   height: 40px !important;
@@ -25622,9 +25622,32 @@ nav.home-topbar .andos-avatar-ring {
   background: none !important;
   box-shadow: none !important;
 }
+nav.home-topbar .andos-dp-gap {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 50% !important;
+  padding: 5% !important;
+  background: #ffffff !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+}
+nav.home-topbar .andos-dp-metal {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 50% !important;
+  padding: 3% !important;
+  background: linear-gradient(135deg, #343b40, #ffffff, #707b82, #00eaff, #252b30) !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+}
 nav.home-topbar .andos-avatar-btn > img:not(.andos-verified-img),
 nav.home-topbar .andos-avatar-btn #hdrLiveAva,
-nav.home-topbar .andos-avatar-btn .andos-avatar-fallback {
+nav.home-topbar .andos-avatar-btn .andos-avatar-fallback,
+nav.home-topbar .andos-dp-metal > img:not(.andos-verified-img),
+nav.home-topbar .andos-dp-metal #hdrLiveAva,
+nav.home-topbar .andos-dp-metal .andos-avatar-fallback {
   position: relative !important;
   inset: auto !important;
   display: block !important;
@@ -25633,9 +25656,9 @@ nav.home-topbar .andos-avatar-btn .andos-avatar-fallback {
   box-sizing: border-box !important;
   border-radius: 50% !important;
   object-fit: cover !important;
-  padding: 5% !important;
+  padding: 0 !important;
   border: 0 !important;
-  background: #ffffff !important;
+  background: #111820 !important;
   background-image: none !important;
   box-shadow: none !important;
   z-index: 1 !important;
