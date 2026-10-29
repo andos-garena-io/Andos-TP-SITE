@@ -169,7 +169,7 @@
     <meta name="theme-color" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0f19">
-    <meta name="andos-build" content="andos-v3-20261029l43">
+    <meta name="andos-build" content="andos-v3-20261029l44">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -192,7 +192,7 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261029l43';
+        var HTML_BUILD_ID = 'andos-v3-20261029l44';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
@@ -25681,7 +25681,26 @@ nav.home-topbar .andos-avatar-btn .andos-avatar-fallback {
 }
 .andos-shell, .andos-main { transition: none !important; }
 
-/* l43: input type karne par orange fire/shadow nahi — bold black outline */
+/* l44: input container — ANDOS indigo, moti line, halka ring; orange fire band */
+@keyframes inputFire {
+  0%, 100% { box-shadow: none; }
+  50% { box-shadow: none; }
+}
+#app .input-field,
+#app .ge-input,
+#app .referral-modal-input,
+#app .review-comment-input,
+#app .sp-form input,
+#app .sp-form textarea,
+#app .pvx-in,
+#app .verify-input,
+#app .plans-verify-input {
+  border: 1.5px solid #d8dee8 !important;
+  border-radius: 14px !important;
+  background: #ffffff !important;
+  box-shadow: none !important;
+  transition: border-color .15s ease, box-shadow .15s ease !important;
+}
 #app input:focus,
 #app input:focus-visible,
 #app textarea:focus,
@@ -25696,32 +25715,36 @@ nav.home-topbar .andos-avatar-btn .andos-avatar-fallback {
 #app .sp-form input:focus,
 #app .sp-form textarea:focus,
 #app .pvx-in:focus,
-#app .qty-stepper .qty-input:focus {
-  animation: none !important;
-  box-shadow: none !important;
-  outline: none !important;
-  border-color: #111111 !important;
-}
+#app .qty-stepper .qty-input:focus,
 #app input[type="text"]:focus,
 #app input[type="tel"]:focus,
 #app input[type="email"]:focus,
 #app input[type="number"]:focus,
-#app input[type="search"]:focus,
-#app textarea:focus,
-#app .input-field:focus {
+#app input[type="search"]:focus {
   animation: none !important;
-  box-shadow: none !important;
   outline: none !important;
-  border-color: #111111 !important;
+  border-style: solid !important;
+  border-width: 2.5px !important;
+  border-color: #4F46E5 !important;
+  box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.16) !important;
+  caret-color: #4F46E5;
 }
 #app .search-bar:focus-within,
 #app .search-page-input-wrap:focus-within,
 #app .plans-verify-card:focus-within {
   animation: none !important;
-  box-shadow: none !important;
-  border-color: #111111 !important;
-  border-width: 2px !important;
+  outline: none !important;
   border-style: solid !important;
+  border-width: 2.5px !important;
+  border-color: #4F46E5 !important;
+  box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.16) !important;
+}
+#app .search-page-input:focus,
+#app .search-page-input:focus-visible,
+#app .search-bar input:focus {
+  border: 0 !important;
+  box-shadow: none !important;
+  outline: none !important;
 }
 
 </style>
