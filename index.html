@@ -169,7 +169,7 @@
     <meta name="theme-color" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0f19">
-    <meta name="andos-build" content="andos-v3-20261030l49">
+    <meta name="andos-build" content="andos-v3-20261030l50">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -192,7 +192,7 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261030l49';
+        var HTML_BUILD_ID = 'andos-v3-20261030l50';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
@@ -25603,7 +25603,7 @@ main.andos-main:not(:has(#pageSlider)) {
 #pageSlider { overflow-x: hidden !important; touch-action: pan-y !important; scroll-snap-type: none !important; }
 nav.home-topbar .andos-verified { display: none !important; }
 /* DP 40px original slot. Ring = usi circle ka border (login colours + safed gap). Alag blob nahi. */
-/* l49: DP ring = image jaisa blue + DP/ring ke beech white gap */
+/* l50: DP ring = user HTML .ring + .inner-ring (photo center, metal demo hole nahi) */
 nav.home-topbar .andos-avatar-btn {
   width: 40px !important;
   height: 40px !important;
@@ -25611,10 +25611,10 @@ nav.home-topbar .andos-avatar-btn {
   position: relative !important;
   box-sizing: border-box !important;
   overflow: hidden !important;
-  padding: 3px !important;
+  padding: 6% !important;
   border: 0 !important;
   border-radius: 50% !important;
-  background: linear-gradient(160deg, #6ec8ff 0%, #3b9eff 48%, #1e7dff 100%) !important;
+  background: conic-gradient(from 220deg, #0785ff, #168bff, #a5a4ff, #168bff, #0785ff) !important;
   box-shadow: none !important;
 }
 nav.home-topbar .andos-avatar-ring {
@@ -25633,8 +25633,8 @@ nav.home-topbar .andos-avatar-btn .andos-avatar-fallback {
   box-sizing: border-box !important;
   border-radius: 50% !important;
   object-fit: cover !important;
-  padding: 0 !important;
-  border: 2.5px solid #ffffff !important;
+  padding: 5% !important;
+  border: 0 !important;
   background: #ffffff !important;
   background-image: none !important;
   box-shadow: none !important;
