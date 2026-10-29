@@ -169,7 +169,7 @@
     <meta name="theme-color" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0f19">
-    <meta name="andos-build" content="andos-v3-20261029l45">
+    <meta name="andos-build" content="andos-v3-20261029l46">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -192,7 +192,7 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261029l45';
+        var HTML_BUILD_ID = 'andos-v3-20261029l46';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
@@ -461,14 +461,19 @@
             __psTop = __ps ? (__ps.scrollTop || 0) : 0;
           }
           if ((window.scrollY || 0) <= 0 && __psTop <= 0 && homeScrollY() <= 0 && e.touches[0].clientY - startY > 24) {
-            pulling = true; setTheme(PINK);
-            var nU = document.querySelector('nav.glass-nav');
-            if (nU) {
-              nU.classList.remove('is-scrolled', 'hdr-bleed');
-              try {
-                nU.style.setProperty('--hdr-p', '0');
-                nU.style.setProperty('--hdr-grad', 'none');
-              } catch (eP) {}
+            pulling = true;
+            var __pgPull = document.querySelector('.andos-shell');
+            var __homePull = !__pgPull || __pgPull.getAttribute('data-page') === 'home' || !__pgPull.getAttribute('data-page');
+            if (__homePull) {
+              setTheme(PINK);
+              var nU = document.querySelector('nav.glass-nav');
+              if (nU) {
+                nU.classList.remove('is-scrolled', 'hdr-bleed');
+                try {
+                  nU.style.setProperty('--hdr-p', '0');
+                  nU.style.setProperty('--hdr-grad', 'none');
+                } catch (eP) {}
+              }
             }
           }
         }, { passive: true });
@@ -25758,29 +25763,6 @@ nav.home-topbar .andos-avatar-btn .andos-avatar-fallback {
   box-shadow: none !important;
   outline: none !important;
 }
-
-/* l45: stretch pink SIRF Home. Baaki pages apna bg — pull par pink nahi */
-html[data-andos-page]:not([data-andos-page="home"]),
-html[data-andos-page]:not([data-andos-page="home"]) body,
-html[data-andos-page]:not([data-andos-page="home"]) #app {
-  background-color: #ffffff !important;
-  background-image: none !important;
-}
-html[data-andos-page="categories"],
-html[data-andos-page="categories"] body,
-html[data-andos-page="categories"] #app { background-color: #f7f7f7 !important; }
-html[data-andos-page="wallet"],
-html[data-andos-page="wallet"] body,
-html[data-andos-page="wallet"] #app { background-color: #f4f2fb !important; }
-html[data-andos-page="account"],
-html[data-andos-page="account"] body,
-html[data-andos-page="account"] #app { background-color: #ffffff !important; }
-html[data-andos-page="orders"],
-html[data-andos-page="orders"] body,
-html[data-andos-page="orders"] #app { background-color: #ffffff !important; }
-html[data-andos-page="home"],
-html[data-andos-page="home"] body { background-color: #F9A8D4 !important; }
-html[data-andos-page="home"] #app { background-color: #0b0f19 !important; }
 
 </style>
 </body>
