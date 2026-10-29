@@ -169,7 +169,7 @@
     <meta name="theme-color" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0f19">
-    <meta name="andos-build" content="andos-v3-20261029l37">
+    <meta name="andos-build" content="andos-v3-20261029l38">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -192,7 +192,7 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261029l37';
+        var HTML_BUILD_ID = 'andos-v3-20261029l38';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
@@ -432,7 +432,7 @@
           var pg = shell ? shell.getAttribute('data-page') : '';
           var isHome = (pg === 'home' || !pg);
           // PULL-DOWN = PINK lock — koi white flash band nahi (Boss fix)
-          if (pulling && isHome) { setTheme(WHITE); return; }
+          if (pulling && isHome) { setTheme(PINK); return; }
           if (isHome) {
             if (typeof window.__andosPaintHomeHdr === 'function') window.__andosPaintHomeHdr(0);
             else {
@@ -461,11 +461,14 @@
             __psTop = __ps ? (__ps.scrollTop || 0) : 0;
           }
           if ((window.scrollY || 0) <= 0 && __psTop <= 0 && homeScrollY() <= 0 && e.touches[0].clientY - startY > 24) {
-            pulling = true; setTheme(WHITE);
+            pulling = true; setTheme(PINK);
             var nU = document.querySelector('nav.glass-nav');
             if (nU) {
-              nU.classList.add('is-scrolled');
-              nU.classList.remove('hdr-bleed');
+              nU.classList.remove('is-scrolled', 'hdr-bleed');
+              try {
+                nU.style.setProperty('--hdr-p', '0');
+                nU.style.setProperty('--hdr-grad', 'none');
+              } catch (eP) {}
             }
           }
         }, { passive: true });
