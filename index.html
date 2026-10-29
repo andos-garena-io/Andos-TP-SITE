@@ -169,7 +169,7 @@
     <meta name="theme-color" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0f19">
-    <meta name="andos-build" content="andos-v3-20261029l47">
+    <meta name="andos-build" content="andos-v3-20261029l48">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -192,7 +192,7 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261029l47';
+        var HTML_BUILD_ID = 'andos-v3-20261029l48';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
@@ -25603,15 +25603,19 @@ main.andos-main:not(:has(#pageSlider)) {
 #pageSlider { overflow-x: hidden !important; touch-action: pan-y !important; scroll-snap-type: none !important; }
 nav.home-topbar .andos-verified { display: none !important; }
 /* DP 40px original slot. Ring = usi circle ka border (login colours + safed gap). Alag blob nahi. */
+/* l48: Home DP ring = andox-app.html header .brand-mark */
 nav.home-topbar .andos-avatar-btn {
   width: 40px !important;
   height: 40px !important;
   flex: 0 0 40px !important;
   position: relative !important;
-  overflow: visible !important;
-  padding: 0 !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+  padding: 2px !important;
   border: 0 !important;
-  background: transparent !important;
+  border-radius: 50% !important;
+  background: conic-gradient(from 220deg, #6f8cff, #eaf0ff 30%, #8fa6ff 61%, #e5ecff 82%, #6f8cff) !important;
+  box-shadow: none !important;
 }
 nav.home-topbar .andos-avatar-ring {
   display: none !important;
@@ -25621,19 +25625,18 @@ nav.home-topbar .andos-avatar-ring {
 nav.home-topbar .andos-avatar-btn > img:not(.andos-verified-img),
 nav.home-topbar .andos-avatar-btn #hdrLiveAva,
 nav.home-topbar .andos-avatar-btn .andos-avatar-fallback {
-  position: absolute !important;
-  inset: 0 !important;
-  width: 40px !important;
-  height: 40px !important;
+  position: relative !important;
+  inset: auto !important;
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
   box-sizing: border-box !important;
   border-radius: 50% !important;
   object-fit: cover !important;
   padding: 0 !important;
-  border: 5px solid transparent !important;
-  background-color: #eef2f7 !important;
-  background-image: linear-gradient(#eef2f7, #eef2f7), linear-gradient(220deg, #b8b1ff 0%, #7d92ff 38%, #2f7cf6 78%, #2b76f5 100%) !important;
-  background-origin: border-box !important;
-  background-clip: padding-box, border-box !important;
+  border: 0 !important;
+  background: #eef2f7 !important;
+  background-image: none !important;
   box-shadow: none !important;
   z-index: 1 !important;
 }
