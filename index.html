@@ -169,7 +169,7 @@
     <meta name="theme-color" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0f19">
-    <meta name="andos-build" content="andos-v3-20261029l42">
+    <meta name="andos-build" content="andos-v3-20261029l43">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -192,7 +192,7 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261029l42';
+        var HTML_BUILD_ID = 'andos-v3-20261029l43';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
@@ -11065,7 +11065,7 @@ main.andos-main{overscroll-behavior-x:none}
         window.scrollTo(0, 0);
         render();
         // STATUS-BAR SYNC: naye screen ke header ka color turant upar lagao
-        try { if (typeof window.__andosApplyStatus === 'function') setTimeout(window.__andosApplyStatus, 90); } catch (e) {}
+        try { if (typeof window.__andosApplyStatus === 'function') window.__andosApplyStatus(); } catch (e) {}
     }
 
     function formatPrice(price) {
@@ -25668,6 +25668,60 @@ nav.home-topbar .andos-avatar-btn .andos-avatar-fallback {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+/* l43: nav pages turant — header/status/search stagger band */
+.andos-main > .page-enter > *,
+.andos-shell .andos-main > .page-enter > * {
+  animation: none !important;
+  animation-delay: 0s !important;
+  opacity: 1 !important;
+  transform: none !important;
+  filter: none !important;
+}
+.andos-shell, .andos-main { transition: none !important; }
+
+/* l43: input type karne par orange fire/shadow nahi — bold black outline */
+#app input:focus,
+#app input:focus-visible,
+#app textarea:focus,
+#app textarea:focus-visible,
+#app .input-field:focus,
+#app .plans-verify-input:focus,
+#app .verify-input:focus,
+#app .ff-custom-input:focus,
+#app .ge-input:focus,
+#app .referral-modal-input:focus,
+#app .review-comment-input:focus,
+#app .sp-form input:focus,
+#app .sp-form textarea:focus,
+#app .pvx-in:focus,
+#app .qty-stepper .qty-input:focus {
+  animation: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+  border-color: #111111 !important;
+}
+#app input[type="text"]:focus,
+#app input[type="tel"]:focus,
+#app input[type="email"]:focus,
+#app input[type="number"]:focus,
+#app input[type="search"]:focus,
+#app textarea:focus,
+#app .input-field:focus {
+  animation: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+  border-color: #111111 !important;
+}
+#app .search-bar:focus-within,
+#app .search-page-input-wrap:focus-within,
+#app .plans-verify-card:focus-within {
+  animation: none !important;
+  box-shadow: none !important;
+  border-color: #111111 !important;
+  border-width: 2px !important;
+  border-style: solid !important;
 }
 
 </style>
