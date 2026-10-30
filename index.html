@@ -512,21 +512,36 @@ nav.glass-nav, .xplore-head, .od-title, .wal-hero, .txn-bar, .sp-bar, .odd-bar, 
 
 <link rel="stylesheet" href="/assets/css/andos5.4e46dfa2.css">
 <style id="andos-statusbar-fix">
-/* ===== STATUS BAR == HEADER (edge-to-edge, koi alag solid strip nahi) =========
-   --andos-sbt       : safe-area top (env) — header khud is strip ko paint karta hai
-   --andos-top-color : JS har scroll/page change par set karta hai:
-                         home top (hero ke upar transparent header) -> brand #F9A8D4
-                         scrolled (.is-scrolled)                     -> #ffffff
-                         baaki pages                                 -> header ka apna bg
-   Wahi colour <meta theme-color> (browser chrome) + html/body background me jaata
-   hai, isliye chrome, status-bar band aur header — teeno ek hi shade me. */
+/* ===== STATUS BAR == HEADER (edge-to-edge, glass wapas, koi seam nahi) =========
+   --andos-sbt       : safe-area top (env) — header khud is strip ko paint karta hai,
+                       background-clip:border-box ki wajah se glass/blur poore band par
+                       chalta hai (top edge par koi alag patti nahi banti).
+   --andos-top-color : JS set karta hai = exactly wo rang jo header ke peeche render
+                       ho raha hai. Wahi rang <meta theme-color> (browser chrome) +
+                       html/body background me jaata hai, isliye chrome aur page ke
+                       beech koi hairline/gap nahi dikhta. */
 :root{ --andos-sbt: env(safe-area-inset-top, 0px); --andos-top-color:#F9A8D4; }
 nav.home-topbar{
   top:0 !important;
+  margin-top:0 !important;
   box-sizing:border-box !important;
   padding-top: var(--andos-sbt) !important;
   height: calc(52px + var(--andos-sbt)) !important;
-  background-clip: border-box !important;
+  /* glass ko poore band par failao + koi border/outline hairline nahi */
+  background-clip:border-box !important;
+  background-origin:border-box !important;
+  border-top:0 !important;
+  outline:0 !important;
+}
+/* hero/shell ka top edge bhi 0 se flush — 1px gap/divider nahi (glass styling untouched) */
+html[data-andos-topbar="1"] .andos-shell[data-page="home"],
+html[data-andos-topbar="1"] .andos-shell[data-page="home"] .page-section{
+  margin-top:0 !important;
+  border-top:0 !important;
+}
+html[data-andos-topbar="1"] .home-topbar::before,
+html[data-andos-topbar="1"] .home-topbar::after{
+  border-top:0 !important;
 }
 html[data-auth="ok"][data-andos-topbar="1"]{
   background-color: var(--andos-top-color) !important;
@@ -540,6 +555,6 @@ html[data-auth="ok"][data-andos-topbar="1"] body{
 html.andos-splash, html.andos-splash body{ background-color:#000000 !important; transition:none; }
 </style>
 <script src="/assets/js/deeplink.0cb0a828.js" defer></script>
-<script src="/assets/js/statusbar.cbf1eb58.js" defer></script>
+<script src="/assets/js/statusbar.c7032b6f.js" defer></script>
 </body>
 </html>
