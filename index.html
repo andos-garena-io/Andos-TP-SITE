@@ -169,7 +169,7 @@
     <meta name="theme-color" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0f19">
-    <meta name="andos-build" content="andos-v3-20261030l54">
+    <meta name="andos-build" content="andos-v3-20261030l55">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -192,7 +192,7 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261030l54';
+        var HTML_BUILD_ID = 'andos-v3-20261030l55';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
@@ -25603,7 +25603,7 @@ main.andos-main:not(:has(#pageSlider)) {
 #pageSlider { overflow-x: hidden !important; touch-action: pan-y !important; scroll-snap-type: none !important; }
 nav.home-topbar .andos-verified { display: none !important; }
 /* DP 40px original slot. Ring = usi circle ka border (login colours + safed gap). Alag blob nahi. */
-/* l54: sirf bahar cyan-blue + white gap. Andar chrome/cyan ring nahi — bus DP. */
+/* l55: bahar cyan-blue ring. Beech white → transparent (header dikhe). Andar bus DP. */
 nav.home-topbar .andos-avatar-btn {
   width: 40px !important;
   height: 40px !important;
@@ -25615,10 +25615,15 @@ nav.home-topbar .andos-avatar-btn {
   position: relative !important;
   box-sizing: border-box !important;
   overflow: hidden !important;
-  padding: 3.5px !important;
-  border: 0 !important;
+  padding: 0 !important;
+  border: 3.5px solid transparent !important;
   border-radius: 50% !important;
-  background: conic-gradient(from 200deg, #00a8ff 0%, #0096ff 22%, #2f8fff 48%, #7aa3ff 72%, #4db8ff 88%, #00a8ff 100%) !important;
+  background:
+    linear-gradient(#0000, #0000) padding-box,
+    conic-gradient(from 200deg, #00a8ff 0%, #0096ff 22%, #2f8fff 48%, #7aa3ff 72%, #4db8ff 88%, #00a8ff 100%) border-box !important;
+  background-origin: border-box !important;
+  -webkit-background-clip: padding-box, border-box !important;
+  background-clip: padding-box, border-box !important;
   box-shadow: none !important;
 }
 nav.home-topbar .andos-avatar-ring {
@@ -25632,7 +25637,7 @@ nav.home-topbar .andos-dp-gap {
   min-height: 0 !important;
   border-radius: 50% !important;
   padding: 2.5px !important;
-  background: #ffffff !important;
+  background: transparent !important;
   box-sizing: border-box !important;
   overflow: hidden !important;
 }
