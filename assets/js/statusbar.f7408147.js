@@ -13,6 +13,7 @@
   var HERO = '#F9A8D4';
   var SCROLLED = '#ffffff';
   var baseBody = null;
+  var lastSample = 0, lastScrolledColor = null;
 
   function parse(c) {
     if (!c || c === 'transparent') return null;
@@ -53,11 +54,13 @@
   }
 
 
-  /* ---- header ke peeche asli painted layer ka rang (glass ke liye) ---- */
+  /* ---- seam sampler: page ke TOP edge (jahan chrome milta hai) ke peeche ka rang ----
+     Glass header ke neeche content badalta rehta hai, isliye top rows par 5 x-positions
+     ka median lete hain (ek point noise/icon se bachne ke liye). */
   var mediaCache = {};
   function gradFirst(bgi) {
     if (!bgi || bgi === 'none' || bgi.indexOf('gradient') < 0) return null;
-    var re = /(rgba?\([^)]*\)|#[0-9a-f]{3,8})/i, m = bgi.match(re);
+    var m = bgi.match(/(rgba?\([^)]*\)|#[0-9a-f]{3,8})/i);
     return m ? (parse(m[1]) || hexToRgb(m[1])) : null;
   }
   function ownPaint(el) {
@@ -88,23 +91,20 @@
       if (x < r.left || x > r.right || y < r.top || y > r.bottom) continue;
       if (m.tagName === 'VIDEO') { if (m.readyState < 2) continue; var c = drawFrom(m, r, x, y); if (c) return c; continue; }
       var c2 = drawFrom(m, r, x, y);
-      if (c2) return c2;                                   /* same-origin img */
-      var src = m.currentSrc || m.src;                      /* cross-origin: CORS copy */
-      if (!src) continue;
-      var cached = mediaCache[src];
+      if (c2) return c2;
+      var s = m.currentSrc || m.src;
+      if (!s) continue;
+      var cached = mediaCache[s];
       if (cached && cached.__ready) { var c3 = drawFrom(cached, r, x, y); if (c3) return c3; }
       else if (!cached) {
         var im = new Image(); im.crossOrigin = 'anonymous';
         im.onload = function () { im.__ready = true; schedule(); };
-        im.src = src; mediaCache[src] = im;
+        im.src = s; mediaCache[s] = im;
       }
     }
     return null;
   }
-  function behindColor(nav) {
-    var nr = nav.getBoundingClientRect();
-    var x = Math.round(Math.min(window.innerWidth - 2, window.innerWidth / 2));
-    var y = Math.round(nr.top + Math.min(nr.height, 52) / 2);
+  function paintAt(nav, x, y) {
     var navKids = [], navAnc = [];
     var kids = nav.querySelectorAll('*');
     for (var i = 0; i < kids.length; i++) navKids.push(kids[i]);
@@ -126,6 +126,23 @@
     }
     return null;
   }
+  function median(arr) {
+    var r = [], g = [], b = [];
+    for (var i = 0; i < arr.length; i++) { r.push(arr[i].r); g.push(arr[i].g); b.push(arr[i].b); }
+    function med(a) { a.sort(function (x, y) { return x - y; }); return a[Math.floor(a.length / 2)]; }
+    return { r: med(r), g: med(g), b: med(b), a: 1 };
+  }
+  function seamColor(nav) {
+    var nr = nav.getBoundingClientRect();
+    var xs = [0.1, 0.3, 0.5, 0.7, 0.9], ys = [3, 8, 14, 22, 32, 44], out = [];
+    for (var i = 0; i < xs.length; i++) {
+      for (var j = 0; j < ys.length; j++) {
+        var c = paintAt(nav, Math.round(window.innerWidth * xs[i]), Math.round(nr.top + ys[j]));
+        if (c) out.push(over({ r: c.r, g: c.g, b: c.b, a: c.a == null ? 1 : c.a }, ambient()));
+      }
+    }
+    return out.length >= 3 ? median(out) : null;
+  }
 
   function apply() {
     if (window.__andosSplashActive || document.getElementById('appSplashOverlay')) return;
@@ -140,19 +157,24 @@
     var scrolled = /(^|\s)is-scrolled(\s|$)/.test(nav.className || '') || scrollTop() > 8;
     ROOT.setAttribute('data-andos-topbar', '1');
 
-    var navBg0 = parse(getComputedStyle(nav).backgroundColor) || { r: 0, g: 0, b: 0, a: 0 };
-    function glassColor() {
-      var behind = behindColor(nav) || ambient();
-      return toHex(navBg0.a > 0.02 ? over(navBg0, behind) : behind);
-    }
+    var navBgNow = parse(getComputedStyle(nav).backgroundColor) || { r: 0, g: 0, b: 0, a: 0 };
     if (isHome) {
       ROOT.setAttribute('data-andos-scrolled', scrolled ? '1' : '0');
-      /* header top par transparent hai (hero) — pink; scroll par glass — usi ka composite */
-      return write(scrolled ? glassColor() : HERO);
+      if (!scrolled) return write(HERO);                 /* hero ke upar transparent */
+      /* sampling heavy hai — 120ms me ek baar se zyada nahi (scroll par UI smooth rahe) */
+      var now = Date.now();
+      if (now - lastSample > 120 || !lastScrolledColor) {
+        var seam = seamColor(nav);                        /* glass ke peeche ka asli rang */
+        lastSample = now;
+        lastScrolledColor = seam ? toHex(navBgNow.a > 0.02 ? over(navBgNow, seam) : seam) : SCROLLED;
+      }
+      return write(lastScrolledColor);
     }
     ROOT.removeAttribute('data-andos-scrolled');
-    if (navBg0.a > 0.98) return write(toHex(navBg0));
-    return write(glassColor());
+    var navBg = parse(getComputedStyle(nav).backgroundColor);
+    if (navBg && navBg.a > 0.98) return write(toHex(navBg));
+    if (navBg && navBg.a > 0.02) return write(toHex(over(navBg, ambient())));
+    return write(toHex(ambient()));
   }
 
   function write(color) {
