@@ -56,14 +56,15 @@
   ],
   "shortcuts": [
     {
-      "name": "Live Events & Deals",
+      "name": "Events & Deals",
       "short_name": "Deals",
       "description": "Flash deals aur live events kholein",
       "url": "./index.html#categories",
       "icons": [
         {
-          "src": "assets/app-icon/logo-512.png",
+          "src": "assets/shortcuts/deals-192.png",
           "sizes": "192x192",
+          "type": "image/png",
           "purpose": "any"
         }
       ]
@@ -71,25 +72,41 @@
     {
       "name": "My Wallet",
       "short_name": "Wallet",
-      "description": "Wallet balance aur deposit balance dekhein",
+      "description": "Wallet balance, coins aur deposits",
       "url": "./index.html#wallet",
       "icons": [
         {
-          "src": "assets/app-icon/logo-512.png",
+          "src": "assets/shortcuts/wallet-192.png",
           "sizes": "192x192",
+          "type": "image/png",
           "purpose": "any"
         }
       ]
     },
     {
-      "name": "Order History",
+      "name": "Orders",
       "short_name": "Orders",
-      "description": "Apne past aur pending orders check karein",
+      "description": "Pending aur completed orders",
       "url": "./index.html#orders",
       "icons": [
         {
-          "src": "assets/app-icon/logo-512.png",
+          "src": "assets/shortcuts/orders-192.png",
           "sizes": "192x192",
+          "type": "image/png",
+          "purpose": "any"
+        }
+      ]
+    },
+    {
+      "name": "History",
+      "short_name": "History",
+      "description": "Transaction aur order history",
+      "url": "./index.html#history",
+      "icons": [
+        {
+          "src": "assets/shortcuts/history-192.png",
+          "sizes": "192x192",
+          "type": "image/png",
           "purpose": "any"
         }
       ]
