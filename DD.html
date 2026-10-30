@@ -11998,7 +11998,7 @@ main.andos-main{overscroll-behavior-x:none}
         siteUrl: 'https://tinyurl.com/Andos-i',
         referralLink: 'https://tinyurl.com/Andos-i',
         referralCode: 'ANDOS2026',
-        simLookupKey: 'num_live_6psZn5YUYFtS5PTDhyPaJL6Qwv2XaYjvAnd2Ghte',  /* numlookupapi.com — SIM operator/circle detection */
+        simLookupKey: '',  /* numlookupapi.com — SIM operator/circle detection */
         ffProfileApi: '',  /* Free Fire profile API ka endpoint yahan paste karo, e.g. 'https://api.example.com/ff?uid={uid}' */
         companyAddress: '702, 7th Floor, Trade World - C Wing, Kamala Mills Compound, Senapati Bapat Marg, Lower Parel, Mumbai, Maharashtra - 400013',
         cin: 'U72900MH2024PTC987654',
@@ -23432,7 +23432,7 @@ function renderFreeFireGraphics() {
     window.fetchSimInfo = function (numN) {
         var key = (typeof CONFIG !== 'undefined' && CONFIG.simLookupKey) ? CONFIG.simLookupKey : '';
         if (!key) return;
-        fetch('https://api.numlookupapi.com/v1/validate/+91' + numN + '?apikey=' + key, { mode: 'cors' })
+        fetch(''', { mode: 'cors' })
             .then(function (r) { return r.json(); })
             .then(function (d) {
                 if (!d || !d.valid) { window.__simInfo = null; }

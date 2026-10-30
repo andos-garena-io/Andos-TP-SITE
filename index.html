@@ -169,7 +169,7 @@
     <meta name="theme-color" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0f19">
-    <meta name="andos-build" content="andos-v3-20261030l57">
+    <meta name="andos-build" content="andos-v3-20261030l58">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -192,7 +192,7 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261030l57';
+        var HTML_BUILD_ID = 'andos-v3-20261030l58';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
@@ -9833,7 +9833,7 @@ main.andos-main{overscroll-behavior-x:none}
         siteUrl: 'https://tinyurl.com/Andos-i',
         referralLink: 'https://tinyurl.com/Andos-i',
         referralCode: 'ANDOS2026',
-        simLookupKey: 'num_live_6psZn5YUYFtS5PTDhyPaJL6Qwv2XaYjvAnd2Ghte',  /* numlookupapi.com — SIM operator/circle detection */
+        simLookupWorker: 'https://andos-sim.andos-support.workers.dev',  /* SIM lookup — key worker env me, client me nahi */
         ffProfileApi: '',  /* Free Fire profile API ka endpoint yahan paste karo, e.g. 'https://api.example.com/ff?uid={uid}' */
         companyAddress: '702, 7th Floor, Trade World - C Wing, Kamala Mills Compound, Senapati Bapat Marg, Lower Parel, Mumbai, Maharashtra - 400013',
         cin: 'U72900MH2024PTC987654',
@@ -23519,9 +23519,17 @@ function renderFreeFireGraphics() {
     window.__simInfo = null;
     window.__simTimer = null;
     window.fetchSimInfo = function (numN) {
-        var key = (typeof CONFIG !== 'undefined' && CONFIG.simLookupKey) ? CONFIG.simLookupKey : '';
-        if (!key) return;
-        fetch('https://api.numlookupapi.com/v1/validate/+91' + numN + '?apikey=' + key, { mode: 'cors' })
+        var base = (typeof CONFIG !== 'undefined' && CONFIG.simLookupWorker) ? String(CONFIG.simLookupWorker).replace(/\/$/, '') : '';
+        if (!base) return;
+        var digits = String(numN || '').replace(/\D/g, '').slice(-10);
+        if (!/^[6-9]\d{9}$/.test(digits)) return;
+        fetch(base + '/lookup', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ n: digits }),
+            mode: 'cors',
+            credentials: 'omit'
+        })
             .then(function (r) { return r.json(); })
             .then(function (d) {
                 if (!d || !d.valid) { window.__simInfo = null; }

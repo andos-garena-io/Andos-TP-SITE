@@ -1,0 +1,5 @@
+name = "andos-sim"
+main = "src/index.js"
+compatibility_date = "2024-09-23"
+workers_dev = true
+account_id = "86be8437703a0bd0fca45d28f0b7b025"
