@@ -169,7 +169,7 @@
     <meta name="theme-color" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0f19">
-    <meta name="andos-build" content="andos-v3-20261030l53">
+    <meta name="andos-build" content="andos-v3-20261030l54">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -192,7 +192,7 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261030l53';
+        var HTML_BUILD_ID = 'andos-v3-20261030l54';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
@@ -25603,7 +25603,7 @@ main.andos-main:not(:has(#pageSlider)) {
 #pageSlider { overflow-x: hidden !important; touch-action: pan-y !important; scroll-snap-type: none !important; }
 nav.home-topbar .andos-verified { display: none !important; }
 /* DP 40px original slot. Ring = usi circle ka border (login colours + safed gap). Alag blob nahi. */
-/* l53: photo wapas (grid, px). Ring = GH image: blue + white gap + chrome */
+/* l54: sirf bahar cyan-blue + white gap. Andar chrome/cyan ring nahi — bus DP. */
 nav.home-topbar .andos-avatar-btn {
   width: 40px !important;
   height: 40px !important;
@@ -25644,11 +25644,11 @@ nav.home-topbar .andos-dp-metal {
   min-height: 0 !important;
   position: relative !important;
   border-radius: 50% !important;
-  padding: 1.5px !important;
-  background: linear-gradient(145deg, #f5f7fa 0%, #c5ccd3 18%, #ffffff 40%, #8b959e 58%, #e8edf1 78%, #4a525a 100%) !important;
+  padding: 0 !important;
+  background: transparent !important;
   box-sizing: border-box !important;
   overflow: hidden !important;
-  box-shadow: inset 0 0 2px 1px rgba(0, 234, 255, 0.8) !important;
+  box-shadow: none !important;
 }
 nav.home-topbar .andos-dp-metal > img,
 nav.home-topbar .andos-dp-metal #hdrLiveAva,
