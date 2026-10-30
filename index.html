@@ -169,7 +169,7 @@
     <meta name="theme-color" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0f19">
-    <meta name="andos-build" content="andos-v3-20261030l56">
+    <meta name="andos-build" content="andos-v3-20261030l57">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -192,7 +192,7 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261030l56';
+        var HTML_BUILD_ID = 'andos-v3-20261030l57';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
@@ -25603,7 +25603,7 @@ main.andos-main:not(:has(#pageSlider)) {
 #pageSlider { overflow-x: hidden !important; touch-action: pan-y !important; scroll-snap-type: none !important; }
 nav.home-topbar .andos-verified { display: none !important; }
 /* DP 40px. Outer = dp-ring conic overlay (px). Beech = pehle wala white space, transparent. Andar bus photo. */
-/* l56: ring mask hole. Gap cover mat karo. ::before chrome nahi. Nested % nahi. */
+/* l57: ring HQ AA + thoda brightness. Gap transparent. Photo same. */
 nav.home-topbar .andos-avatar-btn {
   width: 40px !important;
   height: 40px !important;
@@ -25614,7 +25614,7 @@ nav.home-topbar .andos-avatar-btn {
   place-items: stretch !important;
   position: relative !important;
   box-sizing: border-box !important;
-  overflow: hidden !important;
+  overflow: visible !important;
   padding: 3.5px !important;
   border: 0 !important;
   border-radius: 50% !important;
@@ -25631,10 +25631,14 @@ nav.home-topbar .andos-avatar-ring {
   padding: 0 !important;
   border: 0 !important;
   box-sizing: border-box !important;
-  background: conic-gradient(from 220deg, #0785ff, #168bff, #a5a4ff, #168bff, #0785ff) !important;
-  box-shadow: none !important;
-  -webkit-mask-image: radial-gradient(circle at 50% 50%, transparent 16.5px, #000 16.5px) !important;
-  mask-image: radial-gradient(circle at 50% 50%, transparent 16.5px, #000 16.5px) !important;
+  background: conic-gradient(from 220deg, #0785ff 0%, #168bff 25%, #a5a4ff 50%, #168bff 75%, #0785ff 100%) !important;
+  box-shadow: 0 0 5px rgba(7, 133, 255, 0.38) !important;
+  filter: brightness(1.22) saturate(1.12) contrast(1.04) !important;
+  transform: translateZ(0) !important;
+  -webkit-backface-visibility: hidden !important;
+  backface-visibility: hidden !important;
+  -webkit-mask-image: radial-gradient(circle at 50% 50%, transparent 16.15px, #000 16.85px) !important;
+  mask-image: radial-gradient(circle at 50% 50%, transparent 16.15px, #000 16.85px) !important;
   -webkit-mask-repeat: no-repeat !important;
   mask-repeat: no-repeat !important;
   -webkit-mask-size: 100% 100% !important;
