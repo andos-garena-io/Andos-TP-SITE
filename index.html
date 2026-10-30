@@ -169,7 +169,7 @@
     <meta name="theme-color" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0b0f19">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0f19">
-    <meta name="andos-build" content="andos-v3-20261030l52">
+    <meta name="andos-build" content="andos-v3-20261030l53">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -192,7 +192,7 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261030l52';
+        var HTML_BUILD_ID = 'andos-v3-20261030l53';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
@@ -25603,16 +25603,19 @@ main.andos-main:not(:has(#pageSlider)) {
 #pageSlider { overflow-x: hidden !important; touch-action: pan-y !important; scroll-snap-type: none !important; }
 nav.home-topbar .andos-verified { display: none !important; }
 /* DP 40px original slot. Ring = usi circle ka border (login colours + safed gap). Alag blob nahi. */
-/* l52: GH-ref — moti cyan-blue ring, mota white gap, patli chrome, photo cover */
+/* l53: photo wapas (grid, px). Ring = GH image: blue + white gap + chrome */
 nav.home-topbar .andos-avatar-btn {
   width: 40px !important;
   height: 40px !important;
   flex: 0 0 40px !important;
-  aspect-ratio: 1 / 1 !important;
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  grid-template-rows: 1fr !important;
+  place-items: stretch !important;
   position: relative !important;
   box-sizing: border-box !important;
   overflow: hidden !important;
-  padding: 10% !important;
+  padding: 3.5px !important;
   border: 0 !important;
   border-radius: 50% !important;
   background: conic-gradient(from 200deg, #00a8ff 0%, #0096ff 22%, #2f8fff 48%, #7aa3ff 72%, #4db8ff 88%, #00a8ff 100%) !important;
@@ -25620,58 +25623,70 @@ nav.home-topbar .andos-avatar-btn {
 }
 nav.home-topbar .andos-avatar-ring {
   display: none !important;
-  background: none !important;
-  box-shadow: none !important;
 }
 nav.home-topbar .andos-dp-gap {
-  display: block !important;
-  width: 100% !important;
-  height: 100% !important;
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  grid-template-rows: 1fr !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
   border-radius: 50% !important;
-  padding: 9% !important;
+  padding: 2.5px !important;
   background: #ffffff !important;
   box-sizing: border-box !important;
   overflow: hidden !important;
 }
 nav.home-topbar .andos-dp-metal {
-  display: block !important;
-  width: 100% !important;
-  height: 100% !important;
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  grid-template-rows: 1fr !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  position: relative !important;
   border-radius: 50% !important;
-  padding: 2px !important;
+  padding: 1.5px !important;
   background: linear-gradient(145deg, #f5f7fa 0%, #c5ccd3 18%, #ffffff 40%, #8b959e 58%, #e8edf1 78%, #4a525a 100%) !important;
   box-sizing: border-box !important;
   overflow: hidden !important;
-  box-shadow: inset 0 0 3px 1px rgba(0, 234, 255, 0.85), 0 0 4px rgba(0, 229, 255, 0.55) !important;
+  box-shadow: inset 0 0 2px 1px rgba(0, 234, 255, 0.8) !important;
 }
-nav.home-topbar .andos-avatar-btn img:not(.andos-verified-img),
-nav.home-topbar .andos-avatar-btn #hdrLiveAva,
-nav.home-topbar .andos-avatar-btn [data-live-avatar],
-nav.home-topbar .andos-avatar-btn .andos-avatar-fallback,
 nav.home-topbar .andos-dp-metal > img,
 nav.home-topbar .andos-dp-metal #hdrLiveAva,
-nav.home-topbar .andos-dp-metal .andos-avatar-fallback {
+nav.home-topbar .andos-avatar-btn #hdrLiveAva,
+nav.home-topbar .andos-avatar-btn [data-live-avatar] {
+  grid-area: 1 / 1 !important;
   position: static !important;
-  inset: unset !important;
-  left: auto !important;
-  top: auto !important;
-  right: auto !important;
-  bottom: auto !important;
+  inset: auto !important;
   display: block !important;
   width: 100% !important;
   height: 100% !important;
-  max-width: 100% !important;
-  max-height: 100% !important;
-  box-sizing: border-box !important;
-  border-radius: 50% !important;
+  max-width: none !important;
+  max-height: none !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
   object-fit: cover !important;
   object-position: center !important;
+  border-radius: 50% !important;
   padding: 0 !important;
   border: 0 !important;
   background: transparent !important;
-  background-image: none !important;
   box-shadow: none !important;
-  z-index: auto !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  z-index: 1 !important;
+}
+nav.home-topbar .andos-dp-metal > .andos-avatar-fallback {
+  grid-area: 1 / 1 !important;
+  position: static !important;
+  inset: auto !important;
+  display: grid !important;
+  place-items: center !important;
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 50% !important;
+  background: #e8eef5 !important;
+  color: #64748b !important;
+  z-index: 0 !important;
 }
 /* poster top pe white dhund band — hero ::before + top mask. Header fade alag. */
 .andos-shell[data-page="home"] .home-hero-bleed {
