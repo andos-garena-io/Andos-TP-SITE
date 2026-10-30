@@ -52,6 +52,23 @@
     return Math.max(s ? s.scrollTop : 0, window.scrollY || document.documentElement.scrollTop || 0);
   }
 
+  /* scrolled state me header ko solid white karo (inline !important — app ka
+     .is-scrolled glass rule specificity se jeetta hai, CSS se override nahi hota).
+     Isse band aur chrome dono EXACT #ffffff ho jaate hain -> strip mathematically khatam. */
+  function setSolid(nav, solid) {
+    try {
+      if (solid) {
+        nav.style.setProperty('background-color', SCROLLED, 'important');
+        nav.style.setProperty('backdrop-filter', 'none', 'important');
+        nav.style.setProperty('-webkit-backdrop-filter', 'none', 'important');
+      } else {
+        nav.style.removeProperty('background-color');
+        nav.style.removeProperty('backdrop-filter');
+        nav.style.removeProperty('-webkit-backdrop-filter');
+      }
+    } catch (e) {}
+  }
+
   function apply() {
     if (window.__andosSplashActive || document.getElementById('appSplashOverlay')) return;
     var nav = document.querySelector(NAV);
@@ -67,8 +84,10 @@
 
     if (isHome) {
       ROOT.setAttribute('data-andos-scrolled', scrolled ? '1' : '0');
+      setSolid(nav, scrolled);
       return write(scrolled ? SCROLLED : HERO);
     }
+    setSolid(nav, false);
     ROOT.removeAttribute('data-andos-scrolled');
     var navBg = parse(getComputedStyle(nav).backgroundColor);
     if (navBg && navBg.a > 0.98) return write(toHex(navBg));
