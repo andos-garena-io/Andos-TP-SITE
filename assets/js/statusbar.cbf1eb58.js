@@ -13,7 +13,6 @@
   var HERO = '#F9A8D4';
   var SCROLLED = '#ffffff';
   var baseBody = null;
-  var lastSample = 0, lastScrolledColor = null;
 
   function parse(c) {
     if (!c || c === 'transparent') return null;
@@ -53,95 +52,21 @@
     return Math.max(s ? s.scrollTop : 0, window.scrollY || document.documentElement.scrollTop || 0);
   }
 
-
-  /* ---- seam sampler: page ke TOP edge (jahan chrome milta hai) ke peeche ka rang ----
-     Glass header ke neeche content badalta rehta hai, isliye top rows par 5 x-positions
-     ka median lete hain (ek point noise/icon se bachne ke liye). */
-  var mediaCache = {};
-  function gradFirst(bgi) {
-    if (!bgi || bgi === 'none' || bgi.indexOf('gradient') < 0) return null;
-    var m = bgi.match(/(rgba?\([^)]*\)|#[0-9a-f]{3,8})/i);
-    return m ? (parse(m[1]) || hexToRgb(m[1])) : null;
-  }
-  function ownPaint(el) {
-    var cs = getComputedStyle(el);
-    var c = parse(cs.backgroundColor);
-    if (c && c.a > 0.02) return c;
-    return gradFirst(cs.backgroundImage);
-  }
-  function drawFrom(srcEl, rect, x, y) {
+  /* scrolled state me header ko solid white karo (inline !important — app ka
+     .is-scrolled glass rule specificity se jeetta hai, CSS se override nahi hota).
+     Isse band aur chrome dono EXACT #ffffff ho jaate hain -> strip mathematically khatam. */
+  function setSolid(nav, solid) {
     try {
-      var cv = document.createElement('canvas'); cv.width = 1; cv.height = 1;
-      var ctx = cv.getContext('2d', { willReadFrequently: true });
-      var w = srcEl.naturalWidth || srcEl.videoWidth || rect.width;
-      var h = srcEl.naturalHeight || srcEl.videoHeight || rect.height;
-      var sx = (x - rect.left) / rect.width * w, sy = (y - rect.top) / rect.height * h;
-      ctx.drawImage(srcEl, Math.max(0, sx - 2), Math.max(0, sy - 2), 5, 5, 0, 0, 1, 1);
-      var d = ctx.getImageData(0, 0, 1, 1).data;
-      return { r: d[0], g: d[1], b: d[2], a: 1 };
-    } catch (e) { return null; }
-  }
-  function mediaPaint(el, x, y) {
-    var list = [];
-    if (el.tagName === 'VIDEO' || el.tagName === 'IMG') list.push(el);
-    if (el.querySelectorAll) { var q = el.querySelectorAll('video,img'); for (var i = 0; i < q.length; i++) list.push(q[i]); }
-    for (var i = 0; i < list.length; i++) {
-      var m = list[i], r = m.getBoundingClientRect();
-      if (!(r.width > 2 && r.height > 2)) continue;
-      if (x < r.left || x > r.right || y < r.top || y > r.bottom) continue;
-      if (m.tagName === 'VIDEO') { if (m.readyState < 2) continue; var c = drawFrom(m, r, x, y); if (c) return c; continue; }
-      var c2 = drawFrom(m, r, x, y);
-      if (c2) return c2;
-      var s = m.currentSrc || m.src;
-      if (!s) continue;
-      var cached = mediaCache[s];
-      if (cached && cached.__ready) { var c3 = drawFrom(cached, r, x, y); if (c3) return c3; }
-      else if (!cached) {
-        var im = new Image(); im.crossOrigin = 'anonymous';
-        im.onload = function () { im.__ready = true; schedule(); };
-        im.src = s; mediaCache[s] = im;
+      if (solid) {
+        nav.style.setProperty('background-color', SCROLLED, 'important');
+        nav.style.setProperty('backdrop-filter', 'none', 'important');
+        nav.style.setProperty('-webkit-backdrop-filter', 'none', 'important');
+      } else {
+        nav.style.removeProperty('background-color');
+        nav.style.removeProperty('backdrop-filter');
+        nav.style.removeProperty('-webkit-backdrop-filter');
       }
-    }
-    return null;
-  }
-  function paintAt(nav, x, y) {
-    var navKids = [], navAnc = [];
-    var kids = nav.querySelectorAll('*');
-    for (var i = 0; i < kids.length; i++) navKids.push(kids[i]);
-    for (var p = nav.parentElement; p; p = p.parentElement) navAnc.push(p);
-    var stack = [];
-    try { stack = document.elementsFromPoint(x, y) || []; } catch (e) {}
-    for (var s = 0; s < stack.length; s++) {
-      var el = stack[s];
-      if (!el || el === nav || navKids.indexOf(el) >= 0 || navAnc.indexOf(el) >= 0 || el === ROOT) continue;
-      var mp = mediaPaint(el, x, y);
-      if (mp) return mp;
-      var node = el, hit = null;
-      while (node && navAnc.indexOf(node) < 0 && node !== ROOT) {
-        hit = ownPaint(node);
-        if (hit) break;
-        node = node.parentElement;
-      }
-      if (hit) return hit;
-    }
-    return null;
-  }
-  function median(arr) {
-    var r = [], g = [], b = [];
-    for (var i = 0; i < arr.length; i++) { r.push(arr[i].r); g.push(arr[i].g); b.push(arr[i].b); }
-    function med(a) { a.sort(function (x, y) { return x - y; }); return a[Math.floor(a.length / 2)]; }
-    return { r: med(r), g: med(g), b: med(b), a: 1 };
-  }
-  function seamColor(nav) {
-    var nr = nav.getBoundingClientRect();
-    var xs = [0.1, 0.3, 0.5, 0.7, 0.9], ys = [3, 8, 14, 22, 32, 44], out = [];
-    for (var i = 0; i < xs.length; i++) {
-      for (var j = 0; j < ys.length; j++) {
-        var c = paintAt(nav, Math.round(window.innerWidth * xs[i]), Math.round(nr.top + ys[j]));
-        if (c) out.push(over({ r: c.r, g: c.g, b: c.b, a: c.a == null ? 1 : c.a }, ambient()));
-      }
-    }
-    return out.length >= 3 ? median(out) : null;
+    } catch (e) {}
   }
 
   function apply() {
@@ -157,19 +82,12 @@
     var scrolled = /(^|\s)is-scrolled(\s|$)/.test(nav.className || '') || scrollTop() > 8;
     ROOT.setAttribute('data-andos-topbar', '1');
 
-    var navBgNow = parse(getComputedStyle(nav).backgroundColor) || { r: 0, g: 0, b: 0, a: 0 };
     if (isHome) {
       ROOT.setAttribute('data-andos-scrolled', scrolled ? '1' : '0');
-      if (!scrolled) return write(HERO);                 /* hero ke upar transparent */
-      /* sampling heavy hai — 120ms me ek baar se zyada nahi (scroll par UI smooth rahe) */
-      var now = Date.now();
-      if (now - lastSample > 120 || !lastScrolledColor) {
-        var seam = seamColor(nav);                        /* glass ke peeche ka asli rang */
-        lastSample = now;
-        lastScrolledColor = seam ? toHex(navBgNow.a > 0.02 ? over(navBgNow, seam) : seam) : SCROLLED;
-      }
-      return write(lastScrolledColor);
+      setSolid(nav, scrolled);
+      return write(scrolled ? SCROLLED : HERO);
     }
+    setSolid(nav, false);
     ROOT.removeAttribute('data-andos-scrolled');
     var navBg = parse(getComputedStyle(nav).backgroundColor);
     if (navBg && navBg.a > 0.98) return write(toHex(navBg));
