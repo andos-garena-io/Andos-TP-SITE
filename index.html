@@ -512,14 +512,15 @@ nav.glass-nav, .xplore-head, .od-title, .wal-hero, .txn-bar, .sp-bar, .odd-bar, 
 
 <link rel="stylesheet" href="/assets/css/andos5.4e46dfa2.css">
 <style id="andos-statusbar-fix">
-/* ===== STATUS BAR == HEADER (edge-to-edge, no separate solid strip) ==========
-   --andos-sbt   : safe-area top (env) — header khud is strip ko paint karta hai
-   --andos-top-color : JS har scroll par set karta hai = exactly wo colour jo
-                       header ke peeche render ho raha hai (hero image / glass / solid)
-   html + body background bhi wahi colour follow karte hain, isliye overscroll,
-   browser chrome (theme-color) aur header — teeno ek hi shade me rehte hain. */
+/* ===== STATUS BAR == HEADER (edge-to-edge, koi alag solid strip nahi) =========
+   --andos-sbt       : safe-area top (env) — header khud is strip ko paint karta hai
+   --andos-top-color : JS har scroll/page change par set karta hai:
+                         home top (hero ke upar transparent header) -> brand #F9A8D4
+                         scrolled (.is-scrolled)                     -> #ffffff
+                         baaki pages                                 -> header ka apna bg
+   Wahi colour <meta theme-color> (browser chrome) + html/body background me jaata
+   hai, isliye chrome, status-bar band aur header — teeno ek hi shade me. */
 :root{ --andos-sbt: env(safe-area-inset-top, 0px); --andos-top-color:#F9A8D4; }
-/* sirf home header (baaki pages apne header rules rakhte hain) */
 nav.home-topbar{
   top:0 !important;
   box-sizing:border-box !important;
@@ -539,6 +540,6 @@ html[data-auth="ok"][data-andos-topbar="1"] body{
 html.andos-splash, html.andos-splash body{ background-color:#000000 !important; transition:none; }
 </style>
 <script src="/assets/js/deeplink.0cb0a828.js" defer></script>
-<script src="/assets/js/statusbar.c8692d71.js" defer></script>
+<script src="/assets/js/statusbar.32902b06.js" defer></script>
 </body>
 </html>
