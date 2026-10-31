@@ -35,7 +35,7 @@ html,body{background-color:#0b0f19!important;background-image:none!important}#ap
   --andos-nav-h: 65px;                                           /* chhota bottom nav (measured) */
   --andos-safe-bottom: max(8px, env(safe-area-inset-bottom, 0px)); /* 3-button nav floor */
   /* nav ki asli height + thoda breathing = jitna chahiye, utna hi — extra khali space zero */
-  --andos-bottom-gap: calc(var(--andos-nav-h) + 14px + var(--andos-safe-bottom));
+  --andos-bottom-gap: calc(var(--andos-nav-h) + 9px + var(--andos-safe-bottom));
 }
 @supports (height: 100dvh){ :root{ --andos-dvh: 100dvh; } }
 
@@ -146,3 +146,48 @@ main.andos-main:not(:has(#pageSlider)){
 
 /* Explore section ka base bhi saaf white (clean canvas) */
 .page-section[data-sec="categories"]{ background:#ffffff!important; }
+
+
+/* ============ v11.2 — EDGE-TO-EDGE LOCK + OVER-SCROLL CONTROL ============
+   (A) Wallet hero left/right dono taraf 0px se 100% tak — koi cut line nahi.
+   (B) Page apni real height se zyada "khinchti" nahi: overscroll band. */
+
+/* ---- (A) edge-to-edge lock: wallet ---- */
+.wal-page,
+.wal-hero,
+.wal-body,
+.page-section[data-sec="wallet"]{
+  width: 100% !important;
+  max-width: 100% !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  box-sizing: border-box !important;
+}
+/* hairline bachane ke liye hero ka background 2px dono taraf extend karta hai */
+.wal-hero{ position: relative; }
+.wal-hero::before{
+  content: "";
+  position: absolute;
+  top: 0; bottom: 0;
+  left: -2px; right: -2px;
+  background: inherit;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 0;
+}
+.wal-hero > *{ position: relative; z-index: 1; }
+
+/* ---- (B) over-scroll: bounce/rubber-band band, scroll sirf content par ---- */
+html{ overscroll-behavior-y: none; }
+body{ overscroll-behavior-y: none; overflow-x: hidden; }
+.page-section,
+main.andos-main,
+.pv2, .os2-page, .payx-page, .payment-verification-page,
+.wal-page, .lb-ui, .ep-page{
+  overscroll-behavior-y: contain;
+  scroll-behavior: auto;
+}
+/* purane extra bottom padding (16px + safe) -> 12px + safe : sirf itna jitna chahiye */
+.pv2, .os2-page, .payx-page, .payment-verification-page{
+  padding-bottom: calc(12px + var(--andos-safe-bottom)) !important;
+}

@@ -1,26 +1,86 @@
 /* ANDOS Production Service Worker v3 — Cache Versioning, Legacy PWA Auto-Purge & Fresh HTML Guarantee */
-const CACHE_VERSION = 'v12';
+const CACHE_VERSION = 'v13';
 const STATIC_MEDIA_CACHE = 'andos-media-' + CACHE_VERSION;
 const HTML_CACHE = 'andos-html-' + CACHE_VERSION;
 const HTML_KEY = 'index.html';   /* single key: / or /index.html?source=pwa sab isi par */
-const APP_BUILD_ID = 'andos-v3-20261030l58'; // must match window.__ANDOS_BUILD_ID in assets/js/andos3 (else SW forces a reload that skips the splash)
+const APP_BUILD_ID = 'andos-v3-20261101a1'; // must match window.__ANDOS_BUILD_ID in assets/js/andos3 (else SW forces a reload that skips the splash)
 const PRECACHE_MEDIA = [
   './assets/videos/splash-loading.mp4',
-  './assets/app-icon/splash-frame0-ed73c7df.webp',   // splash poster == mp4 frame 0 (byte-identical)
+  './assets/app-icon/splash-frame0-ed73c7df.webp',
   './assets/app-icon/logo-192.png',
   './assets/app-icon/logo-512.png',
-  /* POINT 6: saara CSS pehle se cache me -> koi bhi page khulte hi poora styled (FOUC zero).
-     Tailwind ab LOCAL static build hai (tw.*.css); CDN par depend nahi. */
   './assets/css/tw.2d52300d.css',
   './assets/css/andos1.f4a7f80d.css',
   './assets/css/andos2.c35d525b.css',
   './assets/css/andos3.8eaf10d2.css',
   './assets/css/andos4.6b07466e.css',
-  './assets/css/andos5.fdb450a6.css',
+  './assets/css/andos5.cc88f7f4.css',
   './assets/css/fa.6.5.0.min.css',
   './assets/css/gf.local.css',
   './assets/css/gf2.local.css',
-  './assets/photos/hero-anniversary-a.jpg'
+  './assets/photos/hero-anniversary-a.jpg',
+  './assets/app-icon/logo-1254.png',
+  './assets/js/andos2.8556ab0e.js',
+  './assets/js/andos3.719baac1.js',
+  './assets/js/andos4.4ca47c00.js',
+  './assets/js/andos5.ed260336.js',
+  './assets/js/deeplink.0cb0a828.js',
+  './assets/mirror/FF-PLAN-520/combo-card.jpg',
+  './assets/mirror/FF-PLAN-520/featured-plans.jpg',
+  './assets/mirror/FF-PLAN-520/ff-card.jpg',
+  './assets/mirror/FF-PLAN-520/ff-guild.png',
+  './assets/mirror/FF-PLAN-520/mega-packs.jpg',
+  './assets/mirror/FF-PLAN-520/membership-plans.jpg',
+  './assets/mirror/FF-PLAN-520/monthly-membership-offer.jpg',
+  './assets/mirror/brand-logos/garena_logo.png',
+  './assets/mirror/instruction-steps/step-1.png',
+  './assets/mirror/instruction-steps/step-2.png',
+  './assets/mirror/photos/cat-ai.png',
+  './assets/mirror/photos/cat-bills.png',
+  './assets/mirror/photos/cat-education.png',
+  './assets/mirror/photos/cat-food.png',
+  './assets/mirror/photos/cat-gaming.png',
+  './assets/mirror/photos/cat-giftcard.png',
+  './assets/mirror/photos/cat-health.png',
+  './assets/mirror/photos/cat-ott.png',
+  './assets/mirror/photos/cat-recharge.png',
+  './assets/mirror/photos/cat-seeall.png',
+  './assets/mirror/photos/cat-shopping.png',
+  './assets/mirror/photos/cat-social.png',
+  './assets/mirror/photos/cat-travel.png',
+  './assets/mirror/photos/daily-streak-gift.jpg',
+  './assets/mirror/photos/ff-rail-01.jpg',
+  './assets/mirror/photos/ff-rail-02.jpg',
+  './assets/mirror/photos/ff-rail-03.jpg',
+  './assets/mirror/photos/ff-rail-04.jpg',
+  './assets/mirror/photos/ff-rail-05.jpg',
+  './assets/mirror/photos/ff-rail-06.jpg',
+  './assets/mirror/photos/hero-anniversary-a.jpg',
+  './assets/mirror/photos/invite-art.jpg',
+  './assets/mirror/photos/leaderboard-p1.jpg',
+  './assets/mirror/photos/leaderboard-p2.jpg',
+  './assets/mirror/photos/leaderboard-p3.jpg',
+  './assets/mirror/photos/leaderboard-podium.jpg',
+  './assets/mirror/photos/trust-video-1.png',
+  './assets/mirror/photos/verify-badge.png',
+  './assets/mirror/photos/wallet-coin.png',
+  './assets/mirror/photos/wallet-spin-banner.jpg',
+  './assets/mirror/service-logos/airtel.png',
+  './assets/mirror/service-logos/amazon.png',
+  './assets/mirror/service-logos/facebook.png',
+  './assets/mirror/service-logos/freefire.png',
+  './assets/mirror/service-logos/instagram.png',
+  './assets/mirror/service-logos/playstore.png',
+  './assets/mirror/service-logos/youtube.png',
+  './assets/shortcuts/deals-192.png',
+  './assets/shortcuts/history-192.png',
+  './assets/shortcuts/orders-192.png',
+  './assets/shortcuts/wallet-192.png',
+  './assets/splash/apple-startup-1125x2436.png',
+  './assets/splash/apple-startup-1170x2532.png',
+  './assets/splash/apple-startup-1284x2778.png',
+  './assets/splash/apple-startup-750x1334.png',
+  './assets/splash/apple-startup-828x1792.png'
 ];
 
 const ackedClients = new Set();
@@ -119,6 +179,13 @@ self.addEventListener('message', (event) => {
 });
 
 // Network-first (`no-store`) for ALL HTML & manifest requests; instant cache-first ONLY for versioned static media (`v3`)
+/* ---- image fallback tile (blank asset kabhi nahi) ---- */
+const FALLBACK_TILE_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#312e81"/><stop offset="1" stop-color="#7c3aed"/></linearGradient></defs><rect width="96" height="96" rx="20" fill="url(#g)"/><path d="M48 28l5.6 12.4L66 46l-12.4 5.6L48 64l-5.6-12.4L30 46l12.4-5.6z" fill="#fff" opacity=".92"/></svg>';
+function isImageRequest(url, req) {
+  if (req.destination === 'image') return true;
+  return /\.(png|jpe?g|webp|gif|svg|avif|ico)$/i.test(url.pathname);
+}
+
 self.addEventListener('fetch', (event) => {
   const req = event.request;
   if (req.method !== 'GET') return;
@@ -177,7 +244,10 @@ self.addEventListener('fetch', (event) => {
   if (
     url.origin === self.location.origin &&
     (url.pathname.includes('/assets/videos/splash-loading.mp4') || url.pathname.includes('/assets/app-icon/') ||
-     url.pathname.startsWith('/assets/css/') || url.pathname.startsWith('/assets/mirror/'))
+     url.pathname.startsWith('/assets/css/') || url.pathname.startsWith('/assets/js/') ||
+     url.pathname.startsWith('/assets/mirror/') || url.pathname.startsWith('/assets/photos/') ||
+     url.pathname.startsWith('/assets/ff-logo/') || url.pathname.startsWith('/assets/splash/') ||
+     url.pathname.startsWith('/assets/shortcuts/') || url.pathname.startsWith('/assets/brand-logos/'))
   ) {
     event.respondWith(
       caches.open(STATIC_MEDIA_CACHE).then(async (cache) => {
@@ -186,11 +256,20 @@ self.addEventListener('fetch', (event) => {
         }
         const hit = await cache.match(req, { ignoreSearch: true });
         if (hit) return hit;
-        const fresh = await fetch(req);
+        let fresh = null;
+        try { fresh = await fetch(req); } catch (e) { fresh = null; }
         if (fresh && fresh.status === 200) {
           cache.put(req, fresh.clone()).catch(() => {});
+          return fresh;
         }
-        return fresh;
+        /* 404 / offline / corrupt: image ke liye kabhi blank na dikhe -> inline tile */
+        if (isImageRequest(url, req)) {
+          return new Response(FALLBACK_TILE_SVG, {
+            status: 200,
+            headers: { 'Content-Type': 'image/svg+xml;charset=utf-8', 'Cache-Control': 'no-store' }
+          });
+        }
+        return fresh || Response.error();
       })
     );
   }
