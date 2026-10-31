@@ -636,6 +636,54 @@ document.addEventListener('error',function(e){var t=e.target;
     return r;}; window.logoutUser.__wrapped=1; return true; }
   if(!hook()){ var n=0,t=setInterval(function(){ if(hook()||++n>40)clearInterval(t) },100); }})();
 </script>
+<script>/* ========== SCROLL-LOCK CLEANUP (v11) ==========
+   Payment/animation transitions ke baad body/html/shell par laga
+   overflow:hidden kabhi-kabhi clear nahi hota tha -> poora app "freeze".
+   Ye guard: har navigation ke baad + app wapas focus par, agar koi drawer/sheet
+   khula nahi hai to scroll ko turant unlock kar deta hai (idempotent, safe). */
+(function(){
+  function drawerOpen(){
+    try{
+      var sb=document.querySelector('.sidebar');
+      if(sb&&(sb.classList.contains('open')||sb.classList.contains('is-open'))) return true;
+      var ov=document.querySelector('.sidebar-overlay');
+      if(ov){ var c=getComputedStyle(ov);
+        if(c.pointerEvents!=='none'&&parseFloat(c.opacity)>0.05&&c.display!=='none') return true; }
+      if(document.querySelector('.mdp-tl')) return true;
+      if(document.querySelector('.ios-spin-sheet.on,.sheet.on,.ss-sheet.on,[data-sheet].on')) return true;
+      return false;
+    }catch(e){ return false; }
+  }
+  function unlock(){
+    if(drawerOpen()) return;
+    try{
+      if(document.body.style.overflow==='hidden'){
+        document.body.style.overflow='';
+        document.documentElement.style.overflow='';
+        document.documentElement.style.overscrollBehavior='';
+        var sh=document.querySelector('.andos-shell'); if(sh) sh.style.overflow='';
+      }
+    }catch(e){}
+  }
+  window.__andosUnlockScroll=unlock;
+  function wrapNav(){
+    if(typeof window.navigate!=='function'||window.navigate.__unlock) return false;
+    var n=window.navigate;
+    window.navigate=function(){
+      var r=n.apply(this,arguments);
+      setTimeout(unlock,60); setTimeout(unlock,450);
+      return r;
+    };
+    window.navigate.__unlock=1; return true;
+  }
+  if(!wrapNav()){ var i=0,t=setInterval(function(){ if(wrapNav()||++i>80) clearInterval(t); },100); }
+  ['pageshow','focus','visibilitychange'].forEach(function(ev){
+    window.addEventListener(ev,function(){ setTimeout(unlock,150); },{passive:true});
+  });
+  document.addEventListener('andos:splash:done',function(){ setTimeout(unlock,150); });
+})();
+</script>
+
 
 
 <style id="andos-fixr-glitch">
@@ -666,7 +714,7 @@ nav.glass-nav, .xplore-head, .od-title, .wal-hero, .txn-bar, .sp-bar, .odd-bar, 
 .page-section[data-sec="wallet"] { background: #f4f2fb; }
 </style>
 
-<link rel="stylesheet" href="/assets/css/andos5.323ebc51.css">
+<link rel="stylesheet" href="/assets/css/andos5.1a659aca.css">
 <style id="andos-android-opt">
 /* ===== ANDROID OPTIMISATION (light-touch, look bilkul same) ==================
    1) 300ms tap delay hataya (touch-action: manipulation)

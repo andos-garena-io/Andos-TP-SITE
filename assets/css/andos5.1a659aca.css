@@ -16,3 +16,91 @@ html,body{background-color:#0b0f19!important;background-image:none!important}#ap
 .verify-banner{margin-top:env(safe-area-inset-top,0px)!important}
 .payx-page{padding-top:env(safe-area-inset-top,0px)}
 .pv2{padding-top:calc(32px + env(safe-area-inset-top,0px))!important}
+
+
+/* ============================================================================
+   ANDOS SCROLL / VIEWPORT HARDENING  (v11) — dynamic viewport + safe-area + auto-flow
+   PROBLEM (device-to-device):
+     a) .pv2 (Payment Pending/Processing) aur .os2-page par hard height:100vh +
+        overflow:hidden -> chhoti screen / 3-button nav / bada font hone par content
+        neeche se kat jata tha aur page scroll hi nahi hota tha.
+     b) 100vh mobile address-bar ko count nahi karta -> neeche ka content uske
+        neeche chala jata tha.
+     c) bottom containers par nav ke liye guaranteed gap nahi tha.
+   FIX: 100dvh (fallback 100vh) + bottom padding floor (5rem + safe-area) +
+        full-screen pages auto-height + overflow-y:auto.
+   ============================================================================ */
+:root{
+  --andos-dvh: 100vh;
+  --andos-safe-bottom: max(20px, env(safe-area-inset-bottom, 0px));  /* 20px floor: 3-button nav */
+  --andos-bottom-gap: calc(5rem + var(--andos-safe-bottom));
+}
+@supports (height: 100dvh){ :root{ --andos-dvh: 100dvh; } }
+
+/* 1) DYNAMIC VIEWPORT */
+.andos-shell{
+  height: var(--andos-dvh)!important;
+  min-height: var(--andos-dvh)!important;
+  max-height: none!important;
+}
+html, body, #app{ min-height: 100%!important; }
+.lb-ui,.evt-page,.dp-page,.search-page-shell,.upcoming-campaign-page,.payment-verification-page,
+.wal-page,.payx-page,.garena-underground,.ge-shell,.ep-page,.sp-page,.txn-page,.os2-page,.pf-page,
+.andos-main>.page-enter,#app,.andos-shell,.verify-shell,.pv2{
+  min-height: var(--andos-dvh)!important;
+}
+
+/* 2) FULL-SCREEN STATUS PAGES (Payment Pending / Order Summary / Payment page) */
+.pv2,.os2-page,.payx-page,.payment-verification-page{
+  height: auto!important;
+  /* 320x480 jaise chhote screens par bhi page khud scroll kare — parent par depend nahi */
+  max-height: var(--andos-dvh)!important;
+  overflow-y: auto!important;
+  overflow-x: hidden!important;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  padding-bottom: var(--andos-bottom-gap)!important;
+  touch-action: pan-y;
+}
+.pv2{ justify-content: flex-start!important; }
+@supports (justify-content: safe center){ .pv2{ justify-content: safe center!important; } }
+.pv2>*{ flex: 0 0 auto; }
+.pv2:after{ content:''; flex:0 0 auto; height: env(safe-area-inset-bottom, 0px); }
+
+/* 3) SCROLL CONTAINERS */
+.page-section{
+  overflow-y: auto!important;
+  overflow-x: hidden!important;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  min-height: 0;
+  padding-bottom: var(--andos-bottom-gap)!important;
+}
+.page-slider, main.andos-main{ min-height: 0; }
+.andos-main>.page-enter, .page-section>.page-enter{ height: auto!important; max-height: none!important; }
+
+/* 3b) jin pages par main.andos-main khud scroll karta hai (plans/support/search/leaderboard/loyalty)
+       wahan bhi bottom gap — warna last card bottom nav ke neeche chhup jata hai */
+main.andos-main:not(:has(#pageSlider)){
+  padding-bottom: var(--andos-bottom-gap)!important;
+  box-sizing: border-box;
+}
+
+/* 4) BOTTOM SAFE-AREA FLOOR */
+.ep-page,.sp-page,.txn-page,.catd-page,.odd-page,.od-page,.act-page,.pf-page,.lb-ui,.wal-page,
+.os2-page,.payx-page,.search-page-shell,.pdp-page,.ge-shell,.verify-shell{
+  padding-bottom: var(--andos-bottom-gap)!important;
+}
+.bottom-nav, nav.glass-nav.enterprise-nav, .andos-bottomnav{
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  box-sizing: border-box;
+}
+
+/* 5) CARDS / SHEETS: fixed height -> min-height + scroll */
+.os2-card,.payx-card{ height: auto; min-height: 0; }
+.ios-spin-sheet,.ios-wallet-alert{
+  max-height: calc(var(--andos-dvh) - 2rem);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
