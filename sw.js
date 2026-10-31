@@ -1,9 +1,10 @@
 /* ANDOS Production Service Worker v3 — Cache Versioning, Legacy PWA Auto-Purge & Fresh HTML Guarantee */
-const CACHE_VERSION = 'v5';
+const CACHE_VERSION = 'v6';
 const STATIC_MEDIA_CACHE = 'andos-media-' + CACHE_VERSION;
 const APP_BUILD_ID = 'andos-v3-20261030l58'; // must match window.__ANDOS_BUILD_ID in assets/js/andos3 (else SW forces a reload that skips the splash)
 const PRECACHE_MEDIA = [
   './assets/videos/splash-loading.mp4',
+  './assets/app-icon/splash-frame0-ed73c7df.webp',   // splash poster == mp4 frame 0 (byte-identical)
   './assets/app-icon/logo-192.png',
   './assets/app-icon/logo-512.png'
 ];
