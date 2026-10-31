@@ -21,9 +21,9 @@
   var video = document.getElementById('appSplashVideo');
 
   var ZOOM_MS = 470;            /* exit animation length (unchanged) */
-  var WATCHDOG_MS = 6000;       /* safety, tab tak metadata aa jaata hai */
-  var WATCHDOG_EXTRA_MS = 1500; /* duration ke baad ka margin — clip kabhi katai nahi */
-  var AUTH_GRACE_AFTER_ENDED = 2000; /* video khatam hone ke baad auth ka max intezaar */
+  var WATCHDOG_MS = 2600;       /* HARD CAP: 2.6s — koi event na aaye to bhi splash band */
+  var WATCHDOG_EXTRA_MS = 250;  /* duration ke baad ka margin (total 3.0s ke andar) */
+  var AUTH_GRACE_AFTER_ENDED = 250; /* video khatam hone ke baad auth ka max intezaar */
   var BG_REPLAY_MS = 1800000;   /* 30 min background -> splash dobara */
 
   var ended = false;            /* video ne apna aakhri frame dikha diya */
@@ -75,14 +75,6 @@
 
   if (!video) { finishNow(); return; }
 
-  /* --- 1. first presented frame: poster -> video pixels (identical image) --- */
-  if (video.requestVideoFrameCallback) {
-    try { video.requestVideoFrameCallback(onFirstFrame); }
-    catch (e) { video.addEventListener('loadeddata', onFirstFrame, { once: true }); }
-  } else {
-    video.addEventListener('loadeddata', onFirstFrame, { once: true });
-  }
-
   /* --- 2. watchdog settles once we know the real duration (safety only) --- */
   video.addEventListener('loadedmetadata', function () {
     var d = (isFinite(video.duration) && video.duration > 0) ? video.duration : 2.7;
@@ -107,15 +99,6 @@
 
   /* ================================================================ */
 
-  function onFirstFrame() {
-    if (firstFrameSeen) return;
-    firstFrameSeen = true;
-    /* Poster == frame 0 (byte-identical), so removing it is a no-op visually.
-       Iske baad sirf video ke pixels dikhte hain — koi transition nahi. */
-    try { video.removeAttribute('poster'); } catch (e) {}
-    window.__andosSplashFirstFrame = true;
-  }
-
   function onEnded() {
     if (ended) return;
     ended = true;
@@ -123,19 +106,9 @@
 
     /* Aakhri frame ko present hone do, phir zoom-out shuru karo.
        (Video ko kabhi nahi kaatta — `ended` pehle hi aa chuka hai.) */
-    var started = false;
-    function go() {
-      if (started) return;
-      started = true;
-      if (authResolved) dismiss();
-      else authGrace = setTimeout(function () { authResolved = true; dismiss(); }, AUTH_GRACE_AFTER_ENDED);
-    }
-    if (video.requestVideoFrameCallback) {
-      try { video.requestVideoFrameCallback(go); } catch (e) { go(); }
-      setTimeout(go, 150);                      /* rVFC na aaye to safety */
-    } else {
-      go();
-    }
+    /* rVFC/frame-seek hata diya — seededha, natural: video khatam -> exit */
+    if (authResolved) dismiss();
+    else authGrace = setTimeout(function () { authResolved = true; dismiss(); }, AUTH_GRACE_AFTER_ENDED);
   }
 
   function failFast() {
@@ -209,7 +182,9 @@
     try { ov.remove(); } catch (e) {}
     window.__andosSplashActive = false;
     window.__andosSplashDone = true;
+    try { sessionStorage.setItem('andos_splash_done', '1'); } catch (e) {}
     try { window.__andosPlayCinematicEntry(); } catch (e) {}
+    try { document.dispatchEvent(new CustomEvent('andos:splash:done')); } catch (e) {}
   }
 
   function finishNow() { authResolved = true; ended = true; dismiss(); }
