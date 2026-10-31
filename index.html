@@ -222,7 +222,7 @@ html.andos-splash, html.andos-splash body{transition:none !important}   /* grey 
          Normal (pink anniversary hero ke saath): browser bar + status bar = PINK
          Scroll / upar pull karne pe (white blur barrier): = WHITE
          (App install karne pe status bar area bhi isi ko follow karta hai) -->
-    <script src="/assets/js/andos4.874358e2.js"></script>
+    <script src="/assets/js/andos4.4ca47c00.js"></script>
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>ANDOS | Next-Gen Panel</title>
@@ -289,7 +289,7 @@ html.andos-splash, html.andos-splash body{transition:none !important}   /* grey 
 
 
 </style>
-<link rel="preload" as="style" href="/assets/css/andos1.f4a7f80d.css"><link rel="preload" as="script" href="/assets/js/andos6.15ddda7d.js"></head>
+<link rel="preload" as="style" href="/assets/css/andos1.f4a7f80d.css"><link rel="preload" as="script" href="/assets/js/andos6.d8feefbf.js"></head>
 <!--YG-->
 <link rel="stylesheet" href="/assets/css/andos4.6b07466e.css">
 <style id="andos-mark-lock">
@@ -627,7 +627,7 @@ document.addEventListener('error',function(e){var t=e.target;
       })();
     </script>
 
-    <script src="/assets/js/andos6.15ddda7d.js"></script>
+    <script src="/assets/js/andos6.d8feefbf.js"></script>
 <script>/* LOGOUT MARKER: logoutUser() localStorage clear kar deta hai, isliye marker uske BAAD likhte hain.
    Bina iske logout ke baad reload par "saved account" ki wajah se dashboard wapas khul jata tha. */
 (function(){function hook(){ if(typeof window.logoutUser!=='function'||window.logoutUser.__wrapped)return false;
@@ -636,6 +636,41 @@ document.addEventListener('error',function(e){var t=e.target;
     return r;}; window.logoutUser.__wrapped=1; return true; }
   if(!hook()){ var n=0,t=setInterval(function(){ if(hook()||++n>40)clearInterval(t) },100); }})();
 </script>
+<script>/* ============ STATUS BAR THEME COLOR (v11.1) ============
+   meta[name=theme-color] pehle hamesha #ffffff tha -> home par white status bar,
+   pink banner se mismatch. Ab data-page ke hisaab se sync (300ms light check):
+     home     -> #F9A8D4   (banner ke saath seamless pink)
+     wallet   -> #2e1065   | account -> #eef2ff | activity -> #fff7ed
+     plans(freefire) -> #1c1917 | payment -> #221b50 | baaki -> #ffffff
+   Root layer ka bg @#0b0f19 hi rehta hai — pink flash kabhi nahi. */
+(function(){
+  var MAP={home:"#F9A8D4",wallet:"#2e1065",account:"#eef2ff",activity:"#fff7ed",
+           loyalty:"#081b26",search:"#1e214d",payment:"#221b50",leaderboard:"#f8f5ff"};
+  function color(){
+    if(window.__andosSplashActive||document.getElementById('appSplashOverlay')) return '#000000';
+    var sh=document.querySelector('.andos-shell'); var p=sh?(sh.getAttribute('data-page')||'home'):'home';
+    if(p==='plans'){ var sv=(typeof selectedService!=='undefined')?String(selectedService):'';
+      return sv==='freefire'?'#1c1917':sv==='bgmi'?'#365314':'#1e1e2f'; }
+    return MAP[p]||'#ffffff';
+  }
+  function apply(){
+    var c=color(), ms=document.querySelectorAll('meta[name="theme-color"]');
+    for(var i=0;i<ms.length;i++){ if(ms[i].content!==c) ms[i].content=c; }
+    document.documentElement.style.setProperty('--andos-theme-color',c);
+    return c;
+  }
+  apply();
+  var last='';
+  /* watchdog: koi bhi purana writer galat value likh de to wapas sahi value */
+  setInterval(function(){ var c=color();
+    var m=document.querySelector('meta[name="theme-color"]');
+    if(!m||m.content!==c){ apply(); } last=c; },300);
+  setTimeout(apply,120); setTimeout(apply,900); setTimeout(apply,2500);
+  window.addEventListener('pageshow',function(){ setTimeout(apply,80); });
+  window.__andosTheme=apply;
+})();
+</script>
+
 <script>/* ========== SCROLL-LOCK CLEANUP (v11) ==========
    Payment/animation transitions ke baad body/html/shell par laga
    overflow:hidden kabhi-kabhi clear nahi hota tha -> poora app "freeze".
@@ -714,7 +749,7 @@ nav.glass-nav, .xplore-head, .od-title, .wal-hero, .txn-bar, .sp-bar, .odd-bar, 
 .page-section[data-sec="wallet"] { background: #f4f2fb; }
 </style>
 
-<link rel="stylesheet" href="/assets/css/andos5.1a659aca.css">
+<link rel="stylesheet" href="/assets/css/andos5.fdb450a6.css">
 <style id="andos-android-opt">
 /* ===== ANDROID OPTIMISATION (light-touch, look bilkul same) ==================
    1) 300ms tap delay hataya (touch-action: manipulation)

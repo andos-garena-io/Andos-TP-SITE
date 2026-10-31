@@ -32,8 +32,10 @@ html,body{background-color:#0b0f19!important;background-image:none!important}#ap
    ============================================================================ */
 :root{
   --andos-dvh: 100vh;
-  --andos-safe-bottom: max(20px, env(safe-area-inset-bottom, 0px));  /* 20px floor: 3-button nav */
-  --andos-bottom-gap: calc(5rem + var(--andos-safe-bottom));
+  --andos-nav-h: 65px;                                           /* chhota bottom nav (measured) */
+  --andos-safe-bottom: max(8px, env(safe-area-inset-bottom, 0px)); /* 3-button nav floor */
+  /* nav ki asli height + thoda breathing = jitna chahiye, utna hi — extra khali space zero */
+  --andos-bottom-gap: calc(var(--andos-nav-h) + 14px + var(--andos-safe-bottom));
 }
 @supports (height: 100dvh){ :root{ --andos-dvh: 100dvh; } }
 
@@ -59,7 +61,8 @@ html, body, #app{ min-height: 100%!important; }
   overflow-x: hidden!important;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-y: contain;
-  padding-bottom: var(--andos-bottom-gap)!important;
+  /* in pages par bottom nav hoti hi nahi -> sirf safe-area, koi dead space nahi */
+  padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px))!important;
   touch-action: pan-y;
 }
 .pv2{ justify-content: flex-start!important; }
@@ -87,10 +90,9 @@ main.andos-main:not(:has(#pageSlider)){
 }
 
 /* 4) BOTTOM SAFE-AREA FLOOR */
-.ep-page,.sp-page,.txn-page,.catd-page,.odd-page,.od-page,.act-page,.pf-page,.lb-ui,.wal-page,
-.os2-page,.payx-page,.search-page-shell,.pdp-page,.ge-shell,.verify-shell{
-  padding-bottom: var(--andos-bottom-gap)!important;
-}
+/* NOTE (v11.1): yahan pehle dobara se bottom-gap lagaya gaya tha — isse double padding ban rahi thi
+   aur screens zaroorat se zyada upar khinch rahi thi. Ab padding sirf SCROLLER par lagti hai
+   (.page-section / main.andos-main), page roots apni original spacing rakhte hain. */
 .bottom-nav, nav.glass-nav.enterprise-nav, .andos-bottomnav{
   padding-bottom: env(safe-area-inset-bottom, 0px);
   box-sizing: border-box;
@@ -104,3 +106,43 @@ main.andos-main:not(:has(#pageSlider)){
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
 }
+
+
+/* ============ WALLET hero seam fix (v11.1) ============
+   BUG: .wal-hero ka bottom 398px par khatam hota tha, par .wal-body ka margin-top:-52px
+   ki wajah se .lb-entry (Champions Board) 418px tak jata hai -> card ke neeche 20px
+   background ekdum se cut ho jata tha (left/right dono taraf ek seedhi line).
+   FIX: hero ka purple background card ke poore neeche tak jaata hai + box-sizing + overflow-x lock. */
+.wal-page,.wal-hero,.wal-body,.wal-card,.lb-entry,.wal-feats,.wal-spin,.wal-unlock,.wal-box{
+  box-sizing: border-box!important;
+  max-width: 100%!important;
+}
+.wal-page{ overflow-x: hidden!important; }
+.wal-hero{
+  padding-bottom: 104px!important;      /* card ke bottom (418) se ~24px neeche tak purple */
+  border-radius: 0!important;
+  background-color: #4c1d95;
+  overflow: visible!important;
+}
+/* card hero ke andar hi rahe: hero bottom se upar. -80px par 72px card ka bottom
+   hero ke 8px andar baithta hai -> koi cut line nahi (pehle -52px tha => 20px bahar). */
+.wal-body{ margin-top: -80px!important; }
+.lb-entry{ position: relative; z-index: 2; }
+/* agar card lamba ho jaye (bada font / chhoti screen) tab bhi hero usko cover kare */
+.wal-hero:has(+ .wal-body){ padding-bottom: 104px!important; }
+
+
+/* ============ EXPLORE — CLEAN CANVAS (v11.1) ============
+   Explore page ko poora blank kar diya gaya hai (naya layout aayega).
+   Sirf saaf white base + app ka normal scroll behaviour. */
+.xplore-blank,.xplore-blank-inner{
+  background: #ffffff!important;
+  min-height: calc(var(--andos-dvh) - var(--andos-nav-h) - var(--andos-safe-bottom));
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+.xplore-blank{ padding: 0!important; margin: 0!important; }
+.xplore-stack{ background:#ffffff!important; }
+
+/* Explore section ka base bhi saaf white (clean canvas) */
+.page-section[data-sec="categories"]{ background:#ffffff!important; }

@@ -1,5 +1,5 @@
 /* ANDOS Production Service Worker v3 — Cache Versioning, Legacy PWA Auto-Purge & Fresh HTML Guarantee */
-const CACHE_VERSION = 'v11';
+const CACHE_VERSION = 'v12';
 const STATIC_MEDIA_CACHE = 'andos-media-' + CACHE_VERSION;
 const HTML_CACHE = 'andos-html-' + CACHE_VERSION;
 const HTML_KEY = 'index.html';   /* single key: / or /index.html?source=pwa sab isi par */
@@ -16,7 +16,7 @@ const PRECACHE_MEDIA = [
   './assets/css/andos2.c35d525b.css',
   './assets/css/andos3.8eaf10d2.css',
   './assets/css/andos4.6b07466e.css',
-  './assets/css/andos5.1a659aca.css',
+  './assets/css/andos5.fdb450a6.css',
   './assets/css/fa.6.5.0.min.css',
   './assets/css/gf.local.css',
   './assets/css/gf2.local.css',
