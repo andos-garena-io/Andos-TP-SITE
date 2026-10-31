@@ -1,5 +1,5 @@
 /* ANDOS Production Service Worker v3 — Cache Versioning, Legacy PWA Auto-Purge & Fresh HTML Guarantee */
-const CACHE_VERSION = 'v9';
+const CACHE_VERSION = 'v10';
 const STATIC_MEDIA_CACHE = 'andos-media-' + CACHE_VERSION;
 const HTML_CACHE = 'andos-html-' + CACHE_VERSION;
 const HTML_KEY = 'index.html';   /* single key: / or /index.html?source=pwa sab isi par */
@@ -8,7 +8,19 @@ const PRECACHE_MEDIA = [
   './assets/videos/splash-loading.mp4',
   './assets/app-icon/splash-frame0-ed73c7df.webp',   // splash poster == mp4 frame 0 (byte-identical)
   './assets/app-icon/logo-192.png',
-  './assets/app-icon/logo-512.png'
+  './assets/app-icon/logo-512.png',
+  /* POINT 6: saara CSS pehle se cache me -> koi bhi page khulte hi poora styled (FOUC zero).
+     Tailwind ab LOCAL static build hai (tw.*.css); CDN par depend nahi. */
+  './assets/css/tw.2d52300d.css',
+  './assets/css/andos1.f4a7f80d.css',
+  './assets/css/andos2.c35d525b.css',
+  './assets/css/andos3.8eaf10d2.css',
+  './assets/css/andos4.6b07466e.css',
+  './assets/css/andos5.323ebc51.css',
+  './assets/css/fa.6.5.0.min.css',
+  './assets/css/gf.local.css',
+  './assets/css/gf2.local.css',
+  './assets/photos/hero-anniversary-a.jpg'
 ];
 
 const ackedClients = new Set();
@@ -164,7 +176,8 @@ self.addEventListener('fetch', (event) => {
   // 2. Serve splash video & app icons instantaneously from `andos-media-v3` (zero cold-start lag!)
   if (
     url.origin === self.location.origin &&
-    (url.pathname.includes('/assets/videos/splash-loading.mp4') || url.pathname.includes('/assets/app-icon/'))
+    (url.pathname.includes('/assets/videos/splash-loading.mp4') || url.pathname.includes('/assets/app-icon/') ||
+     url.pathname.startsWith('/assets/css/') || url.pathname.startsWith('/assets/mirror/'))
   ) {
     event.respondWith(
       caches.open(STATIC_MEDIA_CACHE).then(async (cache) => {
