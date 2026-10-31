@@ -1,6 +1,8 @@
 /* ANDOS Production Service Worker v3 — Cache Versioning, Legacy PWA Auto-Purge & Fresh HTML Guarantee */
-const CACHE_VERSION = 'v8';
+const CACHE_VERSION = 'v9';
 const STATIC_MEDIA_CACHE = 'andos-media-' + CACHE_VERSION;
+const HTML_CACHE = 'andos-html-' + CACHE_VERSION;
+const HTML_KEY = 'index.html';   /* single key: / or /index.html?source=pwa sab isi par */
 const APP_BUILD_ID = 'andos-v3-20261030l58'; // must match window.__ANDOS_BUILD_ID in assets/js/andos3 (else SW forces a reload that skips the splash)
 const PRECACHE_MEDIA = [
   './assets/videos/splash-loading.mp4',
@@ -65,7 +67,7 @@ self.addEventListener('activate', (event) => {
       const keys = await caches.keys();
       await Promise.all(
         keys
-          .filter((key) => key !== STATIC_MEDIA_CACHE)
+          .filter((key) => key !== STATIC_MEDIA_CACHE && key !== HTML_CACHE)
           .map((key) => caches.delete(key))
       );
     } catch (e) {}
@@ -110,18 +112,52 @@ self.addEventListener('fetch', (event) => {
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
 
-  // 1. Always bypass cache for index.html, root navigation, manifest.json & sw.js so users NEVER get stale HTML
+  // 0. APP LAUNCH (HTML): fresh HTML try karo, par 700ms se zyada intezaar nahi.
+  //    Slow network par cached HTML turant milta hai -> splash/video bina rukavat shuru.
+  //    Background fetch fresh HTML cache me daal deta hai (next launch ke liye).
   if (
     req.mode === 'navigate' ||
     req.destination === 'document' ||
     url.pathname === '/' ||
-    url.pathname.endsWith('/index.html') ||
-    url.pathname.endsWith('/manifest.json') ||
-    url.pathname.endsWith('/sw.js')
+    url.pathname.endsWith('/index.html')
   ) {
-    event.respondWith(
-      fetch(req, { cache: 'no-store' }).catch(() => caches.match(req))
-    );
+    event.respondWith((async () => {
+      let cache = null;
+      try { cache = await caches.open(HTML_CACHE); } catch (e) {}
+      const key = new Request(new URL(HTML_KEY, self.registration.scope).href);
+      let cached = cache ? await cache.match(key).catch(() => null) : null;
+      /* 7 din se purana cached HTML = user ne hafta bhar app khola hi nahi -> cache ignore */
+      if (cached && cache) {
+        try {
+          const meta = await cache.match(HTML_KEY + '-at');
+          const at = meta ? Number(await meta.text()) : 0;
+          if (!at || Date.now() - at > 7 * 24 * 60 * 60 * 1000) cached = null;
+        } catch (e) {}
+      }
+
+      const net = fetch(req, { cache: 'no-store' }).then((res) => {
+        if (res && res.ok && cache) {
+          cache.put(key, res.clone()).catch(() => {});
+          cache.put(new Request(new URL(HTML_KEY + '-at', self.registration.scope).href),
+                    new Response(String(Date.now()))).catch(() => {});
+        }
+        return res;
+      });
+
+      if (!cached) {                       /* pehli baar: cache khaali hai -> network */
+        try { return await net; } catch (e) { return Response.error(); }
+      }
+      /* STALE-WHILE-REVALIDATE: cached HTML TURANT do (0 ms), fresh background me
+         aa kar cache update karta rahega. Agli launch par naya build mil jayega. */
+      net.catch(() => {});
+      return cached;
+    })());
+    return;
+  }
+
+  // 1. manifest.json & sw.js: always network (chhote hain, fresh hi chahiye)
+  if (url.pathname.endsWith('/manifest.json') || url.pathname.endsWith('/sw.js')) {
+    event.respondWith(fetch(req, { cache: 'no-store' }).catch(() => caches.match(req)));
     return;
   }
 
