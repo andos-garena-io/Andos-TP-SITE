@@ -137,7 +137,7 @@ window.__ANDOS_LOCAL_MAP={"FF-PLAN-520/combo-card.jpg":"/assets/mirror/FF-PLAN-5
     <meta name="theme-color" content="#000000">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#000000">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000">
-    <meta name="andos-build" content="andos-v3-20261030l58">
+    <meta name="andos-build" content="andos-v3-20261030l60">
     <meta name="apple-mobile-web-app-capable" content="yes">
 <style id="andos-splash-colors">/* SPLASH-PAINT v2: manifest background_color=#000000 ke saath 1:1 — splash ke dauraan
    html/body kabhi white/pink na ho. `html.yg-lock{background:#fff!important}` ko specificity se haraate hain. */
@@ -822,31 +822,8 @@ document.addEventListener('error',function(e){var t=e.target;
 
 
 <style id="andos-fixr-glitch">
-/* FIX-R(1): PWA top-scroll white glitch — dark root bg + no rubber-band (last rule wins vs legacy white !important) */
-html, body { background-color: #0b0f19 !important; overscroll-behavior-y: none !important; }
-/* FIX-R(2): header GPU acceleration — scroll repaint lag hatao */
-nav.glass-nav, .xplore-head, .od-title, .wal-hero, .txn-bar, .sp-bar, .odd-bar, .catd-bar, .pf-title { transform: translateZ(0); will-change: transform; }
-/* FIX-S(3): native scroll-snap page slider — pure CSS/GPU compositor paging (WhatsApp-style 1:1) */
-.page-slider {
-  display: flex;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  overscroll-behavior-x: contain;
-  -webkit-overflow-scrolling: touch;
-  will-change: scroll-position;
-  scrollbar-width: none; /* Hide scrollbar */
-}
-.page-slider::-webkit-scrollbar { display: none; }
-.page-section {
-  min-width: 100vw;
-  width: 100vw;
-  flex-shrink: 0;
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
-}
-.page-section[data-sec="home"], .page-section[data-sec="orders"], .page-section[data-sec="account"] { background: #fff; }
-.page-section[data-sec="categories"] { background: #f7f7f7; }
-.page-section[data-sec="wallet"] { background: #f4f2fb; }
+/* FIX-R header GPU only. Page-slider snap + dark html/body HATAO — unhone card/page structure toda. */
+nav.glass-nav, .xplore-head, .od-title, .wal-hero, .txn-bar, .sp-bar, .odd-bar, .catd-bar, .pf-title { transform: translateZ(0); }
 </style>
 
 <link rel="stylesheet" href="/assets/css/andos5.c9fd73b8.css">
@@ -886,5 +863,35 @@ video{ -webkit-transform:translateZ(0); }
 })();
 </script>
 <script src="/assets/js/deeplink.0cb0a828.js" defer></script>
+<style id="andos-ui-restore">
+/* last-wins: swipe/snap band, inactive pages hide, dark html/body mat paint */
+#pageSlider, .page-slider {
+  overflow-x: hidden !important;
+  scroll-snap-type: none !important;
+  touch-action: pan-y !important;
+}
+#pageSlider .page-section, .page-slider .page-section {
+  min-width: 100% !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  flex: 0 0 100% !important;
+  scroll-snap-align: none !important;
+  scroll-snap-stop: normal !important;
+}
+.andos-shell[data-page="home"] #pageSlider .page-section:not([data-sec="home"]),
+.andos-shell[data-page="categories"] #pageSlider .page-section:not([data-sec="categories"]),
+.andos-shell[data-page="orders"] #pageSlider .page-section:not([data-sec="orders"]),
+.andos-shell[data-page="wallet"] #pageSlider .page-section:not([data-sec="wallet"]),
+.andos-shell[data-page="account"] #pageSlider .page-section:not([data-sec="account"]) {
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+html:not(.andos-splash), html:not(.andos-splash) body {
+  background-color: #ffffff;
+}
+.home-carousel, .promo-rail, .cpn-rail, .od-scroller, .ff-ps {
+  touch-action: pan-x pan-y !important;
+}
+</style>
 </body>
 </html>
