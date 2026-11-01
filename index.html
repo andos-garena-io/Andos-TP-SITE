@@ -137,7 +137,8 @@ window.__ANDOS_LOCAL_MAP={"FF-PLAN-520/combo-card.jpg":"/assets/mirror/FF-PLAN-5
     <meta name="theme-color" content="#000000">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#000000">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000">
-    <meta name="andos-build" content="andos-v3-20261101l63">
+    <meta name="andos-build" content="andos-v3-20261101c1">
+    <script>window.__ANDOS_BUILD_ID='andos-v3-20261101c1';</script>
     <meta name="apple-mobile-web-app-capable" content="yes">
 <style id="andos-splash-colors">/* SPLASH-PAINT v2: manifest background_color=#000000 ke saath 1:1 — splash ke dauraan
    html/body kabhi white/pink na ho. `html.yg-lock{background:#fff!important}` ko specificity se haraate hain. */
@@ -193,6 +194,7 @@ html.andos-splash, html.andos-splash body{transition:none !important}   /* grey 
          upload nahi hai to silently skip — install phir bhi Chrome menu se hoga. -->
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script src="/assets/js/andos3.719baac1.js"></script>
+    <script>window.__ANDOS_BUILD_ID='andos-v3-20261101c1';</script>
 
     <!-- ==================== DEEP LINKS: app icon long-press shortcuts ==================== -->
     <script>
@@ -765,7 +767,12 @@ video{ -webkit-transform:translateZ(0); }
 </script>
 <script src="/assets/js/deeplink.0cb0a828.js" defer></script>
 <style id="andos-wallet-edge">
-/* Wallet purple header edge-to-edge — koi left gap nahi */
+/* Tabs blank na hon: hashed visibility:hidden hata. Slider flex overflow clip kare. */
+#pageSlider > .page-section {
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+/* Wallet purple header edge-to-edge — left cut band */
 .wal-page,
 .wal-hero,
 .wal-body,
@@ -774,6 +781,8 @@ video{ -webkit-transform:translateZ(0); }
   max-width: 100% !important;
   margin-left: 0 !important;
   margin-right: 0 !important;
+  padding-left: 0 !important;
+  left: 0 !important;
   box-sizing: border-box !important;
 }
 </style>

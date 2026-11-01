@@ -1,9 +1,9 @@
 /* ANDOS Production Service Worker v3 — Cache Versioning, Legacy PWA Auto-Purge & Fresh HTML Guarantee */
-const CACHE_VERSION = 'v17';
+const CACHE_VERSION = 'v18';
 const STATIC_MEDIA_CACHE = 'andos-media-' + CACHE_VERSION;
 const HTML_CACHE = 'andos-html-' + CACHE_VERSION;
 const HTML_KEY = 'index.html';   /* single key: / or /index.html?source=pwa sab isi par */
-const APP_BUILD_ID = 'andos-v3-20261101b2'; // must match window.__ANDOS_BUILD_ID in assets/js/andos3 (else SW forces a reload that skips the splash)
+const APP_BUILD_ID = 'andos-v3-20261101c1';
 const PRECACHE_MEDIA = [
   './assets/videos/splash-loading.mp4',
   './assets/app-icon/splash-frame0-ed73c7df.webp',
@@ -23,7 +23,7 @@ const PRECACHE_MEDIA = [
   './assets/js/andos2.8556ab0e.js',
   './assets/js/andos3.719baac1.js',
   './assets/js/andos4.4ca47c00.js',
-  './assets/js/andos5.ed260336.js',
+  './assets/js/andos6.15ddda7d.js',
   './assets/js/deeplink.0cb0a828.js',
   './assets/mirror/FF-PLAN-520/combo-card.jpg',
   './assets/mirror/FF-PLAN-520/featured-plans.jpg',
@@ -223,12 +223,17 @@ self.addEventListener('fetch', (event) => {
         return res;
       });
 
-      if (!cached) {                       /* pehli baar: cache khaali hai -> network */
+      if (!cached) {
         try { return await net; } catch (e) { return Response.error(); }
       }
-      /* STALE-WHILE-REVALIDATE: cached HTML TURANT do (0 ms), fresh background me
-         aa kar cache update karta rahega. Agli launch par naya build mil jayega. */
-      net.catch(() => {});
+      /* NETWORK-FIRST: 1.2s tak naya HTML. Purana cache sirf timeout/offline par. */
+      try {
+        var fresh = await Promise.race([
+          net,
+          new Promise(function (_, rej) { setTimeout(function () { rej(new Error('html-timeout')); }, 1200); })
+        ]);
+        if (fresh && fresh.ok) return fresh;
+      } catch (e) {}
       return cached;
     })());
     return;
