@@ -1,0 +1,215 @@
+#topNavSlot{flex:none;pointer-events:auto}.andos-shell{position:relative}.andos-shell[data-page=home] #topNavSlot{position:absolute;top:0;left:0;right:0;z-index:60}.andos-shell:not([data-page=home]) #topNavSlot{display:none}html,body{height:100%;overscroll-behavior-y:none!important}#app{height:100%}/* ROOT-PINK FIX: pehle poora viewport pink tha (!important) -> reload/slow-net/page-change par
+   pink flash. Ab root app ka neutral dark hai. Pink sirf home banner ke andar. */
+html,body{background-color:#0b0f19!important;background-image:none!important}#app{background-color:#0b0f19!important;background-image:none!important}.andos-shell{height:100%;min-height:0;display:flex;flex-direction:column;background:#0b0f19;overscroll-behavior-y:auto}.andos-main{flex:1 1 auto;min-height:0;overflow-x:hidden;overflow-y:auto;box-sizing:border-box;overscroll-behavior-y:auto}.page-slider{height:100%;overflow-y:hidden;align-items:stretch}.page-section{height:100%;overflow-y:auto;overflow-x:hidden;box-sizing:border-box;overscroll-behavior-y:auto}.page-section[data-sec=home]{position:relative;isolation:isolate}.page-section[data-sec=home] .home-hero-stage{margin-top:0!important}.page-section[data-sec=home]:before{content:"";position:absolute;top:-72px;left:0;right:0;height:72px;background:#0b0f19;z-index:-1}[data-hswipe]{touch-action:pan-x pan-y;overscroll-behavior-x:contain}.page-enter{overscroll-behavior-y:auto}.andos-shell[data-page=home] nav.glass-nav,.andos-shell[data-page=home] nav.home-topbar,.andos-shell[data-page=home] nav.glass-nav.enterprise-nav,.andos-shell[data-page=home] nav.glass-nav.enterprise-nav.hero-over-image{background:transparent!important;background-image:none!important;border-bottom-color:transparent!important;outline:none!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;padding-top:env(safe-area-inset-top,0px)!important}.andos-shell[data-page=home] nav.glass-nav.is-scrolled,.andos-shell[data-page=home] nav.glass-nav.enterprise-nav.hero-over-image.is-scrolled{background:#ffffff94!important;background-image:none!important;border:none!important;box-shadow:none!important;backdrop-filter:blur(16px) saturate(160%)!important;-webkit-backdrop-filter:blur(16px) saturate(160%)!important}.page-enter,main.andos-main,.andos-main.page-enter{animation:none!important;transform:none!important;filter:none!important}main.andos-main:has(#pageSlider){overflow:hidden!important}.page-section{overflow-y:auto!important;overflow-x:hidden!important;overscroll-behavior-y:auto;-webkit-overflow-scrolling:touch}main.andos-main:not(:has(#pageSlider)){overflow-y:auto!important;overflow-x:hidden!important;overscroll-behavior-y:auto;-webkit-overflow-scrolling:touch}.pf-page,.wal-page,.payx-page{overflow:visible!important}.page-slider{scroll-snap-type:x mandatory}.page-section{scroll-snap-align:start;scroll-snap-stop:always}.andos-shell.is-subview #pageSlider,#pageSlider.is-drill-lock{overflow-x:hidden!important;touch-action:pan-y!important;overscroll-behavior-x:none}.andos-shell.is-subview .page-section,#pageSlider.is-drill-lock .page-section,#exploreDrill:not([hidden]){touch-action:pan-y!important}.catd-page{padding-top:env(safe-area-inset-top,0px)!important;padding-left:0!important;padding-right:0!important}.catd-bar{display:flex!important;align-items:center!important;gap:12px!important;height:56px!important;min-height:56px!important;margin-bottom:0!important;padding:0 16px!important;position:sticky;top:0;z-index:20;background:#f7f7f7;backdrop-filter:none;-webkit-backdrop-filter:none;box-sizing:border-box}.catd-bar h1{flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.catd-bar .catd-count{margin-left:auto;flex:0 0 auto;font-family:Plus Jakarta Sans,system-ui,sans-serif!important;font-size:11px!important;font-weight:700!important;line-height:1!important;letter-spacing:0!important;color:#64748b!important;background:#fff;border:1px solid #e5e7eb;border-radius:999px;padding:6px 10px}.catd-bar button{width:40px!important;height:40px!important;min-width:40px!important;min-height:40px!important;flex:0 0 40px!important;border-radius:12px!important}.catd-list{padding:16px 16px 28px;margin-top:16px}:root{--bottom-nav-height: calc(64px + env(safe-area-inset-bottom, 0px)) }.page-section[data-sec=home]{min-height:100%;padding-bottom:0}.page-section[data-sec=home]>.page-enter,.page-section[data-sec=home] .page-enter{min-height:0!important;height:auto!important;overflow:visible!important;overscroll-behavior-y:auto}.page-section[data-sec=home] footer,.andos-shell[data-page=home] footer{padding-bottom:calc(var(--bottom-nav-height) + 16px)!important}.andos-shell[data-page=home] main.andos-main{overflow-y:auto!important;overflow-x:hidden!important;min-height:0!important;-webkit-overflow-scrolling:touch;overscroll-behavior-y:auto}.andos-shell[data-page=home] main.andos-main>.page-enter{min-height:0!important;height:auto!important;overflow:visible!important;overscroll-behavior-y:auto}.andos-shell[data-page=home]{position:relative!important}.andos-shell[data-page=home]>nav.glass-nav,.andos-shell[data-page=home]>nav.home-topbar,.andos-shell[data-page=home] nav.glass-nav.enterprise-nav.home-topbar,.andos-shell[data-page=home] nav.glass-nav.enterprise-nav.hero-over-image{position:absolute!important;top:0!important;left:0!important;right:0!important;width:100%!important;z-index:60!important;--nv-glass: transparent !important;background:transparent!important;background-image:none!important;background-color:transparent!important;border-bottom-color:transparent!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;overflow:visible!important;transition:background .28s ease,box-shadow .28s ease,border-color .28s ease,backdrop-filter .28s ease!important}.andos-shell[data-page=home] nav.glass-nav.is-scrolled,.andos-shell[data-page=home] nav.home-topbar.is-scrolled,.andos-shell[data-page=home] nav.glass-nav.enterprise-nav.hero-over-image.is-scrolled{position:absolute!important;top:0!important;left:0!important;right:0!important;width:100%!important;z-index:60!important;background:#ffffff94!important;background-image:none!important;border-bottom-color:#0f172a0f!important;box-shadow:0 1px #ffffff59 inset,0 10px 28px #0f172a0f!important;backdrop-filter:blur(16px) saturate(160%)!important;-webkit-backdrop-filter:blur(16px) saturate(160%)!important;overflow:visible!important;transition:background .28s ease,box-shadow .28s ease,border-color .28s ease,backdrop-filter .28s ease!important}.andos-shell[data-page=home] nav.glass-nav:before,.andos-shell[data-page=home] nav.home-topbar:before,.andos-shell[data-page=home] nav.glass-nav:after,.andos-shell[data-page=home] nav.home-topbar:after,.andos-shell[data-page=home] nav.glass-nav.hdr-bleed:before,.andos-shell[data-page=home] nav.home-topbar.hdr-bleed:before,.andos-shell[data-page=home] nav.glass-nav.hdr-bleed:after,.andos-shell[data-page=home] nav.home-topbar.hdr-bleed:after{content:none!important;display:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}.andos-shell[data-page=home] .andos-main{padding-top:0!important}.andos-shell[data-page=home] .home-hero-stage{margin-top:0!important}#pageSlider{overflow-x:hidden!important;touch-action:pan-y!important;scroll-snap-type:none!important}nav.home-topbar .andos-verified{display:none!important}nav.home-topbar .andos-avatar-btn{width:40px!important;height:40px!important;flex:0 0 40px!important;display:grid!important;grid-template-columns:1fr!important;grid-template-rows:1fr!important;place-items:stretch!important;position:relative!important;box-sizing:border-box!important;overflow:visible!important;padding:3.5px!important;border:0!important;border-radius:50%!important;background:transparent!important;box-shadow:none!important}nav.home-topbar .andos-avatar-ring{display:block!important;position:absolute!important;inset:0!important;z-index:2!important;pointer-events:none!important;border-radius:50%!important;padding:0!important;border:0!important;box-sizing:border-box!important;background:conic-gradient(from 220deg,#0785ff,#168bff,#a5a4ff,#168bff,#0785ff)!important;box-shadow:0 0 5px #0785ff61!important;filter:brightness(1.22) saturate(1.12) contrast(1.04)!important;transform:translateZ(0)!important;-webkit-backface-visibility:hidden!important;backface-visibility:hidden!important;-webkit-mask-image:radial-gradient(circle at 50% 50%,transparent 16.15px,#000 16.85px)!important;mask-image:radial-gradient(circle at 50% 50%,transparent 16.15px,#000 16.85px)!important;-webkit-mask-repeat:no-repeat!important;mask-repeat:no-repeat!important;-webkit-mask-size:100% 100%!important;mask-size:100% 100%!important}nav.home-topbar .andos-dp-gap{display:grid!important;grid-template-columns:1fr!important;grid-template-rows:1fr!important;min-width:0!important;min-height:0!important;position:relative!important;z-index:1!important;border-radius:50%!important;padding:2.5px!important;background:transparent!important;box-sizing:border-box!important;overflow:hidden!important}nav.home-topbar .andos-dp-metal{display:grid!important;grid-template-columns:1fr!important;grid-template-rows:1fr!important;min-width:0!important;min-height:0!important;position:relative!important;border-radius:50%!important;padding:0!important;background:transparent!important;box-sizing:border-box!important;overflow:hidden!important;box-shadow:none!important}nav.home-topbar .andos-dp-metal>img,nav.home-topbar .andos-dp-metal #hdrLiveAva,nav.home-topbar .andos-avatar-btn #hdrLiveAva,nav.home-topbar .andos-avatar-btn [data-live-avatar]{grid-area:1 / 1!important;position:static!important;inset:auto!important;display:block!important;width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;min-width:0!important;min-height:0!important;object-fit:cover!important;object-position:center!important;border-radius:50%!important;padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important;opacity:1!important;visibility:visible!important;z-index:1!important}nav.home-topbar .andos-dp-metal>.andos-avatar-fallback{grid-area:1 / 1!important;position:static!important;inset:auto!important;display:grid!important;place-items:center!important;width:100%!important;height:100%!important;border-radius:50%!important;background:#e8eef5!important;color:#64748b!important;z-index:0!important}.andos-shell[data-page=home] .home-hero-bleed{background:transparent!important}.andos-shell[data-page=home] .home-hero-bleed:before{content:none!important;display:none!important;background:none!important}.andos-shell[data-page=home] .home-hero-bleed img{-webkit-mask-image:linear-gradient(to bottom,#000 0%,#000 78%,rgba(0,0,0,0) 100%)!important;mask-image:linear-gradient(to bottom,#000 0% 78%,#0000)!important}.andos-shell[data-page=home] footer.home-foot{display:block!important;position:relative!important;overflow:visible!important;height:auto!important;visibility:visible!important;background:#fff!important}.andos-shell[data-page=home] footer.home-foot .andos-trust-video-strip{margin-top:8px!important;margin-bottom:16px!important}.andos-shell[data-page=home] footer.home-foot img{display:block!important;width:100%!important;height:auto!important;max-width:100%!important;visibility:visible!important}#filter-btn.od-filterbtn{width:42px;height:42px;flex:0 0 42px;border-radius:14px;border:1px solid #e2e8f0;background:#fff;color:#0f172a;padding:0;display:flex;align-items:center;justify-content:center}.andos-main>.page-enter>*,.andos-shell .andos-main>.page-enter>*{animation:none!important;animation-delay:0s!important;opacity:1!important;transform:none!important;filter:none!important}.andos-shell,.andos-main{transition:none!important}@keyframes inputFire{0%,to{box-shadow:none}50%{box-shadow:none}}#app .input-field,#app .ge-input,#app .referral-modal-input,#app .review-comment-input,#app .sp-form input,#app .sp-form textarea,#app .pvx-in,#app .verify-input,#app .plans-verify-input{border:1.5px solid #d8dee8!important;border-radius:14px!important;background:#fff!important;box-shadow:none!important;transition:border-color .15s ease,box-shadow .15s ease!important}#app input:focus,#app input:focus-visible,#app textarea:focus,#app textarea:focus-visible,#app .input-field:focus,#app .plans-verify-input:focus,#app .verify-input:focus,#app .ff-custom-input:focus,#app .ge-input:focus,#app .referral-modal-input:focus,#app .review-comment-input:focus,#app .sp-form input:focus,#app .sp-form textarea:focus,#app .pvx-in:focus,#app .qty-stepper .qty-input:focus,#app input[type=text]:focus,#app input[type=tel]:focus,#app input[type=email]:focus,#app input[type=number]:focus,#app input[type=search]:focus{animation:none!important;outline:none!important;border-style:solid!important;border-width:2.5px!important;border-color:#4f46e5!important;box-shadow:0 0 0 4px #4f46e529!important;caret-color:#4f46e5}#app .search-bar:focus-within,#app .search-page-input-wrap:focus-within,#app .plans-verify-card:focus-within{animation:none!important;outline:none!important;border-style:solid!important;border-width:2.5px!important;border-color:#4f46e5!important;box-shadow:0 0 0 4px #4f46e529!important}#app .search-page-input:focus,#app .search-page-input:focus-visible,#app .search-bar input:focus{border:0!important;box-shadow:none!important;outline:none!important}#pageSlider .page-section{min-width:100%!important;width:100%!important;max-width:100%!important;flex:0 0 100%!important}.andos-shell[data-page=home] #pageSlider .page-section:not([data-sec=home]),.andos-shell[data-page=categories] #pageSlider .page-section:not([data-sec=categories]),.andos-shell[data-page=orders] #pageSlider .page-section:not([data-sec=orders]),.andos-shell[data-page=wallet] #pageSlider .page-section:not([data-sec=wallet]),.andos-shell[data-page=account] #pageSlider .page-section:not([data-sec=account]){visibility:hidden!important;pointer-events:none!important}
+
+/* ============ SAFE-AREA (point 6): notch/status-bar ke neeche har page ============
+   Pehle sirf home-topbar / sidebar / lb-back / wal-hero / payx-hero / rf-hero / catd-page
+   par env(safe-area-inset-top) tha. Ye screen missing thi -> header ka text notch ke neeche:
+     .search-page-head  (Search page ka sticky header)
+     .os2-page          (Order Summary / checkout page)
+     .act-page          (Activity page)
+     .verify-banner     (Order form ke top ka banner)
+     .payx-page         (Payment page wrapper) */
+.search-page-head{padding-top:calc(16px + env(safe-area-inset-top,0px))!important}
+.os2-page{padding-top:calc(16px + env(safe-area-inset-top,0px))!important}
+.act-page{padding-top:calc(18px + env(safe-area-inset-top,0px))!important}
+.verify-banner{margin-top:env(safe-area-inset-top,0px)!important}
+.payx-page{padding-top:env(safe-area-inset-top,0px)}
+.pv2{padding-top:calc(32px + env(safe-area-inset-top,0px))!important}
+
+
+/* ============================================================================
+   ANDOS SCROLL / VIEWPORT HARDENING  (v11) — dynamic viewport + safe-area + auto-flow
+   PROBLEM (device-to-device):
+     a) .pv2 (Payment Pending/Processing) aur .os2-page par hard height:100vh +
+        overflow:hidden -> chhoti screen / 3-button nav / bada font hone par content
+        neeche se kat jata tha aur page scroll hi nahi hota tha.
+     b) 100vh mobile address-bar ko count nahi karta -> neeche ka content uske
+        neeche chala jata tha.
+     c) bottom containers par nav ke liye guaranteed gap nahi tha.
+   FIX: 100dvh (fallback 100vh) + bottom padding floor (5rem + safe-area) +
+        full-screen pages auto-height + overflow-y:auto.
+   ============================================================================ */
+:root{
+  --andos-dvh: 100vh;
+  --andos-nav-h: 65px;                                           /* chhota bottom nav (measured) */
+  --andos-safe-bottom: max(8px, env(safe-area-inset-bottom, 0px)); /* 3-button nav floor */
+  /* nav ki asli height + thoda breathing = jitna chahiye, utna hi — extra khali space zero */
+  --andos-bottom-gap: calc(var(--andos-nav-h) + 9px + var(--andos-safe-bottom));
+}
+@supports (height: 100dvh){ :root{ --andos-dvh: 100dvh; } }
+
+/* 1) DYNAMIC VIEWPORT */
+.andos-shell{
+  height: var(--andos-dvh)!important;
+  min-height: var(--andos-dvh)!important;
+  max-height: none!important;
+}
+html, body, #app{ min-height: 100%!important; }
+.lb-ui,.evt-page,.dp-page,.search-page-shell,.upcoming-campaign-page,.payment-verification-page,
+.wal-page,.payx-page,.garena-underground,.ge-shell,.ep-page,.sp-page,.txn-page,.os2-page,.pf-page,
+.andos-main>.page-enter,#app,.andos-shell,.verify-shell,.pv2{
+  min-height: var(--andos-dvh)!important;
+}
+
+/* 2) FULL-SCREEN STATUS PAGES (Payment Pending / Order Summary / Payment page) */
+.pv2,.os2-page,.payx-page,.payment-verification-page{
+  height: auto!important;
+  /* 320x480 jaise chhote screens par bhi page khud scroll kare — parent par depend nahi */
+  max-height: var(--andos-dvh)!important;
+  overflow-y: auto!important;
+  overflow-x: hidden!important;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  /* in pages par bottom nav hoti hi nahi -> sirf safe-area, koi dead space nahi */
+  padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px))!important;
+  touch-action: pan-y;
+}
+.pv2{ justify-content: flex-start!important; }
+@supports (justify-content: safe center){ .pv2{ justify-content: safe center!important; } }
+.pv2>*{ flex: 0 0 auto; }
+.pv2:after{ content:''; flex:0 0 auto; height: env(safe-area-inset-bottom, 0px); }
+
+/* 3) SCROLL CONTAINERS */
+.page-section{
+  overflow-y: auto!important;
+  overflow-x: hidden!important;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  min-height: 0;
+  padding-bottom: var(--andos-bottom-gap)!important;
+}
+.page-slider, main.andos-main{ min-height: 0; }
+.andos-main>.page-enter, .page-section>.page-enter{ height: auto!important; max-height: none!important; }
+
+/* 3b) jin pages par main.andos-main khud scroll karta hai (plans/support/search/leaderboard/loyalty)
+       wahan bhi bottom gap — warna last card bottom nav ke neeche chhup jata hai */
+main.andos-main:not(:has(#pageSlider)){
+  padding-bottom: var(--andos-bottom-gap)!important;
+  box-sizing: border-box;
+}
+
+/* 4) BOTTOM SAFE-AREA FLOOR */
+/* NOTE (v11.1): yahan pehle dobara se bottom-gap lagaya gaya tha — isse double padding ban rahi thi
+   aur screens zaroorat se zyada upar khinch rahi thi. Ab padding sirf SCROLLER par lagti hai
+   (.page-section / main.andos-main), page roots apni original spacing rakhte hain. */
+.bottom-nav, nav.glass-nav.enterprise-nav, .andos-bottomnav{
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  box-sizing: border-box;
+}
+
+/* 5) CARDS / SHEETS: fixed height -> min-height + scroll */
+.os2-card,.payx-card{ height: auto; min-height: 0; }
+.ios-spin-sheet,.ios-wallet-alert{
+  max-height: calc(var(--andos-dvh) - 2rem);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+
+/* ============ WALLET hero seam fix (v11.1) ============
+   BUG: .wal-hero ka bottom 398px par khatam hota tha, par .wal-body ka margin-top:-52px
+   ki wajah se .lb-entry (Champions Board) 418px tak jata hai -> card ke neeche 20px
+   background ekdum se cut ho jata tha (left/right dono taraf ek seedhi line).
+   FIX: hero ka purple background card ke poore neeche tak jaata hai + box-sizing + overflow-x lock. */
+.wal-page,.wal-hero,.wal-body,.wal-card,.lb-entry,.wal-feats,.wal-spin,.wal-unlock,.wal-box{
+  box-sizing: border-box!important;
+  max-width: 100%!important;
+}
+.wal-page{ overflow-x: hidden!important; }
+.wal-hero{
+  padding-bottom: 104px!important;      /* card ke bottom (418) se ~24px neeche tak purple */
+  border-radius: 0!important;
+  background-color: #4c1d95;
+  overflow: visible!important;
+}
+/* card hero ke andar hi rahe: hero bottom se upar. -80px par 72px card ka bottom
+   hero ke 8px andar baithta hai -> koi cut line nahi (pehle -52px tha => 20px bahar). */
+.wal-body{ margin-top: -80px!important; }
+.lb-entry{ position: relative; z-index: 2; }
+/* agar card lamba ho jaye (bada font / chhoti screen) tab bhi hero usko cover kare */
+.wal-hero:has(+ .wal-body){ padding-bottom: 104px!important; }
+
+
+/* ============ EXPLORE — CLEAN CANVAS (v11.1) ============
+   Explore page ko poora blank kar diya gaya hai (naya layout aayega).
+   Sirf saaf white base + app ka normal scroll behaviour. */
+.xplore-blank,.xplore-blank-inner{
+  background: #ffffff!important;
+  min-height: calc(var(--andos-dvh) - var(--andos-nav-h) - var(--andos-safe-bottom));
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+.xplore-blank{ padding: 0!important; margin: 0!important; }
+.xplore-stack{ background:#ffffff!important; }
+
+/* Explore section ka base bhi saaf white (clean canvas) */
+.page-section[data-sec="categories"]{ background:#ffffff!important; }
+
+
+/* ============ v11.2 — EDGE-TO-EDGE LOCK + OVER-SCROLL CONTROL ============
+   (A) Wallet hero left/right dono taraf 0px se 100% tak — koi cut line nahi.
+   (B) Page apni real height se zyada "khinchti" nahi: overscroll band. */
+
+/* ---- (A) edge-to-edge lock: wallet ---- */
+.wal-page,
+.wal-hero,
+.wal-body,
+.page-section[data-sec="wallet"]{
+  width: 100% !important;
+  max-width: 100% !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  box-sizing: border-box !important;
+}
+/* hairline bachane ke liye hero ka background 2px dono taraf extend karta hai */
+.wal-hero{ position: relative; }
+.wal-hero::before{
+  content: "";
+  position: absolute;
+  top: 0; bottom: 0;
+  left: -2px; right: -2px;
+  background: inherit;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 0;
+}
+.wal-hero > *{ position: relative; z-index: 1; }
+
+/* ---- (B) over-scroll: bounce/rubber-band band, scroll sirf content par ---- */
+html{ overscroll-behavior-y: none; }
+body{ overscroll-behavior-y: none; overflow-x: hidden; }
+.page-section,
+main.andos-main,
+.pv2, .os2-page, .payx-page, .payment-verification-page,
+.wal-page, .lb-ui, .ep-page{
+  overscroll-behavior-y: contain;
+  scroll-behavior: auto;
+}
+/* purane extra bottom padding (16px + safe) -> 12px + safe : sirf itna jitna chahiye */
+.pv2, .os2-page, .payx-page, .payment-verification-page{
+  padding-bottom: calc(12px + var(--andos-safe-bottom)) !important;
+}
+
+
+/* ============ v11.3 — "SCROLL NEVER STUCK" (sab devices) ============
+   Asli wajah: 3 nested scroll containers (.andos-main > .page-slider > .page-section)
+   sabhi par overscroll-behavior-y:contain tha. Android/iOS par jab touched element
+   khud scrollable nahi hota (ya end par pahunch jata hai) to contain gesture ko
+   swallow kar leta hai -> page "atka hua" lagta hai, upar/neeche kuch nahi hota.
+   Fix: chaining allow (auto), sirf root par none. */
+.payx-page, .payment-verification-page, .pv2, .os2-page,
+.wal-page, .lb-ui, .ep-page, main.andos-main, .page-section, .andos-shell{
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+}
+/* full-screen page types: height cap + apna scroll (document lock ho jaye to bhi chale) */
+.pv2, .os2-page, .payx-page, .payment-verification-page{
+  max-height: var(--andos-dvh, 100dvh);
+  overflow-y: auto !important;
+  overscroll-behavior-y: auto !important;
+  min-height: 0;
+}
+/* in pages par inline padding se content kata na rahe */
+.payx-page, .payment-verification-page{ padding-bottom: calc(12px + var(--andos-safe-bottom)) !important; }

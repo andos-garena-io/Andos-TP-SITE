@@ -696,6 +696,81 @@ document.addEventListener('error',function(e){var t=e.target;
 })();
 </script>
 
+<script>/* ============ SCROLL SELF-HEAL (v11.3) — sab devices ============
+   Kabhi bhi koi modal / sheet / QR overlay scroll-lock chhod deta hai
+   (body ya .andos-shell par overflow:hidden, ya html par overscroll:none),
+   to app khud 1 second ke andar scroll wapas unlock kar leta hai.
+   Kisi bhi page par content overflow ho aur kuch scroll na ho -> scroller force on.
+   Ye script har device (Android Chrome, iOS Safari, WebView, PWA) par chalta hai. */
+(function(){
+  var HEALS=0, LAST=0;
+  var OVERLAYS=['#appSplashOverlay','#andosDpViewer','#soSheet','.sidebar.open',
+    '.ios-wallet-alert-backdrop','.newbie-offer-backdrop','.payment-qr-overlay',
+    '.qr-reveal-shell','.qr-reveal-cover','.andos-sheet','.andos-modal','.modal-backdrop','[data-andos-modal]'];
+  function vis(el){
+    if(!el||el.hidden) return false;
+    var c=getComputedStyle(el);
+    if(c.display==='none'||c.visibility==='hidden') return false;
+    if(parseFloat(c.opacity||'1')<0.05) return false;
+    var r=el.getBoundingClientRect();
+    return r.width>8 && r.height>8;
+  }
+  function overlayOpen(){
+    if(window.__andosSplashActive) return true;
+    var yg=document.getElementById('yuvaGate');
+    if(yg && vis(yg) && !yg.classList.contains('yg-out')) return true;
+    for(var i=0;i<OVERLAYS.length;i++){
+      var els=document.querySelectorAll(OVERLAYS[i]);
+      for(var j=0;j<els.length;j++){ if(vis(els[j])) return true; }
+    }
+    return false;
+  }
+  function heal(tag){
+    try{
+      if(overlayOpen()) return;
+      var changed=false;
+      var sh=document.querySelector('.andos-shell');
+      if(sh && sh.style.overflow==='hidden'){ sh.style.overflow=''; changed=true; }
+      if(sh && sh.style.overflowY==='hidden'){ sh.style.overflowY=''; changed=true; }
+      if(document.body.style.overflow==='hidden'){ document.body.style.overflow=''; changed=true; }
+      if(document.body.style.position==='fixed'){ document.body.style.position=''; document.body.style.top=''; document.body.style.width=''; changed=true; }
+      if(document.documentElement.style.overflow==='hidden'){ document.documentElement.style.overflow=''; changed=true; }
+      if(document.documentElement.style.overscrollBehavior==='none'){ document.documentElement.style.overscrollBehavior=''; changed=true; }
+      if(document.body.style.overscrollBehavior==='none'){ document.body.style.overscrollBehavior=''; changed=true; }
+      /* content viewport se lamba hai par kuch bhi scroll nahi ho raha -> scroller force karo */
+      var doc=document.scrollingElement, vh=window.innerHeight;
+      var docScrolls = (doc.scrollHeight - vh) > 4;
+      var main=document.querySelector('main.andos-main');
+      var mainScrolls = !!main && (main.scrollHeight - main.clientHeight) > 4 && /(auto|scroll)/.test(getComputedStyle(main).overflowY);
+      if(!docScrolls && !mainScrolls){
+        var secs=document.querySelectorAll('.page-section,.andos-main,.payx-page,.payment-verification-page,.pv2,.os2-page');
+        for(var i=0;i<secs.length;i++){
+          var el=secs[i], r=el.getBoundingClientRect();
+          if(Math.abs(r.left)>3 || r.height<80) continue;
+          if(el.scrollHeight - el.clientHeight > 4){
+            var c=getComputedStyle(el);
+            if(!/(auto|scroll)/.test(c.overflowY)){ el.style.overflowY='auto'; changed=true; }
+          }
+        }
+      }
+      if(changed){
+        HEALS++; window.__andosScrollHeals=HEALS;
+        document.documentElement.setAttribute('data-andos-heal', String(HEALS));
+      }
+      LAST=Date.now();
+    }catch(e){}
+  }
+  window.__andosHealScroll=heal;
+  heal('boot');
+  setInterval(function(){ heal('tick'); }, 800);
+  ['popstate','pageshow','hashchange','orientationchange','resize','focus','visibilitychange'].forEach(function(ev){
+    window.addEventListener(ev, function(){ setTimeout(function(){ heal(ev); }, 150); }, true);
+  });
+  document.addEventListener('click', function(){ setTimeout(function(){ heal('click'); }, 320); }, true);
+  document.addEventListener('touchend', function(){ if(Date.now()-LAST>900) heal('touchend'); }, {capture:true, passive:true});
+  document.addEventListener('scroll', function(){ if(Date.now()-LAST>2500) heal('scroll'); }, {capture:true, passive:true});
+})();
+</script>
 <script>/* ========== SCROLL-LOCK CLEANUP (v11) ==========
    Payment/animation transitions ke baad body/html/shell par laga
    overflow:hidden kabhi-kabhi clear nahi hota tha -> poora app "freeze".
@@ -774,7 +849,7 @@ nav.glass-nav, .xplore-head, .od-title, .wal-hero, .txn-bar, .sp-bar, .odd-bar, 
 .page-section[data-sec="wallet"] { background: #f4f2fb; }
 </style>
 
-<link rel="stylesheet" href="/assets/css/andos5.cc88f7f4.css">
+<link rel="stylesheet" href="/assets/css/andos5.81df0390.css">
 <style id="andos-android-opt">
 /* ===== ANDROID OPTIMISATION (light-touch, look bilkul same) ==================
    1) 300ms tap delay hataya (touch-action: manipulation)
