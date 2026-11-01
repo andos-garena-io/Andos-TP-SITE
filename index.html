@@ -137,7 +137,7 @@ window.__ANDOS_LOCAL_MAP={"FF-PLAN-520/combo-card.jpg":"/assets/mirror/FF-PLAN-5
     <meta name="theme-color" content="#000000">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#000000">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000">
-    <meta name="andos-build" content="andos-v3-20261101l62">
+    <meta name="andos-build" content="andos-v3-20261101l63">
     <meta name="apple-mobile-web-app-capable" content="yes">
 <style id="andos-splash-colors">/* SPLASH-PAINT v2: manifest background_color=#000000 ke saath 1:1 — splash ke dauraan
    html/body kabhi white/pink na ho. `html.yg-lock{background:#fff!important}` ko specificity se haraate hain. */
@@ -161,16 +161,10 @@ html.andos-splash, html.andos-splash body{transition:none !important}   /* grey 
  function unpaint(){try{d.style.removeProperty('background-color');if(document.body)document.body.style.removeProperty('background-color');}catch(e){}}
  paint(); document.addEventListener('DOMContentLoaded',paint);
  function done(){
-   /* Overlay abhi cover kar raha ho to class mat girao — status bar white ho jaati hai. */
-   if(document.getElementById('appSplashOverlay')) return;
-   try{requestAnimationFrame(function(){requestAnimationFrame(function(){
-     try{d.classList.remove('andos-splash');unpaint();}catch(e){}
-     try{window.__andosPlayCinematicEntry&&window.__andosPlayCinematicEntry();}catch(e2){}
-   });});}
+   try{requestAnimationFrame(function(){requestAnimationFrame(function(){try{d.classList.remove('andos-splash');unpaint();}catch(e){}});});}
    catch(e){try{d.classList.remove('andos-splash');unpaint();}catch(e2){}}
  }
  document.addEventListener('andos:splash:done',done);
- setTimeout(function(){ if(!document.getElementById('appSplashOverlay')) done(); },6000);
 })();
 </script>
 <link rel="apple-touch-startup-image" href="/assets/splash/apple-startup-1170x2532.png" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3)">
@@ -275,16 +269,6 @@ html.andos-splash, html.andos-splash body{transition:none !important}   /* grey 
   to   { opacity: 1; transform: scale(1); }
 }
 .andos-cine-in { animation: andosCineIn .42s cubic-bezier(0.4, 0, 0.2, 1) both; will-change: transform, opacity; }
-/* Overlay opaque black until JS remove() — koi 2.9s CSS fade nahi, koi scale(2.2) nahi
-   (wo header/status white layer + “doosri route” jaisa zoom tha). */
-#appSplashOverlay,
-#appSplashOverlay.andos-zoom-out {
-  animation: none !important;
-  transform: none !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-  background: #000000 !important;
-}
 
 
 </style>
@@ -337,71 +321,61 @@ document.addEventListener('error',function(e){var t=e.target;
 </script>
 
 <!-- ===== SPLASH SABSE PEHLE (poster=frame 0 pehle paint, video fetch turant) ===== -->
-<div id="appSplashOverlay" style="position:fixed;top:0;right:0;bottom:0;left:0;inset:0;width:100%;height:100%;min-width:100vw;min-height:100vh;min-height:100dvh;margin:0;padding:0;z-index:2147483647;background:#000000;display:flex;align-items:center;justify-content:center;overflow:hidden;transform:none;opacity:1;">
-    <video id="appSplashVideo" autoplay muted playsinline preload="auto" disablepictureinpicture src="/assets/videos/splash-loading.mp4" poster="/assets/app-icon/splash-frame0-ed73c7df.webp" style="display:block;width:var(--andos-video-w);height:var(--andos-video-h);max-width:76vw;aspect-ratio:16/9;object-fit:contain;object-position:center center;background:#000000;margin:0;padding:0;border:0;outline:0;transform:translate3d(0,0,0);"></video>
+<div id="appSplashOverlay" style="position:fixed;inset:0;width:100%;height:100%;margin:0;padding:0;z-index:2147483647;background:#000000;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+    <video id="appSplashVideo" autoplay muted playsinline preload="auto" disablepictureinpicture src="/assets/videos/splash-loading.mp4" poster="/assets/app-icon/splash-frame0-ed73c7df.webp" style="display:block;width:var(--andos-video-w);height:var(--andos-video-h);max-width:76vw;aspect-ratio:16/9;object-fit:contain;object-position:center center;background:#000000;margin:0;padding:0;border:0;outline:0;"></video>
 </div>
-<script>/* ===== SPLASH HARD FAILSAFE — 3.0s, bundle se AZAAD =====================
-   Bug: splash dismiss karne wala poora logic andos5 bundle me tha. Network hicchki me
-   wo bundle load/fail hua -> koi timer hi nahi chala -> splash 1 minute+ atka raha.
-   Ab ye inline script document ke andar hi hai: bundle chahe load ho ya na ho,
-   3.0s par splash fade-out ho kar app dikhata hai. Kisi event ka intezaar nahi. */
+<script>/* ===== SPLASH — single owner (video end ya 2.5s cap, phir fade) ===== */
 (function () {
   var d = document.documentElement;
-  var HARD_CAP_MS = 4200;
-  var killed = false;
-
-  function flags(done) {
-    window.__andosSplashActive = !done;
-    window.__andosSplashDone = done;
-  }
-  function clearBg() {
-    try { d.classList.remove('andos-splash'); } catch (e) {}
-    try { d.style.removeProperty('background-color'); } catch (e) {}
-    try { if (document.body) document.body.style.removeProperty('background-color'); } catch (e) {}
-  }
-  function fire() {
-    try { document.dispatchEvent(new CustomEvent('andos:splash:done')); } catch (e) {}
-  }
-  function bye(ov) {
-    if (killed) return;
-    killed = true;
-    flags(true);
-    try { sessionStorage.setItem('andos_splash_done', '1'); } catch (e) {}
-    try {
-      var v = document.getElementById('appSplashVideo');
-      if (v) { v.pause(); v.removeAttribute('src'); v.load(); }
-    } catch (e) {}
-    try { if (ov) ov.remove(); } catch (e) {}
-    clearBg();
-    fire();
-    try { window.__andosPlayCinematicEntry && window.__andosPlayCinematicEntry(); } catch (e) {}
-  }
-
   var ov = document.getElementById('appSplashOverlay');
-  /* video splash ab installed PWA me BHI chalta hai. Skip sirf repeat-load par. */
-  var skipNow = d.classList.contains('andos-skip-splash');
+  var video = document.getElementById('appSplashVideo');
+  var CAP_MS = 2500;
+  var done = false;
 
-  if (skipNow || !ov) { bye(ov); return; }
-
-  flags(false);
-  window.__andosSplashHardKill = function () { bye(document.getElementById('appSplashOverlay')); };
-
-  var vid = document.getElementById('appSplashVideo');
-  if (vid) {
-    vid.addEventListener('ended', function () {
-      setTimeout(function () {
-        if (document.getElementById('appSplashOverlay')) window.__andosSplashHardKill();
-      }, 40);
-    }, { once: true });
+  function finish() {
+    if (done) return;
+    done = true;
+    window.__andosSplashActive = false;
+    window.__andosSplashDone = true;
+    try { sessionStorage.setItem('andos_splash_done', '1'); } catch (e) {}
+    if (ov) {
+      ov.style.pointerEvents = 'none';
+      ov.style.transition = 'opacity .35s ease';
+      ov.style.opacity = '0';
+    }
+    setTimeout(function () {
+      try { if (video) { video.pause(); video.removeAttribute('src'); video.load(); } } catch (e) {}
+      try { if (ov) ov.remove(); } catch (e) {}
+      try { d.classList.remove('andos-splash'); } catch (e) {}
+      try { d.style.removeProperty('background-color'); } catch (e) {}
+      try { if (document.body) document.body.style.removeProperty('background-color'); } catch (e) {}
+      try { document.dispatchEvent(new CustomEvent('andos:splash:done')); } catch (e) {}
+      try { window.__andosPlayCinematicEntry && window.__andosPlayCinematicEntry(); } catch (e) {}
+    }, 360);
   }
-  setTimeout(function () {
-    var el = document.getElementById('appSplashOverlay');
-    if (!el) { if (!killed) { flags(true); } return; }
-    window.__andosSplashHardKill();
-  }, HARD_CAP_MS);
+
+  if (d.classList.contains('andos-skip-splash') || !ov) {
+    done = true;
+    window.__andosSplashActive = false;
+    window.__andosSplashDone = true;
+    try { if (ov) ov.remove(); } catch (e) {}
+    try { d.classList.remove('andos-splash'); } catch (e) {}
+    try { document.dispatchEvent(new CustomEvent('andos:splash:done')); } catch (e) {}
+    return;
+  }
+
+  window.__andosSplashActive = true;
+  if (video) {
+    video.addEventListener('ended', finish, { once: true });
+    video.addEventListener('error', finish, { once: true });
+    try {
+      var p = video.play();
+      if (p && p.catch) p.catch(function () { setTimeout(finish, 400); });
+    } catch (e) { setTimeout(finish, 400); }
+  }
+  setTimeout(finish, CAP_MS);
 })();
 </script>
-<script src="/assets/js/andos5.ed260336.js"></script>
 
 <div id="luVerify" aria-hidden="true">
   <div class="lu-sheet" role="dialog" aria-modal="true" aria-label="Verify last used account">
@@ -703,80 +677,6 @@ document.addEventListener('error',function(e){var t=e.target;
 })();
 </script>
 
-<script>/* ============ SCROLL SELF-HEAL (v11.3) — sab devices ============
-   Kabhi bhi koi modal / sheet / QR overlay scroll-lock chhod deta hai
-   (body ya .andos-shell par overflow:hidden, ya html par overscroll:none),
-   to app khud 1 second ke andar scroll wapas unlock kar leta hai.
-   Kisi bhi page par content overflow ho aur kuch scroll na ho -> scroller force on.
-   Ye script har device (Android Chrome, iOS Safari, WebView, PWA) par chalta hai. */
-(function(){
-  var HEALS=0, LAST=0;
-  var OVERLAYS=['#appSplashOverlay','#andosDpViewer','#soSheet','.sidebar.open',
-    '.ios-wallet-alert-backdrop','.newbie-offer-backdrop',
-    '.andos-sheet','.andos-modal','.modal-backdrop','[data-andos-modal]'];
-  function vis(el){
-    if(!el||el.hidden) return false;
-    var c=getComputedStyle(el);
-    if(c.display==='none'||c.visibility==='hidden') return false;
-    if(parseFloat(c.opacity||'1')<0.05) return false;
-    var r=el.getBoundingClientRect();
-    return r.width>8 && r.height>8;
-  }
-  function overlayOpen(){
-    if(window.__andosSplashActive) return true;
-    var yg=document.getElementById('yuvaGate');
-    if(yg && vis(yg) && !yg.classList.contains('yg-out')) return true;
-    for(var i=0;i<OVERLAYS.length;i++){
-      var els=document.querySelectorAll(OVERLAYS[i]);
-      for(var j=0;j<els.length;j++){ if(vis(els[j])) return true; }
-    }
-    return false;
-  }
-  function heal(tag){
-    try{
-      if(overlayOpen()) return;
-      var changed=false;
-      var sh=document.querySelector('.andos-shell');
-      if(sh && sh.style.overflow==='hidden'){ sh.style.overflow=''; changed=true; }
-      if(sh && sh.style.overflowY==='hidden'){ sh.style.overflowY=''; changed=true; }
-      if(document.body.style.overflow==='hidden'){ document.body.style.overflow=''; changed=true; }
-      if(document.body.style.position==='fixed'){ document.body.style.position=''; document.body.style.top=''; document.body.style.width=''; changed=true; }
-      if(document.documentElement.style.overflow==='hidden'){ document.documentElement.style.overflow=''; changed=true; }
-      if(document.documentElement.style.overscrollBehavior==='none'){ document.documentElement.style.overscrollBehavior=''; changed=true; }
-      if(document.body.style.overscrollBehavior==='none'){ document.body.style.overscrollBehavior=''; changed=true; }
-      /* nested height:100% + overflowY auto = scroll prison. Inline overflowY mat laga.
-         Sirf hidden/100% traps hatao — document scroller CSS last-wins se chalta hai. */
-      function clr(el){
-        if(!el||!el.style) return;
-        if(el.style.overflow==='hidden'){ el.style.overflow=''; changed=true; }
-        if(el.style.overflowY==='hidden'){ el.style.overflowY=''; changed=true; }
-        var h=el.style.height;
-        if(h==='100%'||h==='100vh'||h==='100dvh'){ el.style.height=''; changed=true; }
-        var mh=el.style.maxHeight;
-        if(mh==='100%'||mh==='100vh'||mh==='100dvh'){ el.style.maxHeight=''; changed=true; }
-        if(el.style.touchAction==='none'){ el.style.touchAction='pan-y'; changed=true; }
-      }
-      clr(document.documentElement); clr(document.body);
-      var nodes=document.querySelectorAll('#app,.andos-shell,.andos-main,#pageSlider,.page-slider,.page-section,.page-enter,.payx-page,.payment-verification-page,.pv2,.os2-page,.wal-page,.payment-qr-overlay,.qr-reveal-shell,.qr-reveal-cover');
-      for(var i=0;i<nodes.length;i++) clr(nodes[i]);
-      if(changed){
-        HEALS++; window.__andosScrollHeals=HEALS;
-        document.documentElement.setAttribute('data-andos-heal', String(HEALS));
-      }
-      LAST=Date.now();
-    }catch(e){}
-  }
-  window.__andosHealScroll=heal;
-  heal('boot');
-  setInterval(function(){ heal('tick'); }, 800);
-  ['popstate','pageshow','hashchange','orientationchange','resize','focus','visibilitychange'].forEach(function(ev){
-    window.addEventListener(ev, function(){ setTimeout(function(){ heal(ev); }, 150); }, true);
-  });
-  document.addEventListener('click', function(){ setTimeout(function(){ heal('click'); }, 320); }, true);
-  document.addEventListener('touchend', function(){ if(Date.now()-LAST>900) heal('touchend'); }, {capture:true, passive:true});
-  document.addEventListener('scroll', function(){ if(Date.now()-LAST>2500) heal('scroll'); }, {capture:true, passive:true});
-})();
-</script>
 <script>/* ========== SCROLL-LOCK CLEANUP (v11) ==========
    Payment/animation transitions ke baad body/html/shell par laga
    overflow:hidden kabhi-kabhi clear nahi hota tha -> poora app "freeze".
@@ -827,11 +727,6 @@ document.addEventListener('error',function(e){var t=e.target;
 
 
 
-<style id="andos-fixr-glitch">
-/* FIX-R header GPU only. Page-slider snap + dark html/body HATAO — unhone card/page structure toda. */
-nav.glass-nav, .xplore-head, .od-title, .wal-hero, .txn-bar, .sp-bar, .odd-bar, .catd-bar, .pf-title { transform: translateZ(0); }
-</style>
-
 <link rel="stylesheet" href="/assets/css/andos5.1c269aa0.css">
 <style id="andos-android-opt">
 /* ===== ANDROID OPTIMISATION (light-touch, look bilkul same) ==================
@@ -869,52 +764,17 @@ video{ -webkit-transform:translateZ(0); }
 })();
 </script>
 <script src="/assets/js/deeplink.0cb0a828.js" defer></script>
-<style id="andos-ui-restore">
-/* last-wins: swipe/snap band, inactive hide, dark html/body mat paint.
-   Shell/height/page colors NAHI — pichla height:auto unlock layout toda. */
-#pageSlider, .page-slider {
-  overflow-x: hidden !important;
-  scroll-snap-type: none !important;
-  touch-action: pan-y !important;
-}
-#pageSlider .page-section, .page-slider .page-section {
-  min-width: 100% !important;
+<style id="andos-wallet-edge">
+/* Wallet purple header edge-to-edge — koi left gap nahi */
+.wal-page,
+.wal-hero,
+.wal-body,
+.page-section[data-sec="wallet"] {
   width: 100% !important;
   max-width: 100% !important;
-  flex: 0 0 100% !important;
-  scroll-snap-align: none !important;
-  scroll-snap-stop: normal !important;
-}
-.andos-shell[data-page="home"] #pageSlider .page-section:not([data-sec="home"]),
-.andos-shell[data-page="categories"] #pageSlider .page-section:not([data-sec="categories"]),
-.andos-shell[data-page="orders"] #pageSlider .page-section:not([data-sec="orders"]),
-.andos-shell[data-page="wallet"] #pageSlider .page-section:not([data-sec="wallet"]),
-.andos-shell[data-page="account"] #pageSlider .page-section:not([data-sec="account"]) {
-  visibility: hidden !important;
-  pointer-events: none !important;
-}
-html:not(.andos-splash), html:not(.andos-splash) body {
-  background-color: #ffffff;
-}
-.home-carousel, .promo-rail, .cpn-rail, .od-scroller, .ff-ps {
-  touch-action: pan-x pan-y !important;
-}
-#appSplashOverlay,
-#appSplashOverlay.andos-zoom-out {
-  animation: none !important;
-  transform: none !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-  background: #000000 !important;
-  inset: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-  min-height: 100vh !important;
-  min-height: 100dvh !important;
-  z-index: 2147483647 !important;
-}
-.pv2, .os2-page, .payx-page, .payment-verification-page {
-  max-height: none !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  box-sizing: border-box !important;
 }
 </style>
 </body>
