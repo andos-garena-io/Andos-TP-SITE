@@ -118,6 +118,12 @@
       ]
     }
   ],
+  "rewrites": [
+    {
+      "source": "/((?!assets/|sw\\.js|manifest\\.json|index\\.app\\.html).*)",
+      "destination": "/404.html"
+    }
+  ],
   "redirects": [
     {
       "source": "/DD.html",
