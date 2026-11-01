@@ -248,3 +248,38 @@ html, body{ overscroll-behavior-y: none !important; }
 .home-carousel, .promo-rail, .cpn-rail, .od-scroller, .ff-ps{
   touch-action: manipulation !important;
 }
+
+
+/* ============ v12 — PAGE SLIDER LAYOUT RESTORE (blank page fix) ============
+   Root cause: #pageSlider ka display:flex (horizontal track) kahin bhi define nahi
+   tha, aur baad ke hardening rules ne overflow-x:hidden + scroll-snap-type:none
+   !important laga diya tha. Natija: paanchon .page-section EK KE NEECHE EK
+   (y = 0, 844, 1688, 2532, 3376) stack ho gaye. Jab user Orders/Explore/Wallet/
+   Profile kholta tha, active section 844-3376px neeche chala jata tha aur screen
+   par sirf khaali area dikhta tha = "blank page".
+   Fix: slider ko wapas horizontal flex track banao + snap wapas on.
+   (Drill/subview me overflow-x hidden rahega, par stack kabhi nahi hoga.) */
+#pageSlider{
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: stretch !important;
+  height: 100% !important;
+  overflow-y: hidden !important;
+}
+#pageSlider > .page-section{
+  flex: 0 0 100% !important;
+  min-width: 100% !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  height: 100% !important;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+#pageSlider:not(.is-drill-lock) {
+  overflow-x: auto !important;
+  scroll-snap-type: x mandatory !important;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+#pageSlider:not(.is-drill-lock)::-webkit-scrollbar { display: none !important; }
+.andos-shell.is-subview #pageSlider { overflow-x: hidden !important; }
