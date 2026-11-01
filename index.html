@@ -137,7 +137,7 @@ window.__ANDOS_LOCAL_MAP={"FF-PLAN-520/combo-card.jpg":"/assets/mirror/FF-PLAN-5
     <meta name="theme-color" content="#000000">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#000000">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000">
-    <meta name="andos-build" content="andos-v3-20261101l61">
+    <meta name="andos-build" content="andos-v3-20261101l62">
     <meta name="apple-mobile-web-app-capable" content="yes">
 <style id="andos-splash-colors">/* SPLASH-PAINT v2: manifest background_color=#000000 ke saath 1:1 — splash ke dauraan
    html/body kabhi white/pink na ho. `html.yg-lock{background:#fff!important}` ko specificity se haraate hain. */
@@ -843,7 +843,7 @@ nav.glass-nav, .xplore-head, .od-title, .wal-hero, .txn-bar, .sp-bar, .odd-bar, 
 html{
   -webkit-text-size-adjust:100% !important;
   text-size-adjust:100% !important;
-  overscroll-behavior-y:auto;
+  overscroll-behavior-y:contain;
 }
 a,button,[role="button"],input,select,textarea,label{
   -webkit-tap-highlight-color:transparent;
@@ -870,69 +870,8 @@ video{ -webkit-transform:translateZ(0); }
 </script>
 <script src="/assets/js/deeplink.0cb0a828.js" defer></script>
 <style id="andos-ui-restore">
-/* last-wins: swipe/snap band, inactive hide, nested 100% scroll prison khol,
-   splash overlay black cover jab tak DOM me hai. DP/hero/14px/page colors nahi. */
-html.andos-splash,
-html.andos-splash body,
-html.andos-splash #app,
-html.andos-splash .andos-shell {
-  background: #000000 !important;
-  background-color: #000000 !important;
-  overflow: hidden !important;
-}
-#appSplashOverlay,
-#appSplashOverlay.andos-zoom-out {
-  animation: none !important;
-  position: fixed !important;
-  top: 0 !important;
-  right: 0 !important;
-  bottom: 0 !important;
-  left: 0 !important;
-  inset: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-  min-width: 100vw !important;
-  min-height: 100% !important;
-  min-height: 100vh !important;
-  min-height: 100dvh !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  background: #000000 !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-  transform: none !important;
-  z-index: 2147483647 !important;
-}
-html:not(.andos-splash), html:not(.andos-splash) body {
-  height: auto !important;
-  min-height: 100% !important;
-  min-height: 100dvh !important;
-  max-height: none !important;
-  overflow-x: hidden !important;
-  overflow-y: auto !important;
-  overscroll-behavior-y: auto !important;
-  touch-action: pan-y !important;
-  background-color: #ffffff;
-}
-html:not(.andos-splash) #app,
-html:not(.andos-splash) .andos-shell {
-  height: auto !important;
-  min-height: 100% !important;
-  min-height: 100dvh !important;
-  max-height: none !important;
-  overflow: visible !important;
-  background-color: transparent !important;
-}
-html:not(.andos-splash) .andos-main,
-html:not(.andos-splash) #pageSlider,
-html:not(.andos-splash) .page-slider {
-  height: auto !important;
-  min-height: 0 !important;
-  max-height: none !important;
-  overflow-x: hidden !important;
-  overflow-y: visible !important;
-  overscroll-behavior-y: auto !important;
-}
+/* last-wins: swipe/snap band, inactive hide, dark html/body mat paint.
+   Shell/height/page colors NAHI — pichla height:auto unlock layout toda. */
 #pageSlider, .page-slider {
   overflow-x: hidden !important;
   scroll-snap-type: none !important;
@@ -945,30 +884,6 @@ html:not(.andos-splash) .page-slider {
   flex: 0 0 100% !important;
   scroll-snap-align: none !important;
   scroll-snap-stop: normal !important;
-  height: auto !important;
-  max-height: none !important;
-  min-height: 0 !important;
-  overflow-x: hidden !important;
-  overflow-y: visible !important;
-  overscroll-behavior-y: auto !important;
-  touch-action: pan-y !important;
-}
-.page-enter {
-  height: auto !important;
-  max-height: none !important;
-  overflow-x: hidden !important;
-  overflow-y: visible !important;
-}
-.pv2, .os2-page, .payx-page, .payment-verification-page,
-.payment-qr-overlay, .qr-reveal-shell, .qr-reveal-cover {
-  height: auto !important;
-  max-height: none !important;
-  min-height: 100dvh !important;
-  overflow-x: hidden !important;
-  overflow-y: visible !important;
-  overscroll-behavior-y: auto !important;
-  touch-action: pan-y !important;
-  -webkit-overflow-scrolling: touch;
 }
 .andos-shell[data-page="home"] #pageSlider .page-section:not([data-sec="home"]),
 .andos-shell[data-page="categories"] #pageSlider .page-section:not([data-sec="categories"]),
@@ -978,8 +893,28 @@ html:not(.andos-splash) .page-slider {
   visibility: hidden !important;
   pointer-events: none !important;
 }
+html:not(.andos-splash), html:not(.andos-splash) body {
+  background-color: #ffffff;
+}
 .home-carousel, .promo-rail, .cpn-rail, .od-scroller, .ff-ps {
   touch-action: pan-x pan-y !important;
+}
+#appSplashOverlay,
+#appSplashOverlay.andos-zoom-out {
+  animation: none !important;
+  transform: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  background: #000000 !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 100vh !important;
+  min-height: 100dvh !important;
+  z-index: 2147483647 !important;
+}
+.pv2, .os2-page, .payx-page, .payment-verification-page {
+  max-height: none !important;
 }
 </style>
 </body>
