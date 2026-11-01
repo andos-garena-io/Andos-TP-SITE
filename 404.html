@@ -1,257 +1,27 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="robots" content="noindex,nofollow">
-<meta name="theme-color" content="#07070f">
-<title>ANDOS · Temporary notice</title>
+<meta name="robots" content="noindex">
+<title>Page not found · ANDOS</title>
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
-  html,body{background:#07070f;color:#eef1ff;font-family:'Segoe UI',system-ui,-apple-system,sans-serif}
-  body{min-height:100vh;padding:28px 18px 64px}
-  .wrap{max-width:820px;margin:0 auto}
-  .hero{text-align:center;padding:28px 0 18px}
-  .code{font-size:clamp(56px,14vw,104px);font-weight:800;letter-spacing:.08em;
+  body{min-height:100vh;display:grid;place-items:center;background:#07070f;color:#eef1ff;
+       font-family:'Segoe UI',system-ui,-apple-system,sans-serif;text-align:center;padding:24px}
+  .code{font-size:clamp(64px,16vw,120px);font-weight:800;letter-spacing:.08em;
         background:linear-gradient(120deg,#67e8f9,#c4b5fd 45%,#f472b6);
-        -webkit-background-clip:text;background-clip:text;color:transparent;line-height:1}
-  .kicker{margin-top:12px;color:#9aa3c7;font-size:15px}
-  .note{margin:18px auto 32px;max-width:520px;color:#c4c9e0;font-size:14px;line-height:1.55}
-  hr{border:0;height:1px;background:linear-gradient(90deg,transparent,#3b3b5c,transparent);margin:28px 0}
-  h1{font-size:1.45rem;margin:28px 0 12px;color:#fff}
-  h2{font-size:1.2rem;margin:26px 0 10px;color:#e9d5ff}
-  h3{font-size:1.05rem;margin:22px 0 8px;color:#a5f3fc}
-  h4{font-size:.95rem;margin:18px 0 8px;color:#fbcfe8}
-  p{margin:8px 0;color:#cdd3ea;font-size:15px;line-height:1.65}
-  ul{margin:8px 0 12px 1.2rem;color:#cdd3ea;font-size:15px;line-height:1.6}
-  li{margin:4px 0}
-  code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.84em;
-       background:#12121c;border:1px solid #2a2a40;border-radius:6px;padding:.1em .35em;color:#fde68a}
-  pre{background:#101018;border:1px solid #2a2a40;border-radius:12px;padding:14px;overflow:auto;margin:12px 0}
-  pre code{background:none;border:0;padding:0;color:#e2e8f0}
-  .tbl-wrap{overflow:auto;margin:14px 0;border:1px solid #2a2a40;border-radius:12px}
-  table{width:100%;border-collapse:collapse;font-size:13.5px}
-  th,td{padding:10px 12px;text-align:left;border-bottom:1px solid #222238;vertical-align:top}
-  th{background:#12121e;color:#c4b5fd;font-weight:700}
-  tr:last-child td{border-bottom:0}
-  strong{color:#fff}
+        -webkit-background-clip:text;background-clip:text;color:transparent}
+  p{margin:14px 0 26px;color:#9aa3c7;font-size:16px}
+  a{display:inline-block;padding:12px 26px;border-radius:999px;text-decoration:none;color:#07070f;
+    font-weight:700;background:linear-gradient(135deg,#67e8f9,#8b5cf6)}
 </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="hero">
-      <div class="code">404</div>
-      <p class="kicker">ANDOS · kuch din ke liye yahi page</p>
-      <p class="note">App abhi live dashboard nahi dikha rahi. Neeche poori technical retrospective hai — sab visitors ko yahi dikhega.</p>
-    </div>
-    <h1>ANDOS — Technical Retrospective &amp; Audit Report</h1>
-<p><strong>Scope:</strong> jo base mila (single monolith HTML: no-login + login structure) se lekar HEAD <code>f918d12</code> / live origin <code>andostosites.vercel.app</code> (meta <code>andos-v3-20261101c1</code>, SW <code>v18</code>) tak.  </p>
-<p><strong>Date of audit:</strong> 2026-11-01.  </p>
-<p><strong>Rule:</strong> hawa nahi — file, layer, commit. Do hisse: <strong>(1) solid &amp; active</strong> · <strong>(2) negative / reverted</strong>.</p>
-<hr>
-<h2>Kaise padhein</h2>
-<div class="tbl-wrap"><table>
-<tr><th>Layer</th><th>Ab kahan hai</th></tr>
-<tr><td>Boot / splash / auth lock / SW register</td><td><code>index.html</code> (~791 lines)</td></tr>
-<tr><td>App UI + Firebase client + pages</td><td><code>assets/js/andos6.15ddda7d.js</code> (~747 KB hashed)</td></tr>
-<tr><td>Layout / header / slider / wallet CSS</td><td><code>assets/css/andos5.1c269aa0.css</code></td></tr>
-<tr><td>PWA cache</td><td><code>sw.js</code> (<code>CACHE_VERSION=v18</code>, <code>APP_BUILD_ID=andos-v3-20261101c1</code>)</td></tr>
-<tr><td>SIM lookup proxy</td><td><code>workers/andos-sim</code> → <code>https://andos-sim.andos-support.workers.dev</code></td></tr>
-<tr><td>Money-lock rules (local only)</td><td><code>/home/user/firestore.rules</code> — <strong>prod par publish nahi</strong></td></tr>
-<tr><td>Firebase project</td><td><code>andos-49b6a</code> (Auth + Firestore)</td></tr>
-</table></div>
-<p>Hashed CSS/JS filenames content-hash hain (1y <code>immutable</code>). <code>index.html</code> <code>max-age=0, must-revalidate</code>. Phone PWA alag trap: neeche Part 2.</p>
-<hr>
-<h1>Hissa 1 — Solid &amp; active</h1>
-<h2>1.1 Base se frontend split</h2>
-<p><strong>Jo mila:</strong> ~1.6 MB <strong>single HTML monolith</strong> — login gate + dashboard ek hi document, inline CSS/JS, CDN Tailwind/runtime.</p>
-<p><strong>Kya kiya (commit <code>5233d5d</code>, backup <code>6a0b1fb</code>):</strong></p>
-<ul>
-<li>HTML se CSS/JS <strong>hashed files</strong> me nikaala. Claim: HTML ~<strong>−97%</strong>, pixel-identical.</li>
-<li>Ab load graph:</li>
-<li>CSS: <code>andos1</code>…<code>andos5</code> + local Tailwind <code>tw.2d52300d.css</code> + Font Awesome + self-hosted Google Fonts (<code>gf.local.css</code>, <code>gf2.local.css</code>).</li>
-<li>JS: <code>andos2</code> (small), <code>andos3</code> (SW register), <code>andos4</code>, <strong><code>andos6</code> (app)</strong>, <code>deeplink</code>.</li>
-<li><code>andos5.ed260336.js</code> splash bundle tha — current <code>index.html</code> <strong>load nahi karta</strong> (single-owner splash inline).</li>
-<li>CDN Tailwind hata (<code>4c1bc43</code>): <code>cdn.tailwindcss.com</code> runtime JIT nahi; local prebuilt utilities.</li>
-<li>Assets: jsDelivr/GitHub CDN se <strong><code>/assets/mirror/...</code></strong> local copy + 404 pe inline SVG tile (<code>index.html</code> IMAGE SAFETY NET). Path contract: root-relative <code>/assets/...</code>.</li>
-</ul>
-<p><strong>Boot jo monolith se <code>index.html</code> head me reh gaya (ye hashed nahi, pehle paint ke liye zaroori):</strong></p>
-<p>1. <code>localStorage</code> guard (private mode fallback).</p>
-<p>2. <strong>Auth lock v2</strong> — persisted session ho to <code>#yuvaGate</code> / <code>#loginScreen</code> <code>display:none</code> <strong>first paint se pehle</strong>.</p>
-<p>3. Storage shim (<code>andos_user</code> / <code>andos_orders</code> / <code>andos_wallet</code> shape).</p>
-<p>4. Splash first-paint black (<code>html.andos-splash</code>).</p>
-<p>5. Firebase compat scripts (app/auth/firestore 10.8.0).</p>
-<p>App shell runtime me <code>andos6</code> banata hai: <code>.andos-shell</code> → <code>main.andos-main</code> → <code>#pageSlider</code> → <code>.page-section[data-sec=home|categories|orders|wallet|account]</code>. Pages <code>HomePage()</code> / <code>WalletPage()</code> / … functions se fill.</p>
-<hr>
-<h2>1.2 Frontend → backend data-flow (jo wired hai)</h2>
-<h3>Firebase Auth + Firestore</h3>
-<ul>
-<li>Client config <strong>hashed <code>andos6</code></strong> me <code>firebaseConfig</code> — <code>projectId: &quot;andos-49b6a&quot;</code>, <code>authDomain: andos-49b6a.firebaseapp.com</code>.</li>
-<li>Compat SDK: <code>firebase-app</code> / <code>auth</code> / <code>firestore</code> 10.8.0, <code>index.html</code> se.</li>
-<li>Flows jo app use karti hai: Google sign-in, optional phone OTP, guest, <code>localStorage</code> <code>andos_user</code> + <code>andos_auth_state</code> (<code>in</code>/<code>out</code>). Logout <code>andos_logged_out=1</code> marker (gate flash na aaye).</li>
-<li>Firestore collections jo client <strong>padh/likh</strong> try karti hai: <code>users/{uid}</code>, orders, wallet-related docs. <strong>Likha</strong> unauth par REST se <strong>403</strong> verify hua (<code>orders</code>, <code>wallet_ledger</code>).</li>
-<li><code>andos-fs.andos-support.workers.dev</code> is session me <strong>Cloudflare 1042 (dead)</strong> — us par depend mat karo.</li>
-</ul>
-<h3>Cloudflare Workers + proxy</h3>
-<div class="tbl-wrap"><table>
-<tr><th>Worker</th><th>Role</th><th>Client</th></tr>
-<tr><td><code>andos-sim</code> (<code>workers/andos-sim</code>)</td><td>Origin-locked <strong>POST <code>/lookup</code></strong> — SIM/number lookup. API key <strong>worker secret</strong>, HTML/JS me nahi</td><td><code>CONFIG.simLookupWorker</code> URL only</td></tr>
-<tr><td>Guest <code>/health</code></td><td>200</td><td>n/a</td></tr>
-<tr><td><code>tg-proxy</code></td><td>Telegram proxy; GET <strong>405</strong> (POST-only pattern)</td><td><code>andos6</code> me <code>tg-proxy</code> string 1</td></tr>
-</table></div>
-<p><strong>SIM key strip (commit <code>138734d</code>):</strong> client se <code>simLookupKey</code> hataaya; lookup worker ke through. Current <code>andos6.15ddda7d.js</code> me <strong><code>simLookupKey</code> count = 0</strong>. Rewrite (<code>git reset</code> / split) ke baad worker <strong>URL</strong> client me hai, key nahi. <code>index.html</code> worker ko import nahi karta.</p>
-<h3>Telegram admin / tracker bots</h3>
-<ul>
-<li>Automation <strong><code>andos6</code></strong> me (<code>telegram</code> ~53 hits): payment/order events, tracker cards, image-bot vs tracker split (commit <code>16d3247</code>).</li>
-<li>Tokens <strong>client bundle me nahi daalne ka standing rule</strong>. Proxy worker origin-lock. Is audit me bot token dump nahi.</li>
-</ul>
-<hr>
-<h2>1.3 Security &amp; UID (solid, with caveats)</h2>
-<h3>Unauth 403 write protection</h3>
-<ul>
-<li>Unauthenticated Firestore REST GET/POST listed collections → <strong>403</strong>.</li>
-<li>Matlab browser se bina Auth ke <code>orders</code> / <code>wallet_ledger</code> create nahi.</li>
-</ul>
-<h3>Admin UID lock + client money fields</h3>
-<ul>
-<li>Standing product rule: <strong>admin koi UID lock</strong> kare; locked UID <strong>naya spend nahi</strong>.</li>
-<li>Client <strong><code>walletUnlocked</code> / balances write nahi kare</strong>.</li>
-<li>Local <code>firestore.rules</code>: <code>users/{userId}</code> create/update par <code>wallet</code>, <code>walletUnlocked</code>, <code>walletBalance</code>, <code>loyalty</code>, <code>walletPin</code> <strong>hasAny → deny</strong>. <code>wallets/{id}</code> client write <strong>false</strong>. <code>transactions</code> write <strong>false</strong>.</li>
-<li><strong>Caveat:</strong> ye rules file <strong>local</strong> hai. Standing instruction: <strong>prod par publish mat karo</strong> jab tak alag se na kaha jaye. Prod lock isliye <strong>Admin SDK / worker</strong> + client discipline par hai, public rules snapshot par nahi.</li>
-</ul>
-<h3>SIM / secrets</h3>
-<ul>
-<li><code>138734d</code>: key client se strip.</li>
-<li>Drive zip / guessed hashes / PAT print — reject list. Firebase authorized-domain wildcards nahi. Prod login disable nahi.</li>
-</ul>
-<hr>
-<h2>1.4 UI deliverables — production me jo <strong>user-accepted</strong> rahe</h2>
-<p>Sirf woh jo constraints me <strong>rakhe gaye</strong>, baad me “mat chhedo” / revert list se bahar.</p>
-<h3>Cinematic splash (Netflix-style — original accepted logic)</h3>
-<ul>
-<li>Overlay <code>#appSplashOverlay</code> + <code>#appSplashVideo</code> (<code>/assets/videos/splash-loading.mp4</code>), poster = frame 0 webp.</li>
-<li>Hashed splash controller (<code>andos5.ed260336.js</code>) ka <strong>original contract:</strong> clip frame 0 se ~2.70s, dismiss <code>ended</code> par, exit <strong><code>scale(2.2)</code> zoom-out</strong> + opacity, phir <code>window.__andosPlayCinematicEntry()</code> → <code>main.andos-main</code> par <code>andosCineIn</code> (opacity 0→1, scale 0.95→1, <strong>no blur</strong>).</li>
-<li><code>0df6a3f</code> / <code>e39622b</code> / <code>b4d2bb0</code>: splash black lock + Netflix zoom + video poora chale.</li>
-<li><strong>Ab live:</strong> zoom bundle <strong>load nahi</strong>; inline single owner (video <code>ended</code> <strong>ya 2.5s cap</strong>, opacity fade, cine). Zoom-out <strong>current HEAD me active nahi</strong> — neeche Part 2.</li>
-</ul>
-<h3>Header + status-bar stretch</h3>
-<ul>
-<li>Home header <strong>absolute overlay</strong> (banner ke upar), rest pages par transparent; <strong>scrolled:</strong> <code>rgba(255,255,255,.58)</code> + <code>blur(16px) saturate(160%)</code>.</li>
-<li>Pull-down <strong>PINK Home only</strong> (<code>b702eba</code>, <code>26829de</code>) — stretch pe status/header ke beech <strong>white blink band</strong> ko pink root + <code>::before</code> se mara. Doosre pages par stretch pink nahi.</li>
-<li><code>theme-color</code> watchdog (<code>index.html</code> v11.1): splash <code>#000</code>; home <code>#F9A8D4</code>; wallet <code>#2e1065</code>; account <code>#eef2ff</code>; payment <code>#221b50</code>.</li>
-<li>Header <strong>banner mat chhedo</strong> — standing. <code>l35</code> binary white / hysteresis white <strong>rejected</strong>.</li>
-</ul>
-<h3>Profile DP ring (header)</h3>
-<ul>
-<li>Original <code>.dp-ring</code> / avatar btn: conic <code>from 220deg #0785ff,#168bff,#a5a4ff,#168bff,#0785ff</code>, padding <strong>3.5px</strong>.</li>
-<li>Gap = pehle wala white space, <strong>transparent</strong> (header dikhe). Nested <code>%</code> nahi. Photo <code>cover</code> / <code>center</code> / <code>border-radius:50%</code>.</li>
-<li><code>::before</code> 40px chrome, inner 3rd ring, GH-clone 128/512 canvas — <strong>reject</strong>. Hashed <code>andos5</code> me <code>nav.home-topbar .andos-avatar-ring</code> yahi conic + mask.</li>
-</ul>
-<h3>Tabs / navigation</h3>
-<ul>
-<li>Bottom nav: Home / Explore / Orders / Wallet / Profile ↔ <code>data-sec</code> <code>home|categories|orders|wallet|account</code>.</li>
-<li>Tab switch: <code>scrollLeft = index * width</code> (<code>__andosTabSwitch</code> in <code>andos6</code>), <strong>horizontal swipe/snap user-facing OFF</strong> (FIX-T: JS swipe IIFE hata; <code>#pageSlider{scroll-snap-type:none}</code> kai rounds).</li>
-<li><code>1c50900</code>: FIX-R <strong>CSS comments</strong> jo parser ne rules bana diye the — <strong>Home+Profile stack</strong>. Comments hataaye, stack band. Ye <strong>accepted</strong> ship tha.</li>
-</ul>
-<h3>Auth UX (accepted)</h3>
-<ul>
-<li>Hard auth lock before paint (<code>4c1bc43</code>).</li>
-<li>Google CTA freeze / last-used / guest TTL — builds h/i.</li>
-</ul>
-<h3>Assets (accepted)</h3>
-<ul>
-<li>Local logos/banners mirror; 0×404 sweep (<code>2892ecb</code>, <code>b23bc7a</code>).</li>
-<li>Image error → branded SVG tile, koi blank box nahi.</li>
-</ul>
-<hr>
-<h1>Hissa 2 — Negative / reverted experiments</h1>
-<p>Bina chhupaye. Layout toota, user ne reject kiya, ya phone par “kuch nahi badla”.</p>
-<h2>2.1 <code>height: auto</code> nested-scroll unlock — <strong>layout todd, revert <code>f83652f</code></strong></h2>
-<p><strong>Irada:</strong> phone par Home/Wallet/Payment/QR freeze = nested prison:</p>
-<p><code>html,body{height:100%;overscroll-behavior-y:none}</code> → <code>#app</code>/<code>.andos-shell</code> 100% / <code>100dvh</code> → <code>.page-slider{overflow-y:hidden}</code> → <code>.page-section{height:100%;overflow-y:auto}</code>.</p>
-<p><strong>Galat ilaaj (commit <code>c753263</code>):</strong> last-wins se <code>html/body/#app/.andos-shell/.andos-main/#pageSlider/.page-section</code> sab <strong><code>height:auto !important</code></strong>, shell background <strong>transparent</strong>, document ko scroller.</p>
-<p><strong>Asar:</strong></p>
-<ul>
-<li>Header <strong>absolute overlay</strong> document ke saath scroll — chipka nahi.</li>
-<li>Bottom nav viewport lock toota.</li>
-<li>Inactive sections <code>visibility:hidden</code> phir bhi height leti → sabse lambi page ka blank scroll.</li>
-<li>“Doosri app toot gayi” feel.</li>
-</ul>
-<p><strong>Revert <code>f83652f</code>:</strong> shell wapas hashed <code>100% / 100dvh</code>. Freeze ka root CSS me <strong>ab bhi hai</strong>; us round ne sirf chrome maara.</p>
-<h2>2.2 800ms Heal interval — <strong>hataaya (<code>43de346</code>)</strong></h2>
-<p><strong>File:</strong> <code>index.html</code> inline <strong>SCROLL SELF-HEAL v11.3</strong> (<code>52ae8dd</code> se).</p>
-<p><strong>Kya karta tha:</strong> har <strong>800ms</strong> + click/touch/navigate par <code>.andos-shell</code>, <code>#pageSlider</code>, har <code>.page-section</code>, payment/QR se inline <code>overflow:hidden</code> / kabhi <code>height:100%</code> saaf ya <code>overflowY=auto</code> <strong>force</strong>.</p>
-<p><strong>Nuksaan:</strong> hashed layout se <strong>ladai</strong>. Nested auto scrollers, jank/flicker, QR open hote heal skip/unlock galat. Comment baad me “document scroller” keh raha tha jab CSS revert ho chuki thi.</p>
-<p><strong>Ab:</strong> heal <strong>index me nahi</strong>. Chhota <strong>unlock-on-navigate</strong> (body <code>overflow:hidden</code> clear after payment) ab bhi pada hai — 800ms loop nahi.</p>
-<h2>2.3 Teen-malik splash + <code>opacity: 1 !important</code></h2>
-<p><strong>Teen controllers ek overlay par:</strong></p>
-<p>1. Head splash-paint (<code>andos-splash</code> class / unpaint / 5s safety).</p>
-<p>2. Inline HARD_CAP <code>bye()</code> (3s, phir 4.2s).</p>
-<p>3. Hashed <code>andos5.ed260336.js</code> (watchdog ~2.6s, <code>ended</code>, <strong>zoom <code>scale(2.2)</code></strong>).</p>
-<p><strong>Plus CSS:</strong> <code>#appSplashOverlay{animation: andosSplashFailSafe 2.90s forwards}</code> overlay ko pehle fade.</p>
-<p><strong>Clash:</strong> CSS 2.9s pe overlay transparent → app header/status <strong>white layer</strong>; zoom = “doosri route”. <code>opacity:1 !important</code> ne fade <strong>maar</strong> di — dismiss sirf <code>remove()</code> se. Agar remove na ho → <strong>kaali screen atak</strong>. <code>done()</code> overlay dekh kar class nahi giraata tha → stuck black possible.</p>
-<p><strong>Ab HEAD:</strong> <code>andos5</code> script <strong>nahi</strong>; ek inline owner; cap <strong>2500ms</strong>; fade opacity (bina <code>!important</code> lock). Original Netflix <strong>zoom-out current live par nahi chal raha</strong>.</p>
-<h2>2.4 Blank / white tabs (Wallet, Orders, Profile, Explore)</h2>
-<p><strong>User screenshots (2026-11-01 ~18:06):</strong> Home content OK; Explore/Orders/Wallet/Profile = <strong>sirf bottom nav + white</strong>. Payment/Plans (slider ke bahar / <code>page-enter</code>) OK.</p>
-<p><strong>Do asli wajah (APEX <code>638d8fc</code> + is session):</strong></p>
-<p>1. <code>#pageSlider</code> par <strong><code>display:flex</code> row missing</strong> + hardening <code>overflow-x:hidden</code> + <code>scroll-snap:none !important</code> → paanch <code>.page-section</code> <strong>vertical stack</strong> (y = 0 / 844 / 1688…). Tab <code>data-page=wallet</code> par home <code>visibility:hidden</code>, wallet 844px+ neeche → viewport <strong>khaali</strong>.</p>
-<p>2. <code>index.html</code> <code>#andos-ui-restore</code> ne inactive <code>[data-sec]</code> <strong>visibility:hidden</strong>. <code>scrollLeft</code> 0 pe atke to same white.</p>
-<p><code>638d8fc</code>: CSS <code>andos5.1c269aa0.css</code> — <code>#pageSlider{display:flex; flex-direction:row}</code> + <code>scrollLeft</code> track. Explore stub vs full page alag decision (user ne baad me <strong>blank canvas</strong> maanga — <code>CategoriesPage()</code> <code>#exploreCanvas</code> empty).</p>
-<p><strong><code>43de346</code>:</strong> index se hide-restore hataaya; hashed CSS me hide <strong>ab bhi</strong> hai. <code>f918d12</code>: last-wins <code>#pageSlider &gt; .page-section{visibility:visible !important}</code>.</p>
-<h2>2.5 Wallet purple left-cut / baingani strip</h2>
-<ul>
-<li><strong>Strip leak:</strong> pehle slider ne <strong>agle page ka purple</strong> Home/Wallet edge par dikhaya (<code>l47</code> live note). Page colors paint karke “fix” <strong>l45 reject</strong>.</li>
-<li><strong>Left cut:</strong> <code>.wal-hero</code> edge-to-edge nahi (<code>margin</code> / section padding). <code>2892ecb</code> + hashed:</li>
-</ul>
-<p>  <code>.wal-hero, .wal-body, .page-section[data-sec=&quot;wallet&quot;]{ width:100%; margin-left:0; box-sizing:border-box }</code> + <code>::before</code> left/right −2px.</p>
-<ul>
-<li>Blank-tab screenshots me wallet <strong>poora missing</strong> tha — cut nahi, <strong>hide/stack</strong>. <code>f918d12</code> dobara <code>padding-left:0; left:0</code>.</li>
-</ul>
-<h2>2.6 PWA cache — origin theek, phone purana (<code>f918d12</code> se pehle)</h2>
-<p><strong>Proof (curl 2026-11-01):</strong> origin <code>l63</code> / <code>43de346</code> serve ho raha tha; <code>sw.js</code> <strong>v17 same bytes</strong> — naya worker <strong>install nahi</strong>.</p>
-<p>HTML fetch <strong>stale-while-revalidate:</strong> cached <code>index.html</code> <strong>turant</strong>, fresh background. PWA <strong>l62</strong> (heal + hide) dikhati, origin l63.</p>
-<p><code>andos3.719baac1.js</code> hardcode <code>__ANDOS_BUILD_ID=andos-v3-20261030l58</code>; SW <code>b2</code> tha → ACK mismatch.</p>
-<p><strong><code>f918d12</code>:</strong> SW <strong>v18</strong>, <code>APP_BUILD_ID=c1</code>, HTML <strong>network-first 1.2s</strong>, <code>skipWaiting</code> + <code>clients.claim</code> pehle se. Phone tab tak purana dikhega jab tak PWA SW update na le (kill/reopen ya site data clear).</p>
-<h2>2.7 Aur reject / mat-wapis list (UI)</h2>
-<p>Inhe dobara mat lagaana (user corrections):</p>
-<ul>
-<li>Extra overflow stacks; 128/512 fake DP; AI fake UI shots.</li>
-<li>Flat 100% transparent header hamesha; l7 hamesha-opaque pink 0.75; l10 shell <code>#F9A8D4</code>; l11 in-flow bar.</li>
-<li>l13 <code>#eaf0ff</code>; l15 pastel no-login; l23 mask+bottom 0; l24 full-header blur at rest; l26 <code>::after</code> blur(18px).</li>
-<li>l27 hysteresis WHITE; l28 8-step color-mix; <strong>l35 binary WHITE</strong>.</li>
-<li>Gemini/e27180d 44px glow; l30 filled-ring blob; l31 SVG inset-6; l53 metal chrome; l54 <code>#ffffff</code> gap.</li>
-<li>Page background paint (l45); 14px SURGICAL; monolith 1.64MB restore <strong>unless asked</strong>.</li>
-<li><code>scripts/wallet-lock.py</code> <strong>commit nahi</strong>. <code>andos-com</code> unpause <strong>unless asked</strong>.</li>
-</ul>
-<h2>2.8 Dead / incomplete backend</h2>
-<div class="tbl-wrap"><table>
-<tr><th>Item</th><th>Haal</th></tr>
-<tr><td><code>andos-fs</code> worker</td><td>Cloudflare <strong>1042</strong>, dead</td></tr>
-<tr><td>Phase 2</td><td>Plan diya, <strong>code nahi</strong></td></tr>
-<tr><td>Prod Firestore rules publish</td><td><strong>Nahi</strong> (local file only)</td></tr>
-<tr><td>Sim worker re-wire after HTML rewrite</td><td>URL client me; key nahi; full quota path audit pending</td></tr>
-<tr><td>Guest <code>/health</code></td><td>200</td></tr>
-<tr><td>Hashed <code>andos6</code> me <code>walletUnlocked</code> string</td><td>3 hits — <strong>client write path audit</strong> baaki; rules local deny</td></tr>
-</table></div>
-<hr>
-<h2>Current HEAD snapshot (active, not marketing)</h2>
-<div class="tbl-wrap"><table>
-<tr><th></th><th></th></tr>
-<tr><td>Git</td><td><code>f918d12</code></td></tr>
-<tr><td>HTML meta</td><td><code>andos-v3-20261101c1</code></td></tr>
-<tr><td>App JS</td><td><code>andos6.15ddda7d.js</code></td></tr>
-<tr><td>App CSS</td><td><code>andos5.1c269aa0.css</code></td></tr>
-<tr><td>SW</td><td><code>v18</code> / network-first HTML</td></tr>
-<tr><td>Splash</td><td>inline single owner, 2.5s cap, <strong>no zoom bundle</strong></td></tr>
-<tr><td>Heal 800ms</td><td><strong>off</strong></td></tr>
-<tr><td>Explore</td><td>blank <code>#exploreCanvas</code> (redesign slot)</td></tr>
-<tr><td>Slider</td><td>hashed flex row + last-wins sections visible</td></tr>
-</table></div>
-<hr>
-<h2>Ek line</h2>
-<p><strong>Solid:</strong> monolith→hashed split, Auth lock, Firebase <code>andos-49b6a</code>, unauth 403, SIM key strip, accepted header/DP/tabs/stack fix, local money-lock rules (unpublished).  </p>
-<p><strong>Toota-phir-revert:</strong> <code>height:auto</code> shell, heal timer, 3-owner splash, visibility-hidden blank tabs, SW v17 stale HTML.  </p>
-<p><strong>Phone vs origin:</strong> origin <code>c1</code> serve karta hai; installed PWA <strong>v18 adopt</strong> kare bina purani screen dikh sakti hai — ye product bug nahi, cache contract tha.</p>
+  <div>
+    <div class="code">404</div>
+    <p>Ye page exist nahi karta. Wapas home chalo.</p>
+    <a href="/">Go to ANDOS</a>
   </div>
 </body>
 </html>

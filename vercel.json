@@ -120,7 +120,7 @@
   ],
   "rewrites": [
     {
-      "source": "/((?!assets/|sw\\.js|manifest\\.json|index\\.app\\.html).*)",
+      "source": "/((?!assets/|sw\\.js|manifest\\.json|dex\\.html).*)",
       "destination": "/404.html"
     }
   ],
