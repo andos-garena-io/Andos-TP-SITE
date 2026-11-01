@@ -201,7 +201,7 @@ main.andos-main,
    Fix: chaining allow (auto), sirf root par none. */
 .payx-page, .payment-verification-page, .pv2, .os2-page,
 .wal-page, .lb-ui, .ep-page, main.andos-main, .page-section, .andos-shell{
-  touch-action: pan-y;
+  touch-action: manipulation;
   -webkit-overflow-scrolling: touch;
 }
 /* full-screen page types: height cap + apna scroll (document lock ho jaye to bhi chale) */
@@ -213,3 +213,38 @@ main.andos-main,
 }
 /* in pages par inline padding se content kata na rahe */
 .payx-page, .payment-verification-page{ padding-bottom: calc(12px + var(--andos-safe-bottom)) !important; }
+
+
+/* ============ v11.4 — FINAL OVERRIDE (ismein sabse upar rehna hai) ============
+   Purane blocks me overscroll-behavior-y:contain bacha hua tha -> Android/iOS par
+   gesture swallow => page "atka hua". Ye rule sabko override karta hai. */
+.page-section, main.andos-main, .andos-main, .page-slider, .page-enter,
+.pv2, .os2-page, .payx-page, .payment-verification-page,
+.wal-page, .lb-ui, .ep-page, .catd-page, .andos-shell, #pageSlider{
+  overscroll-behavior-y: auto !important;
+}
+html, body{ overscroll-behavior-y: none !important; }
+/* vertical swipe kabhi block na ho (horizontal rails apna pan-x rakhenge) */
+.page-section, main.andos-main, .payx-page, .payment-verification-page,
+.pv2, .os2-page, .wal-page, .lb-ui, .ep-page{
+  touch-action: manipulation !important;
+  -webkit-overflow-scrolling: touch;
+}
+
+
+/* ============ v11.5 — touch-action lock ka final fix ============
+   #pageSlider par touch-action:pan-y!important tha. Wo ancestor hone ki wajah se
+   har child rail ka effective touch-action = pan-y ∩ pan-x = NONE ban jata tha
+   -> horizontal swipe / carousel touch par dead, aur kuch devices par vertical
+   gesture bhi swallow. Ab 'manipulation' (pan-x + pan-y + pinch) — dono kaam karenge. */
+#pageSlider,
+#pageSlider .page-section,
+#pageSlider.is-drill-lock,
+#pageSlider.is-drill-lock .page-section,
+.andos-shell.is-subview #pageSlider,
+.andos-shell.is-subview #pageSlider .page-section,
+.andos-shell.is-subview .page-section,
+#exploreDrill:not([hidden]),
+.home-carousel, .promo-rail, .cpn-rail, .od-scroller, .ff-ps{
+  touch-action: manipulation !important;
+}
