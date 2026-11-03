@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+
+# internal/duplicate copies (deploy hone hi nahi chahiye, phir bhi safety)
+Disallow: /DD.html
+Disallow: /index.txt
+Disallow: /garena.html
+Disallow: /workers/
+Disallow: /scripts/
+Disallow: /docs/
+
+Sitemap: https://andostosites.vercel.app/sitemap.xml

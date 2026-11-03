@@ -1,0 +1,25 @@
+# ANDOS — deployment se bahar rakhne wali cheezein
+# (ye files pehle public serve ho rahi thi — P0-2)
+
+# duplicate / purani site copies
+DD.html
+index.txt
+index🗿.html
+
+# internal code & docs (web root me nahi chahiye)
+# NOTE: garena.html ko mat hatao — index.html se link hai
+workers/
+scripts/
+docs/
+tools/
+QA-REPORT.md
+
+README.md
+*.md
+
+# build / local junk
+.git
+.gitignore
+node_modules
+*.log
+.DS_Store
