@@ -3718,8 +3718,9 @@ html.andos-splash, html.andos-splash body{transition:none !important}   /* grey 
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #ffffff;
-  color: #0f172a;
+  /* FIX-WHITE: boot loader bhi pure black — splash se 1:1, koi safed frame nahi */
+  background: #000000;
+  color: #f8fafc;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   /* buttery enterprise exit */
@@ -3766,8 +3767,8 @@ html.dark #bootLoader {
   width: 52px;
   height: 52px;
   border-radius: 16px;
-  background: #0f172a;
-  color: #ffffff;
+  background: #ffffff;   /* FIX-WHITE: black canvas par inverted mark */
+  color: #000000;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -3786,7 +3787,7 @@ html.dark #bootLoader {
   inset: -7px;
   width: 66px;
   height: 66px;
-  color: #d4d7de;
+  color: #3f4654;   /* FIX-WHITE: dark canvas ke liye ring tone */
   animation: bootSpin 1.12s linear infinite;
   will-change: transform;
 }
@@ -10052,6 +10053,9 @@ main.andos-main{overscroll-behavior-x:none}
     }, true);
 
     /* ===== NETFLIX-STYLE CINEMATIC DASHBOARD ENTRY (scale .95 -> 1 + fade) ===== */
+    /* FIX-WHITE: cinematic entry (andosCineIn) = app interface ka entry point.
+       Yahan black lock chhod do -> interface smoothly apne white theme par. */
+    window.__andosSplashPaintRelease = function () { try { document.dispatchEvent(new CustomEvent('andos:splash:done')); } catch (e) {} };
     window.__andosPlayCinematicEntry = function () {
         try {
             var host = document.querySelector('main.andos-main') || document.getElementById('app');
