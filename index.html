@@ -166,10 +166,31 @@
     <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="apple-touch-icon" href="https://cdn.jsdelivr.net/gh/CIDHARIOM/ANDOS-VS-0.172.1919@main/assets/logo/logo.png">
-    <meta name="theme-color" content="#0b0f19">
-    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0b0f19">
-    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0f19">
-    <meta name="andos-build" content="andos-v3-20261030l58">
+    <meta name="theme-color" content="#000000">
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#000000">
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000">
+    <meta name="andos-build" content="andos-v3-20261103w1">
+<style id="andos-splash-colors">/* SPLASH-PAINT v3 (ported from proven commit b4d2bb0): manifest background_color=#000000 ke saath 1:1.
+   Splash ke dauraan html/body kabhi white/pink na ho — legacy `html.yg-lock{background:#fff!important}`
+   ko inline !important se haraate hain. */
+html{background-color:#000000}   /* first paint — body ke aane se PEHLE bhi white na ho */
+html.andos-splash, html.andos-splash body,
+html.andos-splash.yg-lock, html.andos-splash.yg-lock body{background:#000000 !important}
+html.andos-splash, html.andos-splash body{transition:none !important}   /* grey interpolation band */
+</style>
+<script>/* SPLASH-PAINT v3 — standalone detect + splash class BEFORE first paint */
+(function(){var d=document.documentElement;try{var s=!!(window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===!0);window.__andosIsStandalonePWA=s;if(s)d.classList.add('andos-standalone');}catch(e){}
+ d.classList.add('andos-splash');
+ function paint(){try{d.style.setProperty('background-color','#000000','important');if(document.body)document.body.style.setProperty('background-color','#000000','important');}catch(e){}}
+ function unpaint(){try{d.style.removeProperty('background-color');if(document.body)document.body.style.removeProperty('background-color');}catch(e){}}
+ paint(); document.addEventListener('DOMContentLoaded',paint);
+ function done(){try{d.style.transition='none';if(document.body)document.body.style.transition='none';d.classList.remove('andos-splash');unpaint();setTimeout(function(){try{d.style.removeProperty('transition');if(document.body)document.body.style.removeProperty('transition');}catch(e){}},450);}catch(e){}}
+ document.addEventListener('andos:splash:done',function(){setTimeout(done,0);});
+ /* FIX-WHITE: overlay kisi bhi path se hat jaye (warm re-open / pageshow / bfcache) to bhi BLACK lock chhoote */
+ var _w=setInterval(function(){try{if(!document.getElementById('appSplashOverlay')||window.__andosSplashDone===true){clearInterval(_w);done();}}catch(e){}},200);
+ setTimeout(function(){clearInterval(_w);done();},8000); /* safety: splash 8s se zyada kabhi na atke */
+})();
+</script>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -192,7 +213,7 @@
     <!-- ==================== FORCE CACHE-BUSTING SERVICE WORKER v3 UPDATER ==================== -->
     <script>
       (function () {
-        var HTML_BUILD_ID = 'andos-v3-20261030l58';
+        var HTML_BUILD_ID = 'andos-v3-20261103w1';
         window.__ANDOS_BUILD_ID = HTML_BUILD_ID;
         if (!('serviceWorker' in navigator)) return;
         var refreshing = false;
@@ -9469,7 +9490,8 @@ main.andos-main{overscroll-behavior-x:none}
     
     <style>
                         @media (display-mode: standalone) {
-        html, body { background: #ffffff !important; }
+        /* FIX-WHITE: installed app ka OS/window canvas bhi black — white flash band */
+        html { background: #000000 !important; }
       }
       html, body { -webkit-touch-callout: none; }
       img, picture, svg, video, canvas, .no-save {
@@ -25389,7 +25411,9 @@ nav.glass-nav, .xplore-head, .od-title, .wal-hero, .txn-bar, .sp-bar, .odd-bar, 
 /* FIX-T(4,5): EXACT viewport boundaries + dark base html/body/#app — pull par WHITE frame impossible,
    scroll content par hi ruke (container stretch nahi) */
 html, body, #app { height: 100%; overscroll-behavior-y: contain !important; }
-html, body { background-color: #F9A8D4 !important; background-image: none !important; }
+/* FIX-WHITE: gulabi canary (#F9A8D4) hataya — root canvas black (splash-safe), body apna app color rakhta hai */
+html { background-color: #000000 !important; background-image: none !important; }
+html.andos-splash, html.andos-splash body { background-color: #000000 !important; }
 #app { background-color: #0b0f19 !important; background-image: none !important; }
 .andos-shell { height: 100%; min-height: 0; display: flex; flex-direction: column; background: #0b0f19; overscroll-behavior-y: contain; }
 .andos-main { flex: 1 1 auto; min-height: 0; overflow-x: hidden; overflow-y: auto; box-sizing: border-box; overscroll-behavior-y: contain; }
