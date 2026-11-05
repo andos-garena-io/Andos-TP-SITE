@@ -218,7 +218,7 @@
 
 
 </style>
-<link rel="preload" as="style" href="/assets/css/andos1.f4a7f80d.css"><link rel="preload" as="script" href="/assets/js/andos6.0247b8de.js"><style id="andos-pv3">
+<link rel="preload" as="style" href="/assets/css/andos1.f4a7f80d.css"><link rel="preload" as="script" href="/assets/js/andos6.4a9fa056.js"><style id="andos-pv3">
 #app /* ================= ANDOS · Pv3 =================
    9,
 #app 10,
@@ -605,6 +605,280 @@
 #app #plansVerifyTerminalWrap .sk::after{
   background:linear-gradient(90deg,transparent,rgba(255,255,255,.9),transparent)!important;
 }
+
+/* ================= Pv5 — skeleton upgrade + checkout page ================= */
+/* --- better skeleton (verify card) --- */
+#app #plansVerifyTerminalWrap .plans-verify-card{overflow:hidden!important}
+#app #plansVerifyTerminalWrap .pv-prog{display:none}
+#app #plansVerifyTerminalWrap .plans-verify-card.is-loading .pv-prog{
+  display:block;position:absolute;left:0;right:0;top:0;height:2.5px;border-radius:2px;
+  background:linear-gradient(90deg,transparent,#6366f1 20%,#fb923c 55%,#6366f1 80%,transparent);
+  background-size:55% 100%;background-repeat:no-repeat;animation:pvProg 1.25s cubic-bezier(.4,0,.2,1) infinite;
+}
+@keyframes pvProg{0%{background-position:-60% 0}100%{background-position:160% 0}}
+#app #plansVerifyTerminalWrap .pv-skel{display:none;margin-top:12px;flex-direction:column;gap:8px}
+#app #plansVerifyTerminalWrap .plans-verify-card.is-loading .pv-skel{display:flex}
+#app #plansVerifyTerminalWrap .sk{
+  position:relative;display:block;overflow:hidden;border-radius:12px;
+  background:linear-gradient(100deg,#eef0f7 0%,#f6f7fc 40%,#eef0f7 80%);
+  background-size:220% 100%;animation:skShift 1.6s ease-in-out infinite;
+}
+@keyframes skShift{0%{background-position:120% 0}100%{background-position:-40% 0}}
+#app #plansVerifyTerminalWrap .sk::after{
+  content:"";position:absolute;inset:0;transform:translateX(-110%);
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.92),transparent);
+  animation:skSheen 1.5s cubic-bezier(.4,0,.2,1) infinite;
+}
+@keyframes skSheen{100%{transform:translateX(110%)}}
+#app #plansVerifyTerminalWrap .sk-row{display:flex;align-items:center;gap:10px}
+#app #plansVerifyTerminalWrap .sk-ico{width:36px;height:36px;border-radius:11px;flex:0 0 auto;animation-delay:.12s}
+#app #plansVerifyTerminalWrap .sk-line{height:11px;border-radius:99px;flex:1 1 auto;max-width:62%;animation-delay:.06s}
+#app #plansVerifyTerminalWrap .sk-line2{height:8px;max-width:38%;opacity:.6;margin-top:1px}
+#app #plansVerifyTerminalWrap .sk-input{width:100%;height:50px;border-radius:14px;animation-delay:.18s}
+#app #plansVerifyTerminalWrap .plans-verify-card.is-loading .pv-field-zone{display:none!important}
+@keyframes skBreath{50%{transform:scale(.96)}}
+
+/* --- card polish --- */
+#app #plansVerifyTerminalWrap .plans-verify-card.terminal-upgrade{
+  background:linear-gradient(170deg,#ffffff 0%,#fdfdff 62%,#f8f9ff 100%)!important;
+}
+#app #plansVerifyTerminalWrap .plans-verify-card.terminal-upgrade .pv-head h4{
+  letter-spacing:-.012em!important;
+}
+#app #plansVerifyTerminalWrap .plans-verify-card.terminal-upgrade{padding:16px!important;border-radius:18px!important}
+#app #plansVerifyTerminalWrap .pv-ico{
+  width:38px!important;height:38px!important;border-radius:12px!important;
+  box-shadow:0 7px 14px -10px rgba(194,65,12,.85),inset 0 1px 0 rgba(255,255,255,.5)!important;
+}
+#app #plansVerifyTerminalWrap .pv-body{margin-top:13px}
+#app #plansVerifyTerminalWrap .plans-verify-btn{margin-top:13px!important}
+
+/* ================= CHECKOUT (orderform) page ================= */
+html[data-andos-page="orderform"] .andos-main{background:#f5f6fb!important}
+html[data-andos-page="orderform"] .page-enter > .px-4,
+html[data-andos-page="orderform"] .page-enter > div{padding-left:16px!important;padding-right:16px!important}
+html[data-andos-page="orderform"] .page-enter .bg-white.rounded-3xl{
+  border-radius:18px!important;border:1px solid #e9eaf6!important;
+  box-shadow:0 18px 38px -32px rgba(30,27,75,.55)!important;padding:16px!important;
+}
+html[data-andos-page="orderform"] .page-enter .bg-white.rounded-3xl h3{
+  font-size:13.5px!important;font-weight:900!important;color:#0f172a!important;margin-bottom:12px!important;
+}
+html[data-andos-page="orderform"] .input-field{
+  border:1.5px solid #e6e8f3!important;background:#f7f8fc!important;border-radius:14px!important;
+  height:50px!important;font-size:14px!important;font-weight:700!important;color:#0f172a!important;
+  box-shadow:none!important;transition:border-color .18s,background .18s!important;
+}
+html[data-andos-page="orderform"] .input-field:focus{
+  outline:none!important;border-color:#a5a8f0!important;background:#fff!important;box-shadow:none!important;
+}
+html[data-andos-page="orderform"] label.text-sm.font-bold{font-size:11px!important;letter-spacing:.02em;color:#475569!important}
+html[data-andos-page="orderform"] .of-opt{
+  font-size:8px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:#94a3b8;
+  background:#f1f2f9;border-radius:6px;padding:2px 6px;margin-left:4px;vertical-align:middle;
+}
+/* loyalty card */
+html[data-andos-page="orderform"] .order-loyalty-card{
+  border-radius:16px!important;background:linear-gradient(100deg,#fffbeb,#fffdf7)!important;
+  border:1px solid #fde9c0!important;box-shadow:none!important;padding:11px 13px!important;margin-top:12px!important;
+}
+html[data-andos-page="orderform"] .order-loyalty-card button{font-size:9px!important;border-radius:10px!important;padding:7px 10px!important}
+/* payment method */
+html[data-andos-page="orderform"] .of-paylead{
+  font-size:10px!important;font-weight:800!important;color:#98a0b6!important;
+  letter-spacing:.04em;margin-bottom:2px!important;text-transform:none!important;
+}
+html[data-andos-page="orderform"] .payment-method{
+  border:1.5px solid #e9ebf5!important;border-radius:15px!important;background:#fff!important;
+  padding:12px 13px!important;box-shadow:0 1px 2px rgba(15,23,42,.03)!important;
+  transition:border-color .18s,background .18s,box-shadow .18s!important;
+}
+html[data-andos-page="orderform"] .payment-method .flex-1 p:first-child{font-size:12.5px!important;font-weight:900!important;color:#0f172a!important}
+html[data-andos-page="orderform"] .payment-method .flex-1 p:nth-child(2){font-size:9.5px!important;font-weight:700!important;color:#98a0b6!important}
+html[data-andos-page="orderform"] .payment-method > div:first-child{width:38px!important;height:38px!important;border-radius:11px!important}
+html[data-andos-page="orderform"] .payment-method.active{
+  border-color:#c7cbf7!important;background:linear-gradient(100deg,#f7f8ff,#fdfdff)!important;
+  box-shadow:0 12px 26px -24px rgba(67,56,202,.9)!important;
+}
+html[data-andos-page="orderform"] .pm-radio{
+  width:20px!important;height:20px!important;border-radius:50%!important;border:1.8px solid #dfe2ee!important;
+  background:#fff!important;position:relative!important;flex:0 0 auto;
+}
+html[data-andos-page="orderform"] .payment-method.active .pm-radio{border-color:#4338ca!important;background:#4338ca!important}
+html[data-andos-page="orderform"] .payment-method.active .pm-radio:after{
+  content:"";position:absolute;inset:5px;border-radius:50%;background:#fff;
+}
+html[data-andos-page="orderform"] .payment-method .flex-1 p:first-child{
+  display:flex!important;align-items:center!important;gap:6px!important;flex-wrap:nowrap!important;
+}
+html[data-andos-page="orderform"] .pm-rec{
+  font-size:7px!important;font-weight:900!important;letter-spacing:.05em;text-transform:uppercase!important;
+  color:#047857!important;background:#eafbf1!important;border:1px solid #cdf3e0!important;
+  border-radius:999px!important;padding:1.5px 5px!important;margin:0!important;line-height:1.5;flex:0 0 auto;
+}
+html[data-andos-page="orderform"] .payment-method.wallet-locked{display:none!important}
+/* wallet lock banner */
+html[data-andos-page="orderform"] .wallet-first-lock{
+  border-radius:15px!important;background:#fff8f1!important;border:1px solid #fde3c4!important;padding:12px 13px!important;
+}
+/* ------- PAY BUTTON: select karne ke baad BLACK highlight ------- */
+html[data-andos-page="orderform"] .btn-3d{
+  border-radius:15px!important;height:54px!important;font-size:13.5px!important;font-weight:900!important;letter-spacing:.01em;
+  background:linear-gradient(135deg,#6366f1,#4f46e5 52%,#4338ca)!important;
+  box-shadow:0 1px rgba(255,255,255,.3) inset,0 5px #312e81,0 18px 30px -18px rgba(67,56,202,.9)!important;
+  transition:transform .16s ease,box-shadow .2s ease,background .2s ease!important;
+}
+html[data-andos-page="orderform"] .btn-3d.pay-armed{
+  background:linear-gradient(135deg,#1f2937,#0b0f19 55%,#000)!important;
+  box-shadow:0 1px rgba(255,255,255,.16) inset,0 5px #000,0 20px 34px -18px rgba(0,0,0,.85)!important;
+  color:#fff!important;animation:payArm .45s cubic-bezier(.2,1.4,.4,1);
+}
+@keyframes payArm{0%{transform:scale(.985)}60%{transform:scale(1.012)}100%{transform:scale(1)}}
+html[data-andos-page="orderform"] .btn-3d.pay-armed:active{transform:translateY(2px) scale(.99)}
+html[data-andos-page="orderform"] .pay-armed-tag{
+  display:inline-flex;align-items:center;font-size:9px;font-weight:900;letter-spacing:.09em;text-transform:uppercase;
+  background:rgba(255,255,255,.16);border-radius:999px;padding:3px 8px;margin-left:2px;color:#fff;
+}
+html[data-andos-page="orderform"] .btn-3d[disabled],html[data-andos-page="orderform"] .btn-3d.cursor-not-allowed{
+  filter:grayscale(1)!important;opacity:.55!important;box-shadow:none!important;
+}
+
+/* ================= Pv6 — plans hero photo + promo polish + combo bar ================= */
+/* hero anniversary photo (gold "8" ki jagah) */
+#app .dxh-art{width:104px!important;height:112px!important}
+#app .dxh-8{display:none!important}
+#app .dxh-photo{
+  position:relative;z-index:2;display:block;width:104px;height:112px;border-radius:16px;overflow:hidden;
+  border:1px solid rgba(251,191,36,.34);
+  box-shadow:0 16px 30px -18px rgba(0,0,0,.95),0 0 0 3px rgba(255,255,255,.035) inset;
+}
+#app .dxh-photo img{width:100%;height:100%;object-fit:cover;display:block;transform:scale(1.02)}
+#app .dxh-photo-shine{
+  position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(160deg,rgba(255,255,255,.22),transparent 38%,transparent 68%,rgba(0,0,0,.42));
+}
+#app .dxh-art.is-fail .dxh-photo{background:linear-gradient(150deg,#fbbf24,#b45309)}
+#app .dxh-glow{inset:-14px!important;background:radial-gradient(circle,rgba(245,158,11,.42),transparent 68%)!important}
+
+/* promo banner polish */
+#app .andq-promo-in{padding:12px 14px!important;gap:11px!important}
+#app .andq-promo-title{font-size:15.5px!important;letter-spacing:-.015em!important}
+#app .andq-promo-sub{margin-top:2px!important;font-size:8px!important;letter-spacing:.09em!important;color:#a16207!important}
+#app .andq-badge-hot{font-size:7px!important;letter-spacing:.13em!important;padding:3px 7px 3px 5px!important}
+#app .andq-timer-text strong{
+  font-size:19px!important;font-variant-numeric:tabular-nums;letter-spacing:-.01em!important;color:#b91c1c!important;
+}
+#app .andq-timer-text span{font-size:7px!important;letter-spacing:.09em!important;white-space:nowrap!important;color:#b45309!important}
+#app .andq-timer-text{min-width:0!important;white-space:nowrap!important;display:flex!important;flex-direction:column!important;align-items:flex-end!important;gap:1px!important}
+#app .andq-ring-wrap{width:34px!important;height:34px!important}
+
+/* ===== COMBO BUILDER BAR — naya native design ===== */
+#app .cbb{
+  margin:14px 16px 0;padding:13px 14px;border-radius:18px;background:#fff;
+  border:1px solid #e9eaf6;box-shadow:0 18px 34px -28px rgba(30,27,75,.6);
+  display:flex;flex-direction:column;gap:11px;
+}
+#app .cbb-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+#app .cbb-lead{display:flex;align-items:center;gap:10px;min-width:0}
+#app .cbb-ico{
+  width:34px;height:34px;border-radius:11px;flex:0 0 auto;display:grid;place-items:center;
+  color:#4338ca;font-size:13px;background:linear-gradient(150deg,#eef2ff,#e0e7ff);
+  box-shadow:0 6px 14px -10px rgba(67,56,202,.9),inset 0 1px 0 #fff;
+}
+#app .cbb-copy{display:flex;flex-direction:column;min-width:0}
+#app .cbb-copy b{font-size:12.5px;font-weight:900;color:#0f172a;letter-spacing:-.01em;line-height:1.25}
+#app .cbb-sub{font-size:9px;font-weight:800;color:#98a0b6;letter-spacing:.01em;margin-top:1px}
+#app .cbb-meta{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex:0 0 auto}
+#app .cbb-total{font-size:15px;font-weight:900;color:#4f46e5;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+#app .cbb-steps{display:flex;gap:4px}
+#app .cbb-steps i{display:block;width:16px;height:4px;border-radius:99px;background:#e9ebf5;transition:background .2s}
+#app .cbb-steps i.on{background:#10b981}
+#app .cbb-steps i.cur{background:#c7cbf7}
+#app .cbb-bar{display:flex;align-items:center;gap:9px}
+#app .cbb-save{
+  display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 10px 0 7px;border-radius:99px;
+  background:#ecfdf3;border:1px solid #cdf3e0;flex:1 1 auto;min-width:0;
+}
+#app .cbb-chk{
+  width:15px;height:15px;border-radius:50%;background:#10b981;color:#fff;display:grid;place-items:center;
+  font-size:7px;flex:0 0 auto;
+}
+#app .cbb-save .cmb-save-txt{
+  font-size:9.5px!important;font-weight:900!important;color:#0f766e!important;
+  white-space:nowrap!important;overflow:hidden;text-overflow:ellipsis;
+}
+#app .cbb-buy{
+  flex:0 0 auto;height:38px;padding:0 12px;border-radius:12px;border:none;cursor:pointer;
+  display:inline-flex;align-items:center;gap:7px;color:#fff;
+  background:linear-gradient(135deg,#6366f1,#4f46e5 55%,#4338ca);
+  box-shadow:0 1px rgba(255,255,255,.35) inset,0 4px #312e81,0 14px 22px -16px rgba(67,56,202,.95);
+  transition:transform .14s ease,box-shadow .2s ease,filter .2s ease;
+}
+#app .cbb-buy:active{transform:translateY(2px)}
+#app .cbb-buy i.fa-cart-shopping{font-size:10.5px;opacity:.95}
+#app .cbb-now{font-size:7px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;opacity:.85}
+#app .cbb-buy strong{font-size:12.5px;font-weight:900;font-variant-numeric:tabular-nums}
+#app .cbb-arrow{
+  width:19px;height:19px;border-radius:50%;background:rgba(255,255,255,.22);display:grid;place-items:center;font-size:7.5px;
+}
+#app .cbb-buy.is-muted{
+  background:linear-gradient(135deg,#a5a8f0,#8b8ee8 60%,#7c7fe0);
+  box-shadow:0 1px rgba(255,255,255,.3) inset,0 4px #5b5ecb;
+  opacity:.72;
+}
+
+/* ===== skeleton parity: verified result ke size jaisa ===== */
+#app #plansVerifyTerminalWrap .sk-btn2{
+  width:100%;height:46px;border-radius:14px;animation-delay:.26s;opacity:.85;
+}
+
+/* ================= Pv7 — promo banner (pq) naya native design ================= */
+#app .pq{padding:0 16px;margin:14px 0 0}
+#app .pq-card{
+  display:flex;align-items:center;gap:11px;padding:12px 13px;border-radius:16px;
+  background:linear-gradient(100deg,#fff7ed,#fffdfa 58%,#fffbeb);
+  border:1px solid #fde3c4;box-shadow:0 16px 32px -28px rgba(180,83,9,.85);position:relative;overflow:hidden;
+}
+#app .pq-card:after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(120% 160% at 100% 0,rgba(251,146,60,.16),transparent 58%);
+}
+#app .pq-ico{
+  position:relative;z-index:1;width:36px;height:36px;border-radius:12px;flex:0 0 auto;display:grid;place-items:center;
+  color:#fff;font-size:14px;background:linear-gradient(150deg,#fb923c,#ea580c 62%,#c2410c);
+  box-shadow:0 8px 16px -10px rgba(234,88,12,.95),inset 0 1px 0 rgba(255,255,255,.45);
+}
+#app .pq-ico:before{
+  content:"";position:absolute;inset:-4px;border-radius:15px;border:1.5px solid rgba(251,146,60,.5);
+  animation:pqPulse 2.2s ease-out infinite;
+}
+@keyframes pqPulse{0%{transform:scale(.92);opacity:.85}70%{transform:scale(1.16);opacity:0}100%{opacity:0}}
+#app .pq-mid{position:relative;z-index:1;flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:2px}
+#app .pq-kick{font-size:7.5px;font-weight:900;letter-spacing:.15em;text-transform:uppercase;color:#b45309}
+#app .pq-title{
+  margin:0;font-size:16px;font-weight:900;color:#7c2d12;line-height:1.1;letter-spacing:-.02em;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+#app .pq-timer{
+  position:relative;z-index:1;flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:1px;
+  background:#fff;border:1px solid #fbd9b4;border-radius:12px;padding:5px 9px 6px;
+  box-shadow:0 10px 18px -16px rgba(180,83,9,.9),inset 0 1px 0 #fff;
+}
+#app .pq-cap{font-size:6.5px;font-weight:900;letter-spacing:.13em;text-transform:uppercase;color:#b45309}
+#app .pq-timer strong{
+  font-size:16px;font-weight:900;color:#b91c1c;line-height:1;letter-spacing:-.01em;
+  font-variant-numeric:tabular-nums;
+}
+#app .pq-cap2{font-size:6.5px;font-weight:900;letter-spacing:.13em;text-transform:uppercase;color:#a16207}
+
+/* combo bar refinements */
+#app .cbb-steps i{width:16px!important;height:5px!important;background:#dfe4f2!important;border-radius:99px!important}
+#app .cbb-steps i.on{background:#10b981!important}
+#app .cbb-steps i.cur{background:#c7cbf7!important}
+#app .cbb.is-empty .cbb-save{background:#f5f6fb!important;border-color:#e8eaf4!important}
+#app .cbb.is-empty .cbb-chk{background:#c3c8d8!important}
+#app .cbb.is-empty .cbb-save .cmb-save-txt{color:#8a93a8!important}
+#app .cbb.is-ready .cbb-save{background:#ecfdf3!important;border-color:#cdf3e0!important}
 </style>
 </head>
 <!--YG-->
@@ -841,7 +1115,7 @@
       })();
     </script>
 
-    <script src="/assets/js/andos6.0247b8de.js"></script>
+    <script src="/assets/js/andos6.4a9fa056.js"></script>
 
 <style id="andos-fixr-glitch">
 /* FIX-R(1): PWA top-scroll white glitch — dark root bg + no rubber-band (last rule wins vs legacy white !important) */
