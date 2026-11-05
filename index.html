@@ -218,7 +218,103 @@
 
 
 </style>
-<link rel="preload" as="style" href="/assets/css/andos1.f4a7f80d.css"><link rel="preload" as="script" href="/assets/js/andos6.01bd13ff.js"></head>
+<link rel="preload" as="style" href="/assets/css/andos1.f4a7f80d.css"><link rel="preload" as="script" href="/assets/js/andos6.0a1f7cb3.js"><style id="andos-pv2">
+/* ============ ANDOS · Pv2 — Free Fire verify card REDESIGN (components 9,10,11,12) ============ */
+#plansVerifyTerminalWrap{padding-left:16px!important;padding-right:16px!important}
+.plans-verify-card.terminal-upgrade{
+  position:relative;display:block!important;padding:16px!important;border-radius:20px!important;
+  background:linear-gradient(180deg,#ffffff 0%,#fbfbff 100%)!important;
+  border:1px solid #e8e9f4!important;
+  box-shadow:0 1px 2px rgba(15,23,42,.04),0 18px 40px -24px rgba(79,70,229,.35)!important;
+  overflow:hidden;
+}
+.plans-verify-card.terminal-upgrade::before{
+  content:"";position:absolute;inset:0;pointer-events:none;border-radius:20px;
+  background:radial-gradient(120% 90% at 0% 0%,rgba(99,102,241,.07),transparent 55%);
+}
+/* --- head row --- */
+.pv-head{display:flex;align-items:flex-start;gap:11px;margin-bottom:14px;position:relative}
+.pv-ico{
+  flex:0 0 auto;width:38px;height:38px;border-radius:12px;display:grid;place-items:center;
+  background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;font-size:15px;
+  box-shadow:0 8px 18px -8px rgba(99,102,241,.9),inset 0 1px 0 rgba(255,255,255,.35);
+}
+.pv-headTxt{min-width:0;flex:1}
+.pv-chip{
+  display:inline-flex!important;align-items:center;gap:5px;padding:3px 8px!important;border-radius:999px!important;
+  background:#eef0ff!important;color:#4f46e5!important;font-size:8.5px!important;font-weight:900!important;
+  letter-spacing:.11em!important;text-transform:uppercase;margin:0 0 5px!important;line-height:1.5;
+}
+.pv-chip::before{content:"";width:5px;height:5px;border-radius:50%;background:#4f46e5;box-shadow:0 0 0 3px rgba(79,70,229,.15)}
+.plans-verify-card.is-verified .pv-chip{background:#e8fbf1!important;color:#059669!important}
+.plans-verify-card.is-verified .pv-chip::before{background:#059669;box-shadow:0 0 0 3px rgba(5,150,105,.15)}
+.pv-title{margin:0;font-size:15px;line-height:1.25;font-weight:900;color:#0f172a;letter-spacing:-.02em}
+.pv-sub{margin:3px 0 0;font-size:10.5px;line-height:1.45;font-weight:600;color:#7c88a1}
+.pv-step{
+  flex:0 0 auto;font-size:9px;font-weight:900;letter-spacing:.08em;color:#8b93ad;
+  background:#f4f5fb;border:1px solid #eceef7;border-radius:8px;padding:4px 7px;
+}
+/* --- label + input --- */
+.pv-label{margin:0 0 6px!important;display:block;font-size:10px!important;font-weight:900!important;
+  color:#414c66!important;text-transform:uppercase;letter-spacing:.09em}
+.pv-field{position:relative;display:flex;align-items:center}
+.pv-fieldIco{position:absolute;left:13px;font-size:13px;color:#9aa3b8;pointer-events:none;transition:color .2s}
+.pv-input.plans-verify-input{
+  width:100%!important;height:50px!important;padding:0 62px 0 36px!important;
+  border-radius:14px!important;border:1.5px solid #e6e8f2!important;background:#f7f8fc!important;
+  font-size:14.5px!important;font-weight:800!important;letter-spacing:.04em;color:#111827!important;
+  transition:border-color .18s,box-shadow .18s,background .18s!important;box-shadow:none!important;transform:none!important;
+}
+.pv-input.plans-verify-input::placeholder{font-weight:600;letter-spacing:0;color:#a7aec1}
+.pv-input.plans-verify-input:focus{
+  background:#fff!important;border-color:#7c7ff2!important;transform:none!important;
+  box-shadow:0 0 0 4px rgba(99,102,241,.14)!important;outline:none!important;
+}
+.pv-field:focus-within .pv-fieldIco{color:#5b5ef0}
+.pv-count{
+  position:absolute;right:12px;font-size:10px;font-weight:800;color:#a2a9bd;
+  background:#eef0f7;border-radius:7px;padding:3px 6px;font-variant-numeric:tabular-nums;
+}
+.pv-hint{margin:8px 0 0;font-size:10px;font-weight:700;color:#95a0b5;display:flex;align-items:center;gap:5px}
+.pv-hint i{font-size:9.5px;color:#b3bacb}
+/* --- verify button (12) --- */
+.plans-verify-btn{
+  margin-top:12px!important;width:100%!important;min-width:0!important;height:48px!important;
+  padding:0 18px!important;border-radius:14px!important;font-size:13px!important;font-weight:900!important;
+  letter-spacing:.02em;display:flex;align-items:center;justify-content:center;gap:8px;
+  background:linear-gradient(135deg,#6366f1 0%,#4f46e5 52%,#4338ca 100%)!important;color:#fff!important;
+  border:none!important;box-shadow:0 10px 24px -12px rgba(79,70,229,.95),inset 0 1px 0 rgba(255,255,255,.28)!important;
+  transition:transform .14s,box-shadow .18s,filter .18s!important;position:relative;overflow:hidden;
+}
+.plans-verify-btn:active{transform:translateY(1px) scale(.995)!important}
+.plans-verify-card.is-verified .plans-verify-btn{background:linear-gradient(135deg,#10b981,#059669)!important;
+  box-shadow:0 10px 24px -12px rgba(5,150,105,.9),inset 0 1px 0 rgba(255,255,255,.28)!important}
+.plans-verify-btn:disabled{filter:saturate(.35);opacity:.75}
+.plans-verify-btn.is-loading{background:linear-gradient(135deg,#818cf8,#6366f1)!important;opacity:1!important}
+.plans-spinner{width:15px;height:15px;border-width:2.5px!important;border-color:rgba(255,255,255,.95)!important;
+  border-bottom-color:transparent!important;animation:spin .65s linear infinite}
+/* --- SKELETON loading state --- */
+.pv-skel{display:none;flex-direction:column;gap:9px;margin-top:2px}
+.plans-verify-card.is-loading .pv-skel{display:flex}
+.plans-verify-card.is-loading .pv-body,
+.plans-verify-card.is-loading .pv-sub,
+.plans-verify-card.is-loading .pv-step{display:none!important}
+.plans-verify-card.is-loading{pointer-events:none}
+.sk{position:relative;display:block;overflow:hidden;background:#eef0f7;border-radius:9px}
+.sk::after{content:"";position:absolute;inset:0;transform:translateX(-100%);
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.85),transparent);animation:skShimmer 1.15s infinite}
+@keyframes skShimmer{100%{transform:translateX(100%)}}
+.sk-chip{width:104px;height:18px;border-radius:999px}
+.sk-line{width:64%;height:11px}
+.sk-input{width:100%;height:50px;border-radius:14px}
+.sk-btn{width:100%;height:48px;border-radius:14px;background:#e3e6f5}
+
+/* ============ component 13 — story rail: chhoti image + kam corner ============ */
+.ff-story-rail .ff-ps-card{flex:0 0 74%!important;border-radius:9px!important;box-shadow:0 10px 22px -16px rgba(0,0,0,.6)!important}
+.ff-story-rail .ff-ps-card img{border-radius:9px!important}
+.ff-story-rail .ff-ps{padding:4px 16px 12px!important;gap:10px!important}
+</style>
+</head>
 <!--YG-->
 <link rel="stylesheet" href="/assets/css/andos4.6b07466e.css">
 <body>
@@ -453,7 +549,7 @@
       })();
     </script>
 
-    <script src="/assets/js/andos6.01bd13ff.js"></script>
+    <script src="/assets/js/andos6.0a1f7cb3.js"></script>
 
 <style id="andos-fixr-glitch">
 /* FIX-R(1): PWA top-scroll white glitch — dark root bg + no rubber-band (last rule wins vs legacy white !important) */
@@ -484,5 +580,20 @@ nav.glass-nav, .xplore-head, .od-title, .wal-hero, .txn-bar, .sp-bar, .odd-bar, 
 </style>
 
 <link rel="stylesheet" href="/assets/css/andos5.4e46dfa2.css">
+<script id="andos-pv2-js">
+/* Pv2: Player UID live counter (component 11) */
+(function(){
+  function upd(el){
+    var c=document.getElementById('pvUidCount'); if(!c) return;
+    var v=(el&&el.value)||''; c.textContent=v.replace(/\D/g,'').length+'/12';
+  }
+  document.addEventListener('input', function(e){
+    if(e.target && e.target.id==='verifyBarInputEl'){ upd(e.target); }
+  }, true);
+  document.addEventListener('DOMContentLoaded', function(){
+    var el=document.getElementById('verifyBarInputEl'); if(el) upd(el);
+  });
+})();
+</script>
 </body>
 </html>
