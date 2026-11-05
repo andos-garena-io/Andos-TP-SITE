@@ -138,12 +138,23 @@
     halt(); lockScreen('lock',cfg||{});
   }
 
+  var RAW='https://raw.githubusercontent.com/andos-garena-io/Andos-TP-SITE/main/killswitch.json';
+  var SEV={off:0,lock:1,wipe:2};
+  function pull(url){
+    return fetch(url+(url.indexOf('?')>-1?'&':'?')+'t='+Date.now(),{cache:'no-store',headers:{'cache-control':'no-cache'}})
+      .then(function(r){ return r.ok?r.json():null; }).catch(function(){ return null; });
+  }
   function check(){
-    var url=CFG+'?t='+Date.now();
-    fetch(url,{cache:'no-store',headers:{'cache-control':'no-cache'}})
-      .then(function(r){ return r.ok?r.json():null; })
-      .then(function(cfg){ if(cfg) apply(cfg); })
-      .catch(function(){});
+    /* do source: GitHub raw (deploy ke bina bhi on/off) + site ka apna /killswitch.json */
+    Promise.all([pull(RAW),pull(CFG)]).then(function(list){
+      var best=null;
+      for(var i=0;i<list.length;i++){
+        var c=list[i]; if(!c) continue;
+        if(c.until&&Date.now()>Date.parse(c.until)) c.mode='off';
+        if(!best||(SEV[String(c.mode||'off').toLowerCase()]||0)>(SEV[String(best.mode||'off').toLowerCase()]||0)) best=c;
+      }
+      if(best) apply(best);
+    }).catch(function(){});
   }
 
   window.andosKillSwitch={check:check,apply:apply,wipe:function(){return wipeDevice().then(function(){halt();lockScreen('wipe',{});});}};
