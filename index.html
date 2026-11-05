@@ -289,6 +289,12 @@
 .plans-verify-btn:active{transform:translateY(1px) scale(.995)!important}
 .plans-verify-card.is-verified .plans-verify-btn{background:linear-gradient(135deg,#10b981,#059669)!important;
   box-shadow:0 10px 24px -12px rgba(5,150,105,.9),inset 0 1px 0 rgba(255,255,255,.28)!important}
+/* Pv2 verified polish: button contrast + check badge */
+.plans-verify-card.is-verified .plans-verify-btn:disabled,
+.plans-verify-card.is-verified .plans-verify-btn[disabled]{opacity:1!important;filter:none!important;color:#fff!important;cursor:default}
+.plans-verify-card.is-verified .plans-verify-btn{color:#fff!important;text-shadow:0 1px 1px rgba(0,0,0,.15)}
+.plans-verify-card.is-verified .pv-step{background:#e8fbf1!important;color:#059669!important;border-color:#b6efd3!important}
+
 .plans-verify-btn:disabled{filter:saturate(.35);opacity:.75}
 .plans-verify-btn.is-loading{background:linear-gradient(135deg,#818cf8,#6366f1)!important;opacity:1!important}
 .plans-spinner{width:15px;height:15px;border-width:2.5px!important;border-color:rgba(255,255,255,.95)!important;
