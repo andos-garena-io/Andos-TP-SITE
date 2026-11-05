@@ -1,170 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" class="yg-lock" data-auth="pending">
 <head>
-<script id="andos-killswitch">
-/* ============================================================================
-   ANDOS SECURITY KILL-SWITCH  (remote panic switch)
-   Control file : /killswitch.json   ->  {"mode":"off" | "lock" | "wipe"}
-   mode off  : normal app (koi effect nahi)
-   mode lock : app band (sirf closed screen, data safe)
-   mode wipe : app band + device ka saara site data delete
-               (localStorage, sessionStorage, cookies, IndexedDB, CacheStorage,
-                service-worker unregister) -> "clear case"
-   Check hota hai: page load, online aane par, tab wapas aane par, har 45s.
-   Self-test (sirf apne device par): ?andos_selftest=wipe  |  ?andos_selftest=lock
-   ============================================================================ */
-(function(){
-  var CFG='/killswitch.json', EVERY=45000, busy=false, state=null;
-  var SELFTEST=(function(){var m=/[?&]andos_selftest=(wipe|lock)/i.exec(location.search||'');return m?m[1].toLowerCase():'';})();
-  function $(id){return document.getElementById(id);}
-
-  function wipeDevice(){
-    var jobs=[];
-    try{localStorage.clear();}catch(e){}
-    try{sessionStorage.clear();}catch(e){}
-    try{
-      var ck=document.cookie?document.cookie.split(';'):[];
-      for(var i=0;i<ck.length;i++){
-        var n=ck[i].split('=')[0].trim(); if(!n) continue;
-        document.cookie=n+'=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/';
-        document.cookie=n+'=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain='+location.hostname;
-        document.cookie=n+'=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=.'+location.hostname;
-      }
-    }catch(e){}
-    try{
-      if(window.indexedDB&&indexedDB.databases){
-        jobs.push(indexedDB.databases().then(function(dbs){
-          return Promise.all(dbs.map(function(d){
-            if(!d||!d.name) return null;
-            return new Promise(function(r){try{var q=indexedDB.deleteDatabase(d.name);q.onsuccess=q.onerror=q.onblocked=function(){r()};}catch(e){r()}});
-          }));
-        }));
-      }
-    }catch(e){}
-    try{ if(window.caches&&caches.keys){ jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(x){return caches.delete(x);}));})); } }catch(e){}
-    try{ if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations){ jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister();}));})); } }catch(e){}
-    return Promise.all(jobs).catch(function(){});
-  }
-
-  function lockScreen(mode,cfg){
-    if($('andosKsScreen')){
-      $('andosKsScreen').setAttribute('data-mode',mode);
-      var m=$('andosKsMsg'); if(m&&cfg.message) m.textContent=cfg.message;
-      return;
-    }
-    var st=document.createElement('style');
-    st.textContent=
-      '#andosKsScreen{position:fixed;inset:0;z-index:2147483647;background:#000;color:#fff;display:flex;flex-direction:column;'+
-      'align-items:center;justify-content:center;gap:0;padding:34px 26px;text-align:center;'+
-      'font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;overflow:hidden}'+
-      '#andosKsScreen *{box-sizing:border-box}'+
-      '#andosKsScreen .ks-logo{display:flex;align-items:baseline;gap:4px;font-size:19px;font-weight:900;letter-spacing:-.02em;margin-bottom:26px}'+
-      '#andosKsScreen .ks-logo i{width:7px;height:7px;border-radius:50%;background:#f97316;display:block}'+
-      '#andosKsScreen .ks-shield{width:64px;height:64px;border-radius:20px;display:grid;place-items:center;margin-bottom:18px;'+
-      'background:radial-gradient(120% 120% at 30% 0,#1f2937,#0b0f19);border:1px solid #1f2937;box-shadow:0 22px 44px -26px #000}'+
-      '#andosKsScreen .ks-shield svg{width:28px;height:28px;stroke:#f97316}'+
-      '#andosKsScreen h1{margin:0 0 9px;font-size:20px;font-weight:900;letter-spacing:-.02em;line-height:1.2}'+
-      '#andosKsScreen p{margin:0;font-size:12.5px;line-height:1.65;color:#8b95ad;max-width:300px;font-weight:600}'+
-      '#andosKsScreen .ks-dots{display:flex;gap:7px;margin:26px 0 0}'+
-      '#andosKsScreen .ks-dots i{width:8px;height:8px;border-radius:50%;background:#fff;opacity:.32;'+
-      'animation:ksBounce 1.15s cubic-bezier(.36,.07,.19,.97) infinite}'+
-      '#andosKsScreen .ks-dots i:nth-child(2){animation-delay:.14s}'+
-      '#andosKsScreen .ks-dots i:nth-child(3){animation-delay:.28s}'+
-      '@keyframes ksBounce{0%,70%,100%{transform:translateY(0);opacity:.32}35%{transform:translateY(-8px);opacity:1}}'+
-      '#andosKsScreen .ks-chip{margin-top:20px;font-size:8.5px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;'+
-      'color:#f97316;border:1px solid #3b2410;background:#160d05;border-radius:999px;padding:6px 12px}'+
-      '#andosKsScreen .ks-ref{margin-top:14px;font-size:9px;font-weight:700;letter-spacing:.05em;color:#495066}'+
-      '#andosKsScreen .ks-help{margin-top:16px;font-size:10.5px;font-weight:800;color:#c7d0ea;text-decoration:none;'+
-      'border-bottom:1px solid #334155;padding-bottom:2px}';
-    document.head.appendChild(st);
-    var wrap=document.createElement('div');
-    wrap.id='andosKsScreen';
-    wrap.setAttribute('data-mode',mode);
-    wrap.style.opacity='0';
-    wrap.style.transition='opacity .2s ease';
-    wrap.innerHTML=
-      '<div class="ks-logo">ANDOS<i></i></div>'+
-      '<div class="ks-shield"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+
-        '<path d="M12 3 4 6v6c0 5 3.4 8.3 8 9 4.6-.7 8-4 8-9V6l-8-3Z"/><path d="M12 9v4"/><path d="M12 16.5v.01"/></svg></div>'+
-      '<h1>'+(mode==='wipe'?'Service closed':'Service temporarily off')+'</h1>'+
-      '<p id="andosKsMsg">'+(cfg.message||(mode==='wipe'
-          ?'Security reasons ki wajah se ANDOS is device par band kar diya gaya hai. Is device ka app data (login, wallet cache, orders cache) delete ho gaya hai.'
-          :'ANDOS abhi maintenance me hai. Thodi der baad dobara try karein.'))+'</p>'+
-      '<div class="ks-dots"><i></i><i></i><i></i></div>'+
-      '<span class="ks-chip">'+(mode==='wipe'?'Data cleared on this device':'Access paused')+'</span>'+
-      (cfg.supportUrl?'<a class="ks-help" href="'+cfg.supportUrl+'" target="_blank" rel="noopener">Support par baat karein</a>':'')+
-      '<div class="ks-ref">'+(cfg.ref||('REF '+new Date().toISOString().slice(0,19).replace(/[-:T]/g,'')))+'</div>';
-    (document.body||document.documentElement).appendChild(wrap);
-    requestAnimationFrame(function(){wrap.style.opacity='1';});
-    try{document.title='ANDOS · Service closed';}catch(e){}
-    try{history.replaceState({ks:1},'',location.pathname);}catch(e){}
-    window.__ANDOS_KS_LOCKED__=mode;
-  }
-
-  function halt(){
-    try{
-      var vids=document.querySelectorAll('video,audio');
-      for(var i=0;i<vids.length;i++){try{vids[i].pause();vids[i].removeAttribute('src');vids[i].load&&vids[i].load();}catch(e){}}
-    }catch(e){}
-    try{
-      var hide=['app','yuvaGate','loginScreen','luVerify','appSplashOverlay','bootLoader','toast'];
-      for(var j=0;j<hide.length;j++){var n=$(hide[j]); if(n) n.style.display='none';}
-      document.documentElement.setAttribute('data-andos-killed','1');
-      document.body&&(document.body.style.overflow='hidden');
-    }catch(e){}
-  }
-
-  function apply(cfg){
-    var mode=(cfg&&cfg.mode||'off').toLowerCase();
-    if(cfg&&cfg.until){ if(Date.now()>Date.parse(cfg.until)){ mode='off'; } }
-    if(SELFTEST==='wipe') mode='wipe';
-    else if(SELFTEST==='lock') mode='lock';
-    state=mode;
-    if(mode==='off'){
-      if(window.__ANDOS_KS_LOCKED__){ busy=false; location.reload(); return; } /* switch off = fresh boot */
-      var sc=$('andosKsScreen'); if(sc){ sc.remove(); document.documentElement.removeAttribute('data-andos-killed'); }
-      return;
-    }
-    if(mode==='wipe'){
-      if(busy) return; busy=true;
-      wipeDevice().then(function(){
-        /* app dobara data na likhe: storage writes band */
-        try{ Storage.prototype.setItem=function(){return undefined}; Object.defineProperty(window,'localStorage',{value:{getItem:function(){return null},setItem:function(){},removeItem:function(){},clear:function(){},key:function(){return null},length:0},configurable:true}); }catch(e){}
-        try{ Object.defineProperty(window,'sessionStorage',{value:{getItem:function(){return null},setItem:function(){},removeItem:function(){},clear:function(){},key:function(){return null},length:0},configurable:true}); }catch(e){}
-        halt(); lockScreen('wipe',cfg||{});
-      });
-      return;
-    }
-    halt(); lockScreen('lock',cfg||{});
-  }
-
-  var RAW='https://raw.githubusercontent.com/andos-garena-io/Andos-TP-SITE/main/killswitch.json';
-  var SEV={off:0,lock:1,wipe:2};
-  function pull(url){
-    return fetch(url+(url.indexOf('?')>-1?'&':'?')+'t='+Date.now(),{cache:'no-store',headers:{'cache-control':'no-cache'}})
-      .then(function(r){ return r.ok?r.json():null; }).catch(function(){ return null; });
-  }
-  function check(){
-    /* do source: GitHub raw (deploy ke bina bhi on/off) + site ka apna /killswitch.json */
-    Promise.all([pull(RAW),pull(CFG)]).then(function(list){
-      var best=null;
-      for(var i=0;i<list.length;i++){
-        var c=list[i]; if(!c) continue;
-        if(c.until&&Date.now()>Date.parse(c.until)) c.mode='off';
-        if(!best||(SEV[String(c.mode||'off').toLowerCase()]||0)>(SEV[String(best.mode||'off').toLowerCase()]||0)) best=c;
-      }
-      if(best) apply(best);
-    }).catch(function(){});
-  }
-
-  window.andosKillSwitch={check:check,apply:apply,wipe:function(){return wipeDevice().then(function(){halt();lockScreen('wipe',{});});}};
-  try{check();}catch(e){}
-  setInterval(check,EVERY);
-  window.addEventListener('online',check);
-  document.addEventListener('visibilitychange',function(){ if(!document.hidden) check(); });
-  window.addEventListener('pageshow',function(){ check(); });
-})();
-</script>
 <script>
 /* Storage guard: agar localStorage blocked ho (sandbox/private mode) to memory fallback — page kabhi blank na ho */
 (function(){try{var t='__andos_t';window.localStorage.setItem(t,'1');window.localStorage.removeItem(t);}catch(e){var mk=function(){var m={};return{getItem:function(k){return Object.prototype.hasOwnProperty.call(m,k)?m[k]:null;},setItem:function(k,v){m[k]=String(v);},removeItem:function(k){delete m[k];},clear:function(){m={};},key:function(i){return Object.keys(m)[i]||null;},get length(){return Object.keys(m).length;}};};try{Object.defineProperty(window,'localStorage',{value:mk(),configurable:true});}catch(e2){}try{Object.defineProperty(window,'sessionStorage',{value:mk(),configurable:true});}catch(e3){}}})();
@@ -382,667 +218,95 @@
 
 
 </style>
-<link rel="preload" as="style" href="/assets/css/andos1.f4a7f80d.css"><link rel="preload" as="script" href="/assets/js/andos6.4a9fa056.js"><style id="andos-pv3">
-#app /* ================= ANDOS · Pv3 =================
-   9,
-#app 10,
-#app 11 verify card = naya dark-console look (koi extra text nahi,
-#app koi outline nahi)
-   12 = ORIGINAL 3D button wapas (sirf skeleton effect)
-   14 = promo strip clean,
-#app 15 = deals hero (raster banner hata ke real UI),
-#app 17 = combo card clean
-   ============================================= */
+<link rel="preload" as="style" href="/assets/css/andos1.f4a7f80d.css"><link rel="preload" as="script" href="/assets/js/andos6.393ee2b5.js">
+<style id="andos-r7c">/* ---- PV field (UID) : icon + counter ---- */
+#app .pv-field{
+  display:flex!important;align-items:center!important;gap:9px!important;width:100%!important;
+  height:52px!important;padding:0 12px!important;border-radius:14px!important;
+  background:#f7f8fc!important;border:1.5px solid #e6e8f3!important;
+  transition:border-color .18s,background .18s!important;
+}
+#app .pv-field:focus-within{border-color:#a5a8f0!important;background:#fff!important}
+#app .pv-field .pv-fieldIco{color:#a3aabd!important;font-size:13px!important;flex:0 0 auto}
+#app .pv-field .plans-verify-input{
+  border:none!important;background:transparent!important;height:auto!important;padding:0!important;
+  box-shadow:none!important;flex:1 1 auto!important;min-width:0!important;width:auto!important;
+  font-size:15px!important;font-weight:800!important;color:#0f172a!important;letter-spacing:.03em;
+}
+#app .pv-field .plans-verify-input:focus{outline:none!important;border:none!important;box-shadow:none!important;background:transparent!important}
+#app .pv-field .pv-count{
+  flex:0 0 auto;font-size:10px;font-weight:900;letter-spacing:.03em;color:#8b93a8;
+  background:#eef0f7;border-radius:8px;padding:3px 7px;font-variant-numeric:tabular-nums;
+}
+#app .plans-verify-card.pv-loading .pv-field{display:none!important}
+/* skeleton contrast */
+#app .sk{background:linear-gradient(100deg,#dfe4f0 0%,#eef1f9 38%,#dfe4f0 78%)!important;background-size:220% 100%!important}
 
-/* ---------- 1) TAP/FOCUS par pura container outline — band ---------- */
-#plansVerifyTerminalWrap .plans-verify-card:focus,
-#app #plansVerifyTerminalWrap .plans-verify-card:focus-within,
-#app .plans-verify-card.terminal-upgrade:focus-within,
-#app #plansVerifyTerminalWrap .plans-verify-card *:focus,
-#app #plansVerifyTerminalWrap .plans-verify-card *:focus-visible{
-  outline:none!important;outline-width:0!important;transform:none!important;
+/* ================= Round-7C: verify skeleton + pay CTA + optional chip ================= */
+/* ---- verify card: best-version skeleton ---- */
+#app .plans-verify-card{padding:16px!important;border-radius:22px!important}
+#app .plans-verify-card:focus-within{transform:none!important;border-color:#a5a8f0!important;box-shadow:inset 0 1.5px #fff,0 14px 34px -18px rgba(67,56,202,.28)!important}
+#app .plans-verify-card .verify-terminal-status{font-size:8.5px!important;font-weight:900!important;letter-spacing:.14em!important;text-transform:uppercase!important;color:#6366f1!important}
+#app .plans-verify-card.is-verified .verify-terminal-status{color:#059669!important}
+#app .plans-verify-card .verify-terminal-label{font-size:11px!important;font-weight:800!important;color:#475569!important}
+#app .plans-verify-card .plans-verify-input{
+  height:52px!important;border-radius:14px!important;border:1.5px solid #e6e8f3!important;background:#f7f8fc!important;
+  font-size:15px!important;font-weight:800!important;color:#0f172a!important;box-shadow:none!important;
+  letter-spacing:.02em;transition:border-color .18s,background .18s!important;width:100%!important;
 }
-#app .plans-verify-card:focus-within{
-  border-color:rgba(129,140,248,.22)!important;
-  box-shadow:0 24px 50px -30px rgba(8,10,24,.9)!important;
-  animation:none!important;
-}
-#app .plans-verify-card:focus-within:after{opacity:0!important}
-#app /* ---------- 2) COMPONENT 9 — verify card: dark console ---------- */
-#plansVerifyTerminalWrap{padding-left:16px!important;padding-right:16px!important}
-#app .plans-verify-card.terminal-upgrade{
-  position:relative!important;display:block!important;padding:15px!important;
-  border-radius:18px!important;overflow:hidden!important;
-  background:radial-gradient(135% 120% at 0% 0%,#262153 0%,#141631 46%,#0b0c1a 100%)!important;
-  border:1px solid rgba(129,140,248,.22)!important;
-  box-shadow:0 24px 50px -30px rgba(8,10,24,.9)!important;
-  -webkit-tap-highlight-color:transparent;
-}
-#app .plans-verify-card.terminal-upgrade::before{
-  content:"";position:absolute;width:190px;height:190px;right:-72px;top:-96px;border-radius:50%;
-  background:radial-gradient(circle,rgba(249,115,22,.30),transparent 70%);pointer-events:none;
-}
-#app .pv-head{display:flex!important;align-items:center!important;gap:10px!important;position:relative;margin:0!important}
-#app .pv-headTxt{min-width:0;flex:1;display:flex;flex-direction:column;gap:2px}
-#app .pv-ico{
-  flex:0 0 auto;width:36px;height:36px;border-radius:11px;display:grid;place-items:center;
-  font-size:15px;color:#fff;background:linear-gradient(140deg,#fb923c,#ea580c 72%);
-  box-shadow:0 10px 20px -10px rgba(234,88,12,.95),inset 0 1px 0 rgba(255,255,255,.4);
-}
-#app /* component 10 — status */
-.plans-verify-card .verify-terminal-status,
-#app .pv-chip{
-  display:inline-flex!important;align-items:center;gap:6px;margin:0!important;padding:0!important;
-  background:transparent!important;border:none!important;box-shadow:none!important;
-  color:#a5b4fc!important;font-size:8.5px!important;font-weight:900!important;
-  letter-spacing:.15em!important;text-transform:uppercase!important;line-height:1.4!important;
-}
-#app .pv-chip::before{content:"";width:6px;height:6px;border-radius:50%;background:#34d399;
-  box-shadow:0 0 0 3px rgba(52,211,153,.16);animation:pvDot 1.8s ease-in-out infinite}
-@keyframes pvDot{50%{opacity:.45;transform:scale(.82)}}
-#app .plans-verify-card.is-verified .pv-chip{color:#6ee7b7!important}
-#app .plans-verify-card.is-verified .pv-ico{background:linear-gradient(140deg,#34d399,#059669 72%);
-  box-shadow:0 10px 20px -10px rgba(5,150,105,.95),inset 0 1px 0 rgba(255,255,255,.4)}
-#app .pv-title{margin:0!important;font-size:15.5px!important;font-weight:900!important;color:#fff!important;
-  letter-spacing:-.01em!important;line-height:1.25!important;font-family:inherit}
-#app /* component 11 — UID field */
-.pv-body{margin-top:12px;position:relative}
-#app .pv-field{position:relative;display:flex;align-items:center}
-#app .pv-fieldIco{position:absolute;left:14px;font-size:13px;color:#7c86ad;pointer-events:none;transition:color .18s}
-#app .pv-input.plans-verify-input{
-  width:100%!important;height:52px!important;padding:0 66px 0 38px!important;
-  border-radius:14px!important;border:1.5px solid rgba(255,255,255,.12)!important;
-  background:rgba(255,255,255,.055)!important;color:#fff!important;
-  font-size:15px!important;font-weight:800!important;letter-spacing:.09em;
-  box-shadow:none!important;transform:none!important;transition:border-color .18s,background .18s;
-}
-#app .pv-input.plans-verify-input::placeholder{color:#6b7495!important;font-weight:600;letter-spacing:.02em}
-#app .pv-input.plans-verify-input:focus{
-  outline:none!important;border-color:rgba(251,146,60,.75)!important;
-  background:rgba(255,255,255,.08)!important;box-shadow:none!important;transform:none!important;
-}
-#app .pv-input.plans-verify-input:disabled{color:#fff!important;opacity:1!important;-webkit-text-fill-color:#fff}
-#app .pv-field:focus-within .pv-fieldIco{color:#fb923c}
-#app .pv-count{position:absolute;right:12px;font-size:10px;font-weight:800;color:#aab2cf;
-  background:rgba(255,255,255,.09);border-radius:8px;padding:3px 7px;font-variant-numeric:tabular-nums}
-#app /* ---------- 3) COMPONENT 12 — ORIGINAL 3D button (koi override nahi) ---------- */
-.plans-verify-card .plans-verify-btn{margin-top:12px!important;opacity:1!important}
-#app .plans-verify-btn:disabled{opacity:.72!important}
-#app .plans-verify-btn.is-loading{opacity:.95!important}
-#app .plans-spinner{width:15px;height:15px;border-width:2.5px!important;border-color:rgba(255,255,255,.95)!important;
-  border-bottom-color:transparent!important;animation:spin .65s linear infinite}
-#app .plans-verify-card .verify-reset-btn,
-#app .plans-verify-card [onclick*="resetVerify"],
-#app .plans-verify-card button[onclick*="another"]{
-  margin-top:8px!important;width:100%!important;height:42px!important;border-radius:12px!important;
-  background:rgba(255,255,255,.07)!important;border:1px solid rgba(255,255,255,.12)!important;
-  color:#c7d2fe!important;font-size:11.5px!important;font-weight:800!important;
-}
-#app /* skeleton — sirf field ki jagah,
-#app button 3D hi rehta hai */
-.pv-skel{display:none;margin-top:12px}
-#app .plans-verify-card.is-loading .pv-skel{display:block}
-#app .plans-verify-card.is-loading .pv-body{display:none!important}
-#app .sk{position:relative;display:block;overflow:hidden;background:rgba(255,255,255,.075);border-radius:14px}
-#app .sk::after{content:"";position:absolute;inset:0;transform:translateX(-100%);
-  background:linear-gradient(90deg,transparent,rgba(255,255,255,.16),transparent);animation:skShimmer 1.15s infinite}
-@keyframes skShimmer{100%{transform:translateX(100%)}}
-#app .sk-input{width:100%;height:52px}
-#app .plans-verify-card.is-loading{pointer-events:none}
-#app /* ---------- 4) COMPONENT 13 — rail (74% / 9px) ---------- */
-.ff-story-rail .ff-ps-card{flex:0 0 74%!important;border-radius:9px!important;box-shadow:0 10px 22px -16px rgba(0,0,0,.6)!important}
-#app .ff-story-rail .ff-ps-card img{border-radius:9px!important}
-#app .ff-story-rail .ff-ps{padding:4px 16px 12px!important;gap:10px!important}
-#app /* ---------- 5) COMPONENT 14 — promo strip (clutter hata) ---------- */
-.andq-promo{padding:0 16px!important;margin:14px 0 0!important;background:transparent!important}
-#app .andq-promo-in{
-  display:flex!important;align-items:center!important;gap:12px!important;
-  padding:11px 13px!important;border-radius:15px!important;overflow:hidden!important;
-  background:linear-gradient(100deg,#fff7ed,#fffdfa 62%,#fffbeb)!important;
-  border:1px solid #fde3c4!important;box-shadow:0 12px 26px -22px rgba(180,83,9,.65)!important;
-}
-#app .andq-dots,
-#app .andq-medal,
-#app .andq-ring-wrap,
-#app .andq-timer-sep{display:none!important}
-#app .andq-promo-mid{flex:1 1 auto!important;min-width:0!important;display:flex!important;flex-direction:column!important;gap:2px!important;text-align:left!important}
-#app .andq-badge,
-#app .andq-badge-hot{
-  border:none!important;background:transparent!important;padding:0!important;height:auto!important;
-  color:#c2410c!important;font-size:8px!important;font-weight:900!important;letter-spacing:.14em!important;
-  text-transform:uppercase!important;display:block!important;line-height:1.4!important;
-}
-#app .andq-badge-ico{display:none!important}
-#app .andq-promo-title{margin:0!important;font-size:15px!important;font-weight:900!important;color:#7c2d12!important;line-height:1.15!important;letter-spacing:-.01em}
-#app .andq-promo-sub{margin:1px 0 0!important;font-size:8.5px!important;font-weight:800!important;color:#b45309!important;letter-spacing:.1em!important;text-transform:uppercase!important}
-#app .andq-timer-card{
-  flex:0 0 auto!important;display:flex!important;align-items:center!important;
-  border:none!important;background:transparent!important;box-shadow:none!important;
-  padding:0!important;gap:0!important;
-}
-#app .andq-timer-text{display:flex!important;flex-direction:column!important;align-items:flex-end!important;gap:0!important}
-#app .andq-timer-text strong{font-size:20px!important;font-weight:900!important;color:#9a3412!important;line-height:1!important;
-  font-variant-numeric:tabular-nums;letter-spacing:-.02em}
-#app .andq-timer-text span{font-size:7.5px!important;font-weight:800!important;color:#c2410c!important;
-  letter-spacing:.1em!important;text-transform:uppercase!important}
-#app /* ---------- 6) COMPONENT 15 — deals hero (raster banner ki jagah real UI) ---------- */
-.ff-deals-merge{display:none!important}
-#app .dxh{padding:0 16px!important;margin:14px 0 0!important}
-#app .dxh-in{
-  position:relative!important;display:flex!important;align-items:center!important;gap:10px!important;
-  padding:16px!important;border-radius:18px!important;overflow:hidden!important;
-  background:radial-gradient(125% 145% at 92% -10%,#4a3312 0%,#221a34 44%,#0d0b16 100%)!important;
-  border:1px solid rgba(251,191,36,.18)!important;
-  box-shadow:0 24px 46px -32px rgba(0,0,0,.9)!important;
-}
-#app .dxh-txt{position:relative;z-index:2;flex:1 1 auto;min-width:0}
-#app .dxh-kick{display:block!important;font-size:7.5px!important;font-weight:900!important;letter-spacing:.17em!important;
-  text-transform:uppercase!important;color:#fbbf24!important;margin:0 0 7px!important}
-#app .dxh-h{margin:0!important;font-size:23px!important;line-height:1!important;font-weight:900!important;color:#fff!important;letter-spacing:-.03em!important}
-#app .dxh-p{margin:8px 0 0!important;font-size:10px!important;font-weight:700!important;color:#a9a3c4!important;line-height:1.4}
-#app .dxh-chips{display:flex!important;gap:5px!important;margin-top:11px!important;flex-wrap:wrap}
-#app .dxh-chips span{display:inline-flex!important;align-items:center!important;gap:4px!important;
-  font-size:8px!important;font-weight:800!important;color:#e9e4ff!important;
-  background:rgba(255,255,255,.08)!important;border:1px solid rgba(255,255,255,.1)!important;
-  border-radius:999px!important;padding:3px 8px!important;letter-spacing:.03em}
-#app .dxh-chips span i{color:#fbbf24;font-size:7.5px}
-#app .dxh-art{position:relative;flex:0 0 auto;width:96px;height:104px;display:grid;place-items:center}
-#app .dxh-8{position:relative;z-index:2;font-size:66px;font-weight:900;line-height:1;letter-spacing:-.07em;
-  background:linear-gradient(158deg,#fff6d0,#fbbf24 46%,#b45309 92%);
-  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;
-  filter:drop-shadow(0 10px 20px rgba(245,158,11,.42))}
-#app .dxh-glow{position:absolute;inset:-12px;border-radius:50%;
-  background:radial-gradient(circle,rgba(245,158,11,.34),transparent 66%)}
-#app /* ---------- 7) COMPONENT 17 — combo builder clean card ---------- */
-.cmb-wrap{
-  margin:14px 16px 0!important;padding:12px!important;border-radius:16px!important;
-  background:#fff!important;border:1px solid #e9eaf6!important;
-  box-shadow:0 16px 32px -26px rgba(30,27,75,.55)!important;
-  display:flex!important;align-items:center!important;flex-wrap:wrap!important;gap:8px!important;
-  min-height:0!important;height:auto!important;aspect-ratio:auto!important;overflow:hidden!important;
-}
-#app .cmb-bg{display:none!important}
-#app .cmb-wrap > *:not(.cmb-bg){position:static!important;left:auto!important;top:auto!important;right:auto!important;bottom:auto!important;transform:none!important;margin:0!important}
-#app .cmb-title-patch{
-  flex:1 1 100%!important;display:flex!important;align-items:center!important;gap:5px!important;
-  background:transparent!important;padding:0!important;border:none!important;box-shadow:none!important;
-  font-size:11.5px!important;font-weight:900!important;color:#111827!important;letter-spacing:0!important;
-}
-#app .cmb-dot{color:#c7cbe0!important}
-#app .cmb-stepwrap{display:none!important}
-#app .cmb-del-patch{flex:0 0 auto!important;background:transparent!important;padding:0!important;border:none!important}
-#app .cmb-del-patch del{font-size:10.5px!important;font-weight:800!important;color:#a9afc4!important}
-#app .cmb-save{
-  flex:0 0 auto!important;display:inline-flex!important;align-items:center!important;gap:5px!important;
-  font-size:9.5px!important;font-weight:900!important;color:#047857!important;
-  background:#eafbf1!important;border:1px solid #c7f0dc!important;border-radius:999px!important;
-  padding:4px 8px!important;letter-spacing:.02em;
-}
-#app .cmb-check{width:12px;height:12px;border-radius:50%;background:#10b981;color:#fff;display:grid;place-items:center;font-size:6.5px}
-#app .cmb-buy{
-  flex:0 0 auto!important;margin-left:auto!important;display:inline-flex!important;align-items:center!important;gap:8px!important;
-  padding:9px 13px!important;border:none!important;border-radius:13px!important;color:#fff!important;
-  background:linear-gradient(135deg,#6366f1,#4338ca)!important;
-  box-shadow:0 1px rgba(255,255,255,.3) inset,0 4px #312e81,0 12px 22px -12px rgba(67,56,202,.9)!important;
-}
-#app .cmb-cart{font-size:11px!important;opacity:.9}
-#app .cmb-col{display:flex!important;flex-direction:column!important;line-height:1.15!important;text-align:left!important;gap:0!important}
-#app .cmb-now{font-size:7px!important;font-weight:800!important;letter-spacing:.1em!important;text-transform:uppercase;opacity:.82}
-#app .cmb-buy strong{font-size:13px!important;font-weight:900!important;color:#fff!important}
-#app .cmb-arrow{width:20px!important;height:20px!important;border-radius:50%!important;background:rgba(255,255,255,.22)!important;
-  display:grid!important;place-items:center!important;font-size:8.5px!important;color:#fff!important}
-
-/* ---- specificity hard-fix: dark UID field (app ke #app/#fff rules ko hataana) ---- */
-#app .plans-verify-card.terminal-upgrade #verifyBarInputEl.pv-input.plans-verify-input,
-#app .plans-verify-card.terminal-upgrade .pv-input.plans-verify-input{
-  background:rgba(255,255,255,.055)!important;
-  background-image:none!important;
-  border:1.5px solid rgba(255,255,255,.12)!important;
-  color:#ffffff!important;-webkit-text-fill-color:#ffffff!important;caret-color:#fb923c;
-  box-shadow:none!important;transform:none!important;opacity:1!important;
-  backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
-}
-#app .plans-verify-card.terminal-upgrade .pv-input.plans-verify-input::placeholder{
-  color:#6f7898!important;-webkit-text-fill-color:#6f7898!important;opacity:1!important;
-}
-#app .plans-verify-card.terminal-upgrade .pv-input.plans-verify-input:focus{
-  border-color:rgba(251,146,60,.8)!important;background:rgba(255,255,255,.085)!important;
-  box-shadow:none!important;transform:none!important;
-}
-#app .plans-verify-card.terminal-upgrade #verifyBarInputEl:disabled{
-  color:#ffffff!important;-webkit-text-fill-color:#ffffff!important;opacity:1!important;
-}
-/* reset ("Enter another UID") — dark card par */
-#app .plans-verify-card button[onclick="resetFFVerify()"]{
-  margin-top:10px!important;width:100%!important;height:42px!important;
-  border:1px solid rgba(255,255,255,.14)!important;background:rgba(255,255,255,.07)!important;
-  color:#c7d2fe!important;font-size:11px!important;font-weight:900!important;border-radius:12px!important;
-  box-shadow:none!important;
-}
-/* combo card polish */
-#app .cmb-del-patch{display:none!important}
-#app .cmb-buy{position:relative!important;overflow:hidden!important;flex:0 0 auto!important}
-#app .cmb-arrow{position:static!important;flex:0 0 auto!important;transform:none!important}
-#app .cmb-buy strong{white-space:nowrap!important}
-
-/* ================= Pv3b — final fixes ================= */
-/* tap/type par card par koi ring/border change nahi */
-#app #plansVerifyTerminalWrap .plans-verify-card,
-#app #plansVerifyTerminalWrap .plans-verify-card:focus,
-#app #plansVerifyTerminalWrap .plans-verify-card:focus-within,
-#app #plansVerifyTerminalWrap .plans-verify-card:focus-within:hover{
-  border:1px solid rgba(129,140,248,.22)!important;
-  border-width:1px!important;border-style:solid!important;border-color:rgba(129,140,248,.22)!important;
-  outline:none!important;outline-offset:0!important;transform:none!important;
-  box-shadow:0 24px 50px -30px rgba(8,10,24,.9)!important;
-}
-#app #plansVerifyTerminalWrap .plans-verify-card:focus-within:after,
-#app #plansVerifyTerminalWrap .plans-verify-card:after{opacity:0!important;content:none!important}
-#app #plansVerifyTerminalWrap *{-webkit-tap-highlight-color:transparent}
-
-/* combo card — clean 2-row layout */
-#app .cmb-wrap{
-  display:flex!important;align-items:center!important;flex-wrap:wrap!important;
-  gap:9px!important;padding:13px!important;border-radius:16px!important;
-  background:#fff!important;border:1px solid #e9eaf6!important;box-shadow:0 16px 32px -26px rgba(30,27,75,.55)!important;
-}
-#app .cmb-wrap > *:not(.cmb-bg){position:static!important;left:auto!important;top:auto!important;right:auto!important;bottom:auto!important}
-#app .cmb-title-patch{
-  flex:1 1 100%!important;width:auto!important;height:auto!important;max-width:100%!important;
-  background:transparent!important;font-size:12px!important;font-weight:900!important;color:#0f172a!important;
-  display:flex!important;align-items:center!important;gap:5px!important;white-space:normal!important;overflow:visible!important;
-}
-#app .cmb-title-patch .cmb-dot{color:#c7cbe0!important}
-#app .cmb-title-patch #comboTotalInline{color:#4f46e5!important}
-#app .cmb-save{
-  flex:0 0 auto!important;height:26px!important;max-width:56%!important;
-  padding:0 10px!important;border-radius:999px!important;background:#dcfce7!important;
-  display:inline-flex!important;align-items:center!important;gap:5px!important;color:#15803d!important;
-}
-#app .cmb-save-txt{font-size:9.5px!important;font-weight:900!important;white-space:nowrap!important}
-#app .cmb-check{width:13px!important;height:13px!important;border-radius:50%!important;background:#10b981!important;color:#fff!important;display:grid!important;place-items:center!important;font-size:7px!important}
-#app .cmb-buy{
-  margin-left:auto!important;flex:0 0 auto!important;width:auto!important;height:40px!important;
-  padding:0 13px!important;border-radius:13px!important;border:0!important;
-  display:inline-flex!important;align-items:center!important;gap:9px!important;
-  background:linear-gradient(135deg,#4f6ef7,#7c5cf7 62%,#9a6ffc)!important;color:#fff!important;
-  box-shadow:0 14px 26px -18px rgba(124,58,237,.9)!important;overflow:hidden!important;
-}
-#app .cmb-buy:after{display:none!important}
-#app .cmb-arrow{
-  width:20px!important;height:20px!important;font-size:8.5px!important;background:rgba(255,255,255,.9)!important;
-  color:#4338ca!important;margin-left:0!important;position:static!important;flex:0 0 auto!important;
-}
-#app .cmb-cart{font-size:11px!important;opacity:.92!important}
-#app .cmb-col{gap:0!important;line-height:1.1!important}
-#app .cmb-now{font-size:7px!important;font-weight:900!important;letter-spacing:.12em!important;text-transform:uppercase!important;opacity:.85!important}
-#app .cmb-buy strong{font-size:12.5px!important;font-weight:900!important;color:#fff!important}
-
-/* Pv3c — verified chip contrast + combo tighten */
-#app #plansVerifyTerminalWrap .plans-verify-card.is-verified .verify-terminal-status,
-#app #plansVerifyTerminalWrap .plans-verify-card.is-verified .pv-chip{
-  color:#6ee7b7!important;background:transparent!important;border:none!important;box-shadow:none!important;
-  -webkit-text-fill-color:#6ee7b7;
-}
-#app #plansVerifyTerminalWrap .plans-verify-card.is-verified .pv-chip::before{
-  background:#34d399!important;box-shadow:0 0 0 3px rgba(52,211,153,.18)!important;
-}
-#app #plansVerifyTerminalWrap .plans-verify-btn.is-verified{
-  color:#fff!important;-webkit-text-fill-color:#fff;font-weight:900!important;
-  opacity:1!important;
-}
-#app .cmb-wrap{gap:7px!important;padding:12px 13px!important}
-#app .cmb-save{width:auto!important;max-width:none!important;flex:0 1 auto!important;height:28px!important}
-#app .cmb-buy{height:40px!important;padding:0 12px 0 13px!important;gap:8px!important}
-#app .cmb-arrow{width:19px!important;height:19px!important;margin-right:1px!important}
-
-/* Pv3d — plans page par tap karne se kisi card/button par outline nahi */
-#app .page-enter .plan-card-glass:focus,
-#app .page-enter .plan-card-glass:focus-within,
-#app .page-enter .plan-card-glass:focus-visible,
-#app .page-enter .plan-cta-glass:focus-visible,
-#app .page-enter .cmb-buy:focus-visible,
-#app .page-enter .cmb-buy:focus{outline:none!important;outline-offset:0!important}
-
-/* Pv3e — combo pill natural width + arrow chrome */
-#app .cmb-save{flex:0 0 auto!important;width:fit-content!important;max-width:100%!important;
-  background:#eafbf1!important;border:1px solid #c9f0dc!important;box-shadow:none!important}
-#app .cmb-save-txt{color:#0f766e!important}
-#app .cmb-check{background:#10b981!important}
-#app .cmb-arrow{width:18px!important;height:18px!important;background:rgba(255,255,255,.85)!important;color:#4338ca!important;
-  font-size:8px!important;box-shadow:none!important}
-
-/* ================= Pv4 — LIGHT verify card (user choice) ================= */
-#app #plansVerifyTerminalWrap .plans-verify-card.terminal-upgrade{
-  background:linear-gradient(168deg,#ffffff 0%,#fbfbff 58%,#f6f7ff 100%)!important;
-  border:1px solid #e9eaf6!important;
-  box-shadow:0 1px 2px rgba(15,23,42,.04),0 18px 38px -28px rgba(30,27,75,.55)!important;
-}
-#app #plansVerifyTerminalWrap .plans-verify-card.terminal-upgrade::before{
-  background:radial-gradient(circle at 100% 0%,rgba(249,115,22,.12),transparent 62%)!important;
-  width:220px!important;height:220px!important;right:-90px!important;top:-110px!important;
-}
-#app #plansVerifyTerminalWrap .plans-verify-card:focus-within{
-  border:1px solid #e9eaf6!important;
-  box-shadow:0 1px 2px rgba(15,23,42,.04),0 18px 38px -28px rgba(30,27,75,.55)!important;
-}
-/* status chip */
-#app #plansVerifyTerminalWrap .plans-verify-card .verify-terminal-status,
-#app #plansVerifyTerminalWrap .pv-chip{
-  color:#4f46e5!important;-webkit-text-fill-color:#4f46e5!important;
-}
-#app #plansVerifyTerminalWrap .plans-verify-card.is-verified .verify-terminal-status,
-#app #plansVerifyTerminalWrap .plans-verify-card.is-verified .pv-chip{
-  color:#059669!important;-webkit-text-fill-color:#059669!important;
-}
-#app #plansVerifyTerminalWrap .plans-verify-card.is-verified .pv-chip::before{
-  background:#10b981!important;box-shadow:0 0 0 3px rgba(16,185,129,.16)!important;
-}
-#app #plansVerifyTerminalWrap .pv-title{color:#0f172a!important}
-/* field */
-#app .plans-verify-card.terminal-upgrade .pv-input.plans-verify-input,
-#app .plans-verify-card.terminal-upgrade #verifyBarInputEl.pv-input.plans-verify-input{
-  background:#f7f8fc!important;background-image:none!important;
-  border:1.5px solid #e6e8f3!important;color:#0f172a!important;-webkit-text-fill-color:#0f172a!important;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.9)!important;
-}
-#app .plans-verify-card.terminal-upgrade .pv-input.plans-verify-input::placeholder{
-  color:#9aa3b8!important;-webkit-text-fill-color:#9aa3b8!important;
-}
-#app .plans-verify-card.terminal-upgrade .pv-input.plans-verify-input:focus{
-  background:#fff!important;border-color:#a5a8f0!important;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.9)!important;transform:none!important;
-}
-#app .plans-verify-card.terminal-upgrade #verifyBarInputEl:disabled{
-  color:#0f172a!important;-webkit-text-fill-color:#0f172a!important;
-}
-#app #plansVerifyTerminalWrap .pv-fieldIco{color:#b0b8cc}
-#app #plansVerifyTerminalWrap .pv-field:focus-within .pv-fieldIco{color:#f97316}
-#app #plansVerifyTerminalWrap .pv-count{background:#eef0f7;color:#8b93a8}
-/* reset button */
-#app .plans-verify-card button[onclick="resetFFVerify()"]{
-  background:#eef2ff!important;border:1px solid #dfe3ff!important;color:#4338ca!important;
-  box-shadow:none!important;
-}
-/* skeleton light */
-#app #plansVerifyTerminalWrap .sk{background:#eef0f7!important}
-#app #plansVerifyTerminalWrap .sk::after{
-  background:linear-gradient(90deg,transparent,rgba(255,255,255,.9),transparent)!important;
-}
-
-/* ================= Pv5 — skeleton upgrade + checkout page ================= */
-/* --- better skeleton (verify card) --- */
-#app #plansVerifyTerminalWrap .plans-verify-card{overflow:hidden!important}
-#app #plansVerifyTerminalWrap .pv-prog{display:none}
-#app #plansVerifyTerminalWrap .plans-verify-card.is-loading .pv-prog{
-  display:block;position:absolute;left:0;right:0;top:0;height:2.5px;border-radius:2px;
+#app .plans-verify-card .plans-verify-input:focus{outline:none!important;border-color:#a5a8f0!important;background:#fff!important;box-shadow:none!important}
+#app .plans-verify-card .pv-prog{display:none}
+#app .plans-verify-card.pv-loading .pv-prog{
+  display:block;position:absolute;left:0;right:0;top:0;height:2.5px;
   background:linear-gradient(90deg,transparent,#6366f1 20%,#fb923c 55%,#6366f1 80%,transparent);
   background-size:55% 100%;background-repeat:no-repeat;animation:pvProg 1.25s cubic-bezier(.4,0,.2,1) infinite;
 }
 @keyframes pvProg{0%{background-position:-60% 0}100%{background-position:160% 0}}
-#app #plansVerifyTerminalWrap .pv-skel{display:none;margin-top:12px;flex-direction:column;gap:8px}
-#app #plansVerifyTerminalWrap .plans-verify-card.is-loading .pv-skel{display:flex}
-#app #plansVerifyTerminalWrap .sk{
-  position:relative;display:block;overflow:hidden;border-radius:12px;
-  background:linear-gradient(100deg,#eef0f7 0%,#f6f7fc 40%,#eef0f7 80%);
-  background-size:220% 100%;animation:skShift 1.6s ease-in-out infinite;
-}
+#app .plans-verify-card.pv-loading{overflow:hidden}
+#app .plans-verify-card .pv-skel{display:none;width:100%}
+#app .plans-verify-card.pv-loading .pv-skel{display:flex}
+#app .plans-verify-card.pv-loading .pv-skel-cta{display:block;margin-top:10px}
+#app .plans-verify-card.pv-loading .verify-terminal-label,
+#app .plans-verify-card.pv-loading .plans-verify-input{display:none!important}
+#app .pv-skel{gap:8px;flex-direction:column}
+#app .sk{position:relative;display:block;overflow:hidden;border-radius:12px;background:linear-gradient(100deg,#eef0f7 0%,#f6f7fc 40%,#eef0f7 80%);background-size:220% 100%;animation:skShift 1.6s ease-in-out infinite}
 @keyframes skShift{0%{background-position:120% 0}100%{background-position:-40% 0}}
-#app #plansVerifyTerminalWrap .sk::after{
-  content:"";position:absolute;inset:0;transform:translateX(-110%);
-  background:linear-gradient(90deg,transparent,rgba(255,255,255,.92),transparent);
-  animation:skSheen 1.5s cubic-bezier(.4,0,.2,1) infinite;
-}
+#app .sk::after{content:"";position:absolute;inset:0;transform:translateX(-110%);background:linear-gradient(90deg,transparent,rgba(255,255,255,.72),transparent);animation:skSheen 1.5s cubic-bezier(.4,0,.2,1) infinite}
 @keyframes skSheen{100%{transform:translateX(110%)}}
-#app #plansVerifyTerminalWrap .sk-row{display:flex;align-items:center;gap:10px}
-#app #plansVerifyTerminalWrap .sk-ico{width:36px;height:36px;border-radius:11px;flex:0 0 auto;animation-delay:.12s}
-#app #plansVerifyTerminalWrap .sk-line{height:11px;border-radius:99px;flex:1 1 auto;max-width:62%;animation-delay:.06s}
-#app #plansVerifyTerminalWrap .sk-line2{height:8px;max-width:38%;opacity:.6;margin-top:1px}
-#app #plansVerifyTerminalWrap .sk-input{width:100%;height:50px;border-radius:14px;animation-delay:.18s}
-#app #plansVerifyTerminalWrap .plans-verify-card.is-loading .pv-field-zone{display:none!important}
-@keyframes skBreath{50%{transform:scale(.96)}}
+#app .sk-input{width:100%;height:52px;border-radius:14px}
+#app .sk-line2{width:40%;height:9px;border-radius:99px;opacity:.9}
+#app .sk-btn2{width:100%;height:44px;border-radius:12px;opacity:.95;animation-delay:.2s}
 
-/* --- card polish --- */
-#app #plansVerifyTerminalWrap .plans-verify-card.terminal-upgrade{
-  background:linear-gradient(170deg,#ffffff 0%,#fdfdff 62%,#f8f9ff 100%)!important;
-}
-#app #plansVerifyTerminalWrap .plans-verify-card.terminal-upgrade .pv-head h4{
-  letter-spacing:-.012em!important;
-}
-#app #plansVerifyTerminalWrap .plans-verify-card.terminal-upgrade{padding:16px!important;border-radius:18px!important}
-#app #plansVerifyTerminalWrap .pv-ico{
-  width:38px!important;height:38px!important;border-radius:12px!important;
-  box-shadow:0 7px 14px -10px rgba(194,65,12,.85),inset 0 1px 0 rgba(255,255,255,.5)!important;
-}
-#app #plansVerifyTerminalWrap .pv-body{margin-top:13px}
-#app #plansVerifyTerminalWrap .plans-verify-btn{margin-top:13px!important}
+/* ---- checkout: mobile optional chip ---- */
+#app .of-opt{font-size:8px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:#94a3b8;background:#f1f2f9;border-radius:6px;padding:2px 6px;margin-left:4px;vertical-align:middle}
 
-/* ================= CHECKOUT (orderform) page ================= */
-html[data-andos-page="orderform"] .andos-main{background:#f5f6fb!important}
-html[data-andos-page="orderform"] .page-enter > .px-4,
-html[data-andos-page="orderform"] .page-enter > div{padding-left:16px!important;padding-right:16px!important}
-html[data-andos-page="orderform"] .page-enter .bg-white.rounded-3xl{
-  border-radius:18px!important;border:1px solid #e9eaf6!important;
-  box-shadow:0 18px 38px -32px rgba(30,27,75,.55)!important;padding:16px!important;
-}
-html[data-andos-page="orderform"] .page-enter .bg-white.rounded-3xl h3{
-  font-size:13.5px!important;font-weight:900!important;color:#0f172a!important;margin-bottom:12px!important;
-}
-html[data-andos-page="orderform"] .input-field{
-  border:1.5px solid #e6e8f3!important;background:#f7f8fc!important;border-radius:14px!important;
-  height:50px!important;font-size:14px!important;font-weight:700!important;color:#0f172a!important;
-  box-shadow:none!important;transition:border-color .18s,background .18s!important;
-}
-html[data-andos-page="orderform"] .input-field:focus{
-  outline:none!important;border-color:#a5a8f0!important;background:#fff!important;box-shadow:none!important;
-}
-html[data-andos-page="orderform"] label.text-sm.font-bold{font-size:11px!important;letter-spacing:.02em;color:#475569!important}
-html[data-andos-page="orderform"] .of-opt{
-  font-size:8px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:#94a3b8;
-  background:#f1f2f9;border-radius:6px;padding:2px 6px;margin-left:4px;vertical-align:middle;
-}
-/* loyalty card */
-html[data-andos-page="orderform"] .order-loyalty-card{
-  border-radius:16px!important;background:linear-gradient(100deg,#fffbeb,#fffdf7)!important;
-  border:1px solid #fde9c0!important;box-shadow:none!important;padding:11px 13px!important;margin-top:12px!important;
-}
-html[data-andos-page="orderform"] .order-loyalty-card button{font-size:9px!important;border-radius:10px!important;padding:7px 10px!important}
-/* payment method */
-html[data-andos-page="orderform"] .of-paylead{
-  font-size:10px!important;font-weight:800!important;color:#98a0b6!important;
-  letter-spacing:.04em;margin-bottom:2px!important;text-transform:none!important;
-}
-html[data-andos-page="orderform"] .payment-method{
-  border:1.5px solid #e9ebf5!important;border-radius:15px!important;background:#fff!important;
-  padding:12px 13px!important;box-shadow:0 1px 2px rgba(15,23,42,.03)!important;
-  transition:border-color .18s,background .18s,box-shadow .18s!important;
-}
-html[data-andos-page="orderform"] .payment-method .flex-1 p:first-child{font-size:12.5px!important;font-weight:900!important;color:#0f172a!important}
-html[data-andos-page="orderform"] .payment-method .flex-1 p:nth-child(2){font-size:9.5px!important;font-weight:700!important;color:#98a0b6!important}
-html[data-andos-page="orderform"] .payment-method > div:first-child{width:38px!important;height:38px!important;border-radius:11px!important}
-html[data-andos-page="orderform"] .payment-method.active{
-  border-color:#c7cbf7!important;background:linear-gradient(100deg,#f7f8ff,#fdfdff)!important;
-  box-shadow:0 12px 26px -24px rgba(67,56,202,.9)!important;
-}
-html[data-andos-page="orderform"] .pm-radio{
-  width:20px!important;height:20px!important;border-radius:50%!important;border:1.8px solid #dfe2ee!important;
-  background:#fff!important;position:relative!important;flex:0 0 auto;
-}
-html[data-andos-page="orderform"] .payment-method.active .pm-radio{border-color:#4338ca!important;background:#4338ca!important}
-html[data-andos-page="orderform"] .payment-method.active .pm-radio:after{
-  content:"";position:absolute;inset:5px;border-radius:50%;background:#fff;
-}
-html[data-andos-page="orderform"] .payment-method .flex-1 p:first-child{
-  display:flex!important;align-items:center!important;gap:6px!important;flex-wrap:nowrap!important;
-}
-html[data-andos-page="orderform"] .pm-rec{
-  font-size:7px!important;font-weight:900!important;letter-spacing:.05em;text-transform:uppercase!important;
-  color:#047857!important;background:#eafbf1!important;border:1px solid #cdf3e0!important;
-  border-radius:999px!important;padding:1.5px 5px!important;margin:0!important;line-height:1.5;flex:0 0 auto;
-}
-html[data-andos-page="orderform"] .payment-method.wallet-locked{display:none!important}
-/* wallet lock banner */
-html[data-andos-page="orderform"] .wallet-first-lock{
-  border-radius:15px!important;background:#fff8f1!important;border:1px solid #fde3c4!important;padding:12px 13px!important;
-}
-/* ------- PAY BUTTON: select karne ke baad BLACK highlight ------- */
-html[data-andos-page="orderform"] .btn-3d{
-  border-radius:15px!important;height:54px!important;font-size:13.5px!important;font-weight:900!important;letter-spacing:.01em;
+/* ---- checkout: Pay CTA highlight (lock icon hata) ---- */
+#app .btn-3d.pay-cta{
   background:linear-gradient(135deg,#6366f1,#4f46e5 52%,#4338ca)!important;
-  box-shadow:0 1px rgba(255,255,255,.3) inset,0 5px #312e81,0 18px 30px -18px rgba(67,56,202,.9)!important;
-  transition:transform .16s ease,box-shadow .2s ease,background .2s ease!important;
+  box-shadow:inset 0 1px rgba(255,255,255,.35),0 5px #312e81,0 20px 34px -18px rgba(67,56,202,.95)!important;
+  transition:transform .16s ease,box-shadow .22s ease,background .22s ease!important;
 }
-html[data-andos-page="orderform"] .btn-3d.pay-armed{
-  background:linear-gradient(135deg,#1f2937,#0b0f19 55%,#000)!important;
-  box-shadow:0 1px rgba(255,255,255,.16) inset,0 5px #000,0 20px 34px -18px rgba(0,0,0,.85)!important;
-  color:#fff!important;animation:payArm .45s cubic-bezier(.2,1.4,.4,1);
+#app .btn-3d.pay-cta.is-armed{
+  background:linear-gradient(135deg,#4f46e5,#4338ca 55%,#312e81)!important;
+  box-shadow:inset 0 1px rgba(255,255,255,.4),0 5px #1e1b4b,0 22px 40px -18px rgba(67,56,202,1),0 0 0 3px rgba(99,102,241,.16)!important;
+  animation:payArm .42s cubic-bezier(.2,1.4,.4,1);
 }
-@keyframes payArm{0%{transform:scale(.985)}60%{transform:scale(1.012)}100%{transform:scale(1)}}
-html[data-andos-page="orderform"] .btn-3d.pay-armed:active{transform:translateY(2px) scale(.99)}
-html[data-andos-page="orderform"] .pay-armed-tag{
-  display:inline-flex;align-items:center;font-size:9px;font-weight:900;letter-spacing:.09em;text-transform:uppercase;
-  background:rgba(255,255,255,.16);border-radius:999px;padding:3px 8px;margin-left:2px;color:#fff;
-}
-html[data-andos-page="orderform"] .btn-3d[disabled],html[data-andos-page="orderform"] .btn-3d.cursor-not-allowed{
-  filter:grayscale(1)!important;opacity:.55!important;box-shadow:none!important;
-}
+@keyframes payArm{0%{transform:scale(.988)}60%{transform:scale(1.01)}100%{transform:scale(1)}}
+#app .btn-3d.pay-cta:active{transform:translateY(2px) scale(.995)}
+#app .pay-armed-tag{display:inline-flex;align-items:center;font-size:9px;font-weight:900;letter-spacing:.09em;text-transform:uppercase;background:rgba(255,255,255,.18);border-radius:999px;padding:3px 8px;margin-left:2px;color:#fff}
 
-/* ================= Pv6 — plans hero photo + promo polish + combo bar ================= */
-/* hero anniversary photo (gold "8" ki jagah) */
-#app .dxh-art{width:104px!important;height:112px!important}
-#app .dxh-8{display:none!important}
-#app .dxh-photo{
-  position:relative;z-index:2;display:block;width:104px;height:112px;border-radius:16px;overflow:hidden;
-  border:1px solid rgba(251,191,36,.34);
-  box-shadow:0 16px 30px -18px rgba(0,0,0,.95),0 0 0 3px rgba(255,255,255,.035) inset;
+/* ---- FINAL overrides (last in sheet) ---- */
+#app .plans-verify-card .pv-field{display:flex!important;align-items:center!important;gap:9px!important;width:100%!important;height:52px!important;padding:0 12px!important;border-radius:14px!important;background:#f7f8fc!important;border:1.5px solid #e6e8f3!important;transition:border-color .18s,background .18s!important}
+#app .plans-verify-card .pv-field:focus-within{border-color:#a5a8f0!important;background:#fff!important}
+#app .plans-verify-card .pv-field .pv-fieldIco{color:#a3aabd!important;font-size:13px!important;flex:0 0 auto!important}
+#app .plans-verify-card .pv-field .plans-verify-input{
+  border:0!important;background:transparent!important;height:auto!important;padding:0!important;margin:0!important;
+  box-shadow:none!important;border-radius:0!important;flex:1 1 auto!important;min-width:0!important;width:auto!important;
+  font-size:15px!important;font-weight:800!important;color:#0f172a!important;letter-spacing:.03em!important;
 }
-#app .dxh-photo img{width:100%;height:100%;object-fit:cover;display:block;transform:scale(1.02)}
-#app .dxh-photo-shine{
-  position:absolute;inset:0;pointer-events:none;
-  background:linear-gradient(160deg,rgba(255,255,255,.22),transparent 38%,transparent 68%,rgba(0,0,0,.42));
-}
-#app .dxh-art.is-fail .dxh-photo{background:linear-gradient(150deg,#fbbf24,#b45309)}
-#app .dxh-glow{inset:-14px!important;background:radial-gradient(circle,rgba(245,158,11,.42),transparent 68%)!important}
-
-/* promo banner polish */
-#app .andq-promo-in{padding:12px 14px!important;gap:11px!important}
-#app .andq-promo-title{font-size:15.5px!important;letter-spacing:-.015em!important}
-#app .andq-promo-sub{margin-top:2px!important;font-size:8px!important;letter-spacing:.09em!important;color:#a16207!important}
-#app .andq-badge-hot{font-size:7px!important;letter-spacing:.13em!important;padding:3px 7px 3px 5px!important}
-#app .andq-timer-text strong{
-  font-size:19px!important;font-variant-numeric:tabular-nums;letter-spacing:-.01em!important;color:#b91c1c!important;
-}
-#app .andq-timer-text span{font-size:7px!important;letter-spacing:.09em!important;white-space:nowrap!important;color:#b45309!important}
-#app .andq-timer-text{min-width:0!important;white-space:nowrap!important;display:flex!important;flex-direction:column!important;align-items:flex-end!important;gap:1px!important}
-#app .andq-ring-wrap{width:34px!important;height:34px!important}
-
-/* ===== COMBO BUILDER BAR — naya native design ===== */
-#app .cbb{
-  margin:14px 16px 0;padding:13px 14px;border-radius:18px;background:#fff;
-  border:1px solid #e9eaf6;box-shadow:0 18px 34px -28px rgba(30,27,75,.6);
-  display:flex;flex-direction:column;gap:11px;
-}
-#app .cbb-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
-#app .cbb-lead{display:flex;align-items:center;gap:10px;min-width:0}
-#app .cbb-ico{
-  width:34px;height:34px;border-radius:11px;flex:0 0 auto;display:grid;place-items:center;
-  color:#4338ca;font-size:13px;background:linear-gradient(150deg,#eef2ff,#e0e7ff);
-  box-shadow:0 6px 14px -10px rgba(67,56,202,.9),inset 0 1px 0 #fff;
-}
-#app .cbb-copy{display:flex;flex-direction:column;min-width:0}
-#app .cbb-copy b{font-size:12.5px;font-weight:900;color:#0f172a;letter-spacing:-.01em;line-height:1.25}
-#app .cbb-sub{font-size:9px;font-weight:800;color:#98a0b6;letter-spacing:.01em;margin-top:1px}
-#app .cbb-meta{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex:0 0 auto}
-#app .cbb-total{font-size:15px;font-weight:900;color:#4f46e5;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
-#app .cbb-steps{display:flex;gap:4px}
-#app .cbb-steps i{display:block;width:16px;height:4px;border-radius:99px;background:#e9ebf5;transition:background .2s}
-#app .cbb-steps i.on{background:#10b981}
-#app .cbb-steps i.cur{background:#c7cbf7}
-#app .cbb-bar{display:flex;align-items:center;gap:9px}
-#app .cbb-save{
-  display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 10px 0 7px;border-radius:99px;
-  background:#ecfdf3;border:1px solid #cdf3e0;flex:1 1 auto;min-width:0;
-}
-#app .cbb-chk{
-  width:15px;height:15px;border-radius:50%;background:#10b981;color:#fff;display:grid;place-items:center;
-  font-size:7px;flex:0 0 auto;
-}
-#app .cbb-save .cmb-save-txt{
-  font-size:9.5px!important;font-weight:900!important;color:#0f766e!important;
-  white-space:nowrap!important;overflow:hidden;text-overflow:ellipsis;
-}
-#app .cbb-buy{
-  flex:0 0 auto;height:38px;padding:0 12px;border-radius:12px;border:none;cursor:pointer;
-  display:inline-flex;align-items:center;gap:7px;color:#fff;
-  background:linear-gradient(135deg,#6366f1,#4f46e5 55%,#4338ca);
-  box-shadow:0 1px rgba(255,255,255,.35) inset,0 4px #312e81,0 14px 22px -16px rgba(67,56,202,.95);
-  transition:transform .14s ease,box-shadow .2s ease,filter .2s ease;
-}
-#app .cbb-buy:active{transform:translateY(2px)}
-#app .cbb-buy i.fa-cart-shopping{font-size:10.5px;opacity:.95}
-#app .cbb-now{font-size:7px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;opacity:.85}
-#app .cbb-buy strong{font-size:12.5px;font-weight:900;font-variant-numeric:tabular-nums}
-#app .cbb-arrow{
-  width:19px;height:19px;border-radius:50%;background:rgba(255,255,255,.22);display:grid;place-items:center;font-size:7.5px;
-}
-#app .cbb-buy.is-muted{
-  background:linear-gradient(135deg,#a5a8f0,#8b8ee8 60%,#7c7fe0);
-  box-shadow:0 1px rgba(255,255,255,.3) inset,0 4px #5b5ecb;
-  opacity:.72;
-}
-
-/* ===== skeleton parity: verified result ke size jaisa ===== */
-#app #plansVerifyTerminalWrap .sk-btn2{
-  width:100%;height:46px;border-radius:14px;animation-delay:.26s;opacity:.85;
-}
-
-/* ================= Pv7 — promo banner (pq) naya native design ================= */
-#app .pq{padding:0 16px;margin:14px 0 0}
-#app .pq-card{
-  display:flex;align-items:center;gap:11px;padding:12px 13px;border-radius:16px;
-  background:linear-gradient(100deg,#fff7ed,#fffdfa 58%,#fffbeb);
-  border:1px solid #fde3c4;box-shadow:0 16px 32px -28px rgba(180,83,9,.85);position:relative;overflow:hidden;
-}
-#app .pq-card:after{
-  content:"";position:absolute;inset:0;pointer-events:none;
-  background:radial-gradient(120% 160% at 100% 0,rgba(251,146,60,.16),transparent 58%);
-}
-#app .pq-ico{
-  position:relative;z-index:1;width:36px;height:36px;border-radius:12px;flex:0 0 auto;display:grid;place-items:center;
-  color:#fff;font-size:14px;background:linear-gradient(150deg,#fb923c,#ea580c 62%,#c2410c);
-  box-shadow:0 8px 16px -10px rgba(234,88,12,.95),inset 0 1px 0 rgba(255,255,255,.45);
-}
-#app .pq-ico:before{
-  content:"";position:absolute;inset:-4px;border-radius:15px;border:1.5px solid rgba(251,146,60,.5);
-  animation:pqPulse 2.2s ease-out infinite;
-}
-@keyframes pqPulse{0%{transform:scale(.92);opacity:.85}70%{transform:scale(1.16);opacity:0}100%{opacity:0}}
-#app .pq-mid{position:relative;z-index:1;flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:2px}
-#app .pq-kick{font-size:7.5px;font-weight:900;letter-spacing:.15em;text-transform:uppercase;color:#b45309}
-#app .pq-title{
-  margin:0;font-size:16px;font-weight:900;color:#7c2d12;line-height:1.1;letter-spacing:-.02em;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-}
-#app .pq-timer{
-  position:relative;z-index:1;flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:1px;
-  background:#fff;border:1px solid #fbd9b4;border-radius:12px;padding:5px 9px 6px;
-  box-shadow:0 10px 18px -16px rgba(180,83,9,.9),inset 0 1px 0 #fff;
-}
-#app .pq-cap{font-size:6.5px;font-weight:900;letter-spacing:.13em;text-transform:uppercase;color:#b45309}
-#app .pq-timer strong{
-  font-size:16px;font-weight:900;color:#b91c1c;line-height:1;letter-spacing:-.01em;
-  font-variant-numeric:tabular-nums;
-}
-#app .pq-cap2{font-size:6.5px;font-weight:900;letter-spacing:.13em;text-transform:uppercase;color:#a16207}
-
-/* combo bar refinements */
-#app .cbb-steps i{width:16px!important;height:5px!important;background:#dfe4f2!important;border-radius:99px!important}
-#app .cbb-steps i.on{background:#10b981!important}
-#app .cbb-steps i.cur{background:#c7cbf7!important}
-#app .cbb.is-empty .cbb-save{background:#f5f6fb!important;border-color:#e8eaf4!important}
-#app .cbb.is-empty .cbb-chk{background:#c3c8d8!important}
-#app .cbb.is-empty .cbb-save .cmb-save-txt{color:#8a93a8!important}
-#app .cbb.is-ready .cbb-save{background:#ecfdf3!important;border-color:#cdf3e0!important}
+#app .plans-verify-card .pv-field .plans-verify-input:focus{border:0!important;box-shadow:none!important;background:transparent!important;outline:none!important}
+#app .plans-verify-card .pv-field .pv-count{flex:0 0 auto!important;font-size:10px!important;font-weight:900!important;letter-spacing:.03em!important;color:#8b93a8!important;background:#eef0f7!important;border-radius:8px!important;padding:3px 7px!important;font-variant-numeric:tabular-nums}
+#app .plans-verify-card.pv-loading .pv-field{display:none!important}
 </style>
 </head>
 <!--YG-->
@@ -1279,7 +543,7 @@ html[data-andos-page="orderform"] .btn-3d[disabled],html[data-andos-page="orderf
       })();
     </script>
 
-    <script src="/assets/js/andos6.4a9fa056.js"></script>
+    <script src="/assets/js/andos6.393ee2b5.js"></script>
 
 <style id="andos-fixr-glitch">
 /* FIX-R(1): PWA top-scroll white glitch — dark root bg + no rubber-band (last rule wins vs legacy white !important) */
@@ -1310,20 +574,5 @@ nav.glass-nav, .xplore-head, .od-title, .wal-hero, .txn-bar, .sp-bar, .odd-bar, 
 </style>
 
 <link rel="stylesheet" href="/assets/css/andos5.4e46dfa2.css">
-<script id="andos-pv2-js">
-/* Pv2: Player UID live counter (component 11) */
-(function(){
-  function upd(el){
-    var c=document.getElementById('pvUidCount'); if(!c) return;
-    var v=(el&&el.value)||''; c.textContent=v.replace(/\D/g,'').length+'/12';
-  }
-  document.addEventListener('input', function(e){
-    if(e.target && e.target.id==='verifyBarInputEl'){ upd(e.target); }
-  }, true);
-  document.addEventListener('DOMContentLoaded', function(){
-    var el=document.getElementById('verifyBarInputEl'); if(el) upd(el);
-  });
-})();
-</script>
 </body>
 </html>
