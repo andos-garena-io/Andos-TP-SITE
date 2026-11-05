@@ -1,0 +1,8 @@
+{
+  "mode": "off",
+  "message": "",
+  "until": null,
+  "supportUrl": "",
+  "ref": null,
+  "_help": "mode: off = app chalu · lock = app band (data safe) · wipe = app band + device ka saara site data delete. until = ISO date (auto-unlock)."
+}

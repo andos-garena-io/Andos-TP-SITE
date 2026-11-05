@@ -1,6 +1,158 @@
 <!DOCTYPE html>
 <html lang="en" class="yg-lock" data-auth="pending">
 <head>
+<script id="andos-killswitch">
+/* ============================================================================
+   ANDOS SECURITY KILL-SWITCH  (remote panic switch)
+   Control file : /killswitch.json   ->  {"mode":"off" | "lock" | "wipe"}
+   mode off  : normal app (koi effect nahi)
+   mode lock : app band (sirf closed screen, data safe)
+   mode wipe : app band + device ka saara site data delete
+               (localStorage, sessionStorage, cookies, IndexedDB, CacheStorage,
+                service-worker unregister) -> "clear case"
+   Check hota hai: page load, online aane par, tab wapas aane par, har 45s.
+   Self-test (sirf apne device par): ?andos_selftest=wipe  |  ?andos_selftest=lock
+   ============================================================================ */
+(function(){
+  var CFG='/killswitch.json', EVERY=45000, busy=false, state=null;
+  function $(id){return document.getElementById(id);}
+
+  function wipeDevice(){
+    var jobs=[];
+    try{localStorage.clear();}catch(e){}
+    try{sessionStorage.clear();}catch(e){}
+    try{
+      var ck=document.cookie?document.cookie.split(';'):[];
+      for(var i=0;i<ck.length;i++){
+        var n=ck[i].split('=')[0].trim(); if(!n) continue;
+        document.cookie=n+'=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/';
+        document.cookie=n+'=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain='+location.hostname;
+        document.cookie=n+'=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=.'+location.hostname;
+      }
+    }catch(e){}
+    try{
+      if(window.indexedDB&&indexedDB.databases){
+        jobs.push(indexedDB.databases().then(function(dbs){
+          return Promise.all(dbs.map(function(d){
+            if(!d||!d.name) return null;
+            return new Promise(function(r){try{var q=indexedDB.deleteDatabase(d.name);q.onsuccess=q.onerror=q.onblocked=function(){r()};}catch(e){r()}});
+          }));
+        }));
+      }
+    }catch(e){}
+    try{ if(window.caches&&caches.keys){ jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(x){return caches.delete(x);}));})); } }catch(e){}
+    try{ if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations){ jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister();}));})); } }catch(e){}
+    return Promise.all(jobs).catch(function(){});
+  }
+
+  function lockScreen(mode,cfg){
+    if($('andosKsScreen')){
+      $('andosKsScreen').setAttribute('data-mode',mode);
+      var m=$('andosKsMsg'); if(m&&cfg.message) m.textContent=cfg.message;
+      return;
+    }
+    var st=document.createElement('style');
+    st.textContent=
+      '#andosKsScreen{position:fixed;inset:0;z-index:2147483647;background:#000;color:#fff;display:flex;flex-direction:column;'+
+      'align-items:center;justify-content:center;gap:0;padding:34px 26px;text-align:center;'+
+      'font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;overflow:hidden}'+
+      '#andosKsScreen *{box-sizing:border-box}'+
+      '#andosKsScreen .ks-logo{display:flex;align-items:baseline;gap:4px;font-size:19px;font-weight:900;letter-spacing:-.02em;margin-bottom:26px}'+
+      '#andosKsScreen .ks-logo i{width:7px;height:7px;border-radius:50%;background:#f97316;display:block}'+
+      '#andosKsScreen .ks-shield{width:64px;height:64px;border-radius:20px;display:grid;place-items:center;margin-bottom:18px;'+
+      'background:radial-gradient(120% 120% at 30% 0,#1f2937,#0b0f19);border:1px solid #1f2937;box-shadow:0 22px 44px -26px #000}'+
+      '#andosKsScreen .ks-shield svg{width:28px;height:28px;stroke:#f97316}'+
+      '#andosKsScreen h1{margin:0 0 9px;font-size:20px;font-weight:900;letter-spacing:-.02em;line-height:1.2}'+
+      '#andosKsScreen p{margin:0;font-size:12.5px;line-height:1.65;color:#8b95ad;max-width:300px;font-weight:600}'+
+      '#andosKsScreen .ks-dots{display:flex;gap:7px;margin:26px 0 0}'+
+      '#andosKsScreen .ks-dots i{width:8px;height:8px;border-radius:50%;background:#fff;opacity:.32;'+
+      'animation:ksBounce 1.15s cubic-bezier(.36,.07,.19,.97) infinite}'+
+      '#andosKsScreen .ks-dots i:nth-child(2){animation-delay:.14s}'+
+      '#andosKsScreen .ks-dots i:nth-child(3){animation-delay:.28s}'+
+      '@keyframes ksBounce{0%,70%,100%{transform:translateY(0);opacity:.32}35%{transform:translateY(-8px);opacity:1}}'+
+      '#andosKsScreen .ks-chip{margin-top:20px;font-size:8.5px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;'+
+      'color:#f97316;border:1px solid #3b2410;background:#160d05;border-radius:999px;padding:6px 12px}'+
+      '#andosKsScreen .ks-ref{margin-top:14px;font-size:9px;font-weight:700;letter-spacing:.05em;color:#495066}'+
+      '#andosKsScreen .ks-help{margin-top:16px;font-size:10.5px;font-weight:800;color:#c7d0ea;text-decoration:none;'+
+      'border-bottom:1px solid #334155;padding-bottom:2px}';
+    document.head.appendChild(st);
+    var wrap=document.createElement('div');
+    wrap.id='andosKsScreen';
+    wrap.setAttribute('data-mode',mode);
+    wrap.style.opacity='0';
+    wrap.style.transition='opacity .2s ease';
+    wrap.innerHTML=
+      '<div class="ks-logo">ANDOS<i></i></div>'+
+      '<div class="ks-shield"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+
+        '<path d="M12 3 4 6v6c0 5 3.4 8.3 8 9 4.6-.7 8-4 8-9V6l-8-3Z"/><path d="M12 9v4"/><path d="M12 16.5v.01"/></svg></div>'+
+      '<h1>'+(mode==='wipe'?'Service closed':'Service temporarily off')+'</h1>'+
+      '<p id="andosKsMsg">'+(cfg.message||(mode==='wipe'
+          ?'Security reasons ki wajah se ANDOS is device par band kar diya gaya hai. Is device ka app data (login, wallet cache, orders cache) delete ho gaya hai.'
+          :'ANDOS abhi maintenance me hai. Thodi der baad dobara try karein.'))+'</p>'+
+      '<div class="ks-dots"><i></i><i></i><i></i></div>'+
+      '<span class="ks-chip">'+(mode==='wipe'?'Data cleared on this device':'Access paused')+'</span>'+
+      (cfg.supportUrl?'<a class="ks-help" href="'+cfg.supportUrl+'" target="_blank" rel="noopener">Support par baat karein</a>':'')+
+      '<div class="ks-ref">'+(cfg.ref||('REF '+new Date().toISOString().slice(0,19).replace(/[-:T]/g,'')))+'</div>';
+    (document.body||document.documentElement).appendChild(wrap);
+    requestAnimationFrame(function(){wrap.style.opacity='1';});
+    try{document.title='ANDOS · Service closed';}catch(e){}
+    try{history.replaceState({ks:1},'',location.pathname);}catch(e){}
+    window.__ANDOS_KS_LOCKED__=mode;
+  }
+
+  function halt(){
+    try{
+      var vids=document.querySelectorAll('video,audio');
+      for(var i=0;i<vids.length;i++){try{vids[i].pause();vids[i].removeAttribute('src');vids[i].load&&vids[i].load();}catch(e){}}
+    }catch(e){}
+    try{
+      var hide=['app','yuvaGate','loginScreen','luVerify','appSplashOverlay','bootLoader','toast'];
+      for(var j=0;j<hide.length;j++){var n=$(hide[j]); if(n) n.style.display='none';}
+      document.documentElement.setAttribute('data-andos-killed','1');
+      document.body&&(document.body.style.overflow='hidden');
+    }catch(e){}
+  }
+
+  function apply(cfg){
+    var mode=(cfg&&cfg.mode||'off').toLowerCase();
+    if(cfg&&cfg.until){ if(Date.now()>Date.parse(cfg.until)){ mode='off'; } }
+    if(location.search.indexOf('andos_selftest=wipe')>-1) mode='wipe';
+    else if(location.search.indexOf('andos_selftest=lock')>-1) mode='lock';
+    state=mode;
+    if(mode==='off'){
+      if(window.__ANDOS_KS_LOCKED__){ busy=false; location.reload(); return; } /* switch off = fresh boot */
+      var sc=$('andosKsScreen'); if(sc){ sc.remove(); document.documentElement.removeAttribute('data-andos-killed'); }
+      return;
+    }
+    if(mode==='wipe'){
+      if(busy) return; busy=true;
+      wipeDevice().then(function(){
+        /* app dobara data na likhe: storage writes band */
+        try{ Storage.prototype.setItem=function(){return undefined}; Object.defineProperty(window,'localStorage',{value:{getItem:function(){return null},setItem:function(){},removeItem:function(){},clear:function(){},key:function(){return null},length:0},configurable:true}); }catch(e){}
+        try{ Object.defineProperty(window,'sessionStorage',{value:{getItem:function(){return null},setItem:function(){},removeItem:function(){},clear:function(){},key:function(){return null},length:0},configurable:true}); }catch(e){}
+        halt(); lockScreen('wipe',cfg||{});
+      });
+      return;
+    }
+    halt(); lockScreen('lock',cfg||{});
+  }
+
+  function check(){
+    var url=CFG+'?t='+Date.now();
+    fetch(url,{cache:'no-store',headers:{'cache-control':'no-cache'}})
+      .then(function(r){ return r.ok?r.json():null; })
+      .then(function(cfg){ if(cfg) apply(cfg); })
+      .catch(function(){});
+  }
+
+  window.andosKillSwitch={check:check,apply:apply,wipe:function(){return wipeDevice().then(function(){halt();lockScreen('wipe',{});});}};
+  try{check();}catch(e){}
+  setInterval(check,EVERY);
+  window.addEventListener('online',check);
+  document.addEventListener('visibilitychange',function(){ if(!document.hidden) check(); });
+  window.addEventListener('pageshow',function(){ check(); });
+})();
+</script>
 <script>
 /* Storage guard: agar localStorage blocked ho (sandbox/private mode) to memory fallback — page kabhi blank na ho */
 (function(){try{var t='__andos_t';window.localStorage.setItem(t,'1');window.localStorage.removeItem(t);}catch(e){var mk=function(){var m={};return{getItem:function(k){return Object.prototype.hasOwnProperty.call(m,k)?m[k]:null;},setItem:function(k,v){m[k]=String(v);},removeItem:function(k){delete m[k];},clear:function(){m={};},key:function(i){return Object.keys(m)[i]||null;},get length(){return Object.keys(m).length;}};};try{Object.defineProperty(window,'localStorage',{value:mk(),configurable:true});}catch(e2){}try{Object.defineProperty(window,'sessionStorage',{value:mk(),configurable:true});}catch(e3){}}})();
