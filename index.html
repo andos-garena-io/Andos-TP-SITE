@@ -15,6 +15,7 @@
    ============================================================================ */
 (function(){
   var CFG='/killswitch.json', EVERY=45000, busy=false, state=null;
+  var SELFTEST=(function(){var m=/[?&]andos_selftest=(wipe|lock)/i.exec(location.search||'');return m?m[1].toLowerCase():'';})();
   function $(id){return document.getElementById(id);}
 
   function wipeDevice(){
@@ -116,8 +117,8 @@
   function apply(cfg){
     var mode=(cfg&&cfg.mode||'off').toLowerCase();
     if(cfg&&cfg.until){ if(Date.now()>Date.parse(cfg.until)){ mode='off'; } }
-    if(location.search.indexOf('andos_selftest=wipe')>-1) mode='wipe';
-    else if(location.search.indexOf('andos_selftest=lock')>-1) mode='lock';
+    if(SELFTEST==='wipe') mode='wipe';
+    else if(SELFTEST==='lock') mode='lock';
     state=mode;
     if(mode==='off'){
       if(window.__ANDOS_KS_LOCKED__){ busy=false; location.reload(); return; } /* switch off = fresh boot */
