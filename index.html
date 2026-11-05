@@ -547,6 +547,64 @@
 #app .cmb-check{background:#10b981!important}
 #app .cmb-arrow{width:18px!important;height:18px!important;background:rgba(255,255,255,.85)!important;color:#4338ca!important;
   font-size:8px!important;box-shadow:none!important}
+
+/* ================= Pv4 — LIGHT verify card (user choice) ================= */
+#app #plansVerifyTerminalWrap .plans-verify-card.terminal-upgrade{
+  background:linear-gradient(168deg,#ffffff 0%,#fbfbff 58%,#f6f7ff 100%)!important;
+  border:1px solid #e9eaf6!important;
+  box-shadow:0 1px 2px rgba(15,23,42,.04),0 18px 38px -28px rgba(30,27,75,.55)!important;
+}
+#app #plansVerifyTerminalWrap .plans-verify-card.terminal-upgrade::before{
+  background:radial-gradient(circle at 100% 0%,rgba(249,115,22,.12),transparent 62%)!important;
+  width:220px!important;height:220px!important;right:-90px!important;top:-110px!important;
+}
+#app #plansVerifyTerminalWrap .plans-verify-card:focus-within{
+  border:1px solid #e9eaf6!important;
+  box-shadow:0 1px 2px rgba(15,23,42,.04),0 18px 38px -28px rgba(30,27,75,.55)!important;
+}
+/* status chip */
+#app #plansVerifyTerminalWrap .plans-verify-card .verify-terminal-status,
+#app #plansVerifyTerminalWrap .pv-chip{
+  color:#4f46e5!important;-webkit-text-fill-color:#4f46e5!important;
+}
+#app #plansVerifyTerminalWrap .plans-verify-card.is-verified .verify-terminal-status,
+#app #plansVerifyTerminalWrap .plans-verify-card.is-verified .pv-chip{
+  color:#059669!important;-webkit-text-fill-color:#059669!important;
+}
+#app #plansVerifyTerminalWrap .plans-verify-card.is-verified .pv-chip::before{
+  background:#10b981!important;box-shadow:0 0 0 3px rgba(16,185,129,.16)!important;
+}
+#app #plansVerifyTerminalWrap .pv-title{color:#0f172a!important}
+/* field */
+#app .plans-verify-card.terminal-upgrade .pv-input.plans-verify-input,
+#app .plans-verify-card.terminal-upgrade #verifyBarInputEl.pv-input.plans-verify-input{
+  background:#f7f8fc!important;background-image:none!important;
+  border:1.5px solid #e6e8f3!important;color:#0f172a!important;-webkit-text-fill-color:#0f172a!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.9)!important;
+}
+#app .plans-verify-card.terminal-upgrade .pv-input.plans-verify-input::placeholder{
+  color:#9aa3b8!important;-webkit-text-fill-color:#9aa3b8!important;
+}
+#app .plans-verify-card.terminal-upgrade .pv-input.plans-verify-input:focus{
+  background:#fff!important;border-color:#a5a8f0!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.9)!important;transform:none!important;
+}
+#app .plans-verify-card.terminal-upgrade #verifyBarInputEl:disabled{
+  color:#0f172a!important;-webkit-text-fill-color:#0f172a!important;
+}
+#app #plansVerifyTerminalWrap .pv-fieldIco{color:#b0b8cc}
+#app #plansVerifyTerminalWrap .pv-field:focus-within .pv-fieldIco{color:#f97316}
+#app #plansVerifyTerminalWrap .pv-count{background:#eef0f7;color:#8b93a8}
+/* reset button */
+#app .plans-verify-card button[onclick="resetFFVerify()"]{
+  background:#eef2ff!important;border:1px solid #dfe3ff!important;color:#4338ca!important;
+  box-shadow:none!important;
+}
+/* skeleton light */
+#app #plansVerifyTerminalWrap .sk{background:#eef0f7!important}
+#app #plansVerifyTerminalWrap .sk::after{
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.9),transparent)!important;
+}
 </style>
 </head>
 <!--YG-->
