@@ -23,6 +23,3 @@ README.md
 node_modules
 *.log
 .DS_Store
-
-# legacy backup — public URL se serve NAHI hona chahiye
-archive_legacy/
