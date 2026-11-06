@@ -219,7 +219,41 @@
 
 </style>
 <link rel="preload" as="style" href="/assets/css/andos1.f4a7f80d.css"><link rel="preload" as="script" href="/assets/js/andos6.393ee2b5.js">
-<style id="andos-r7c">/* ---- PV field (UID) : icon + counter ---- */
+<style id="andos-r7c">
+/* ================= Round 7D — outline kill + pink flash kill ================= */
+/* 1) UID verify card: koi outline / ring / scale nahi (tap par bhi) */
+#app .plans-verify-card,
+#app .plans-verify-card *,
+#app .pv-field,
+#app .pv-field *{
+  outline:none!important;outline-offset:0!important;-webkit-tap-highlight-color:transparent!important;
+  -webkit-focus-ring-color:transparent!important;
+}
+#app .plans-verify-card input:focus,
+#app .plans-verify-card input:focus-visible,
+#app .plans-verify-card button:focus,
+#app .plans-verify-card button:focus-visible,
+#app .plans-verify-card [onclick]:focus,
+#app .plans-verify-card [onclick]:focus-visible{
+  outline:none!important;outline-width:0!important;outline-offset:0!important;
+  box-shadow:none!important;transform:none!important;
+}
+#app .plans-verify-card:focus-within{
+  transform:none!important;
+  border-color:rgba(15,23,42,.08)!important;
+  box-shadow:inset 0 1.5px #fff,0 12px 34px -20px rgba(79,70,229,.22)!important;
+}
+#app .plans-verify-card .pv-field:focus-within{border-color:#a5a8f0!important;box-shadow:none!important;transform:none!important}
+#app .plans-verify-btn:focus-visible{outline:none!important}
+
+/* 2) PINK FLASH: root/app/pink bands safed */
+html,body{background-color:#ffffff!important;background-image:none!important}
+#app{background-color:#ffffff!important;background-image:none!important}
+#app .andos-shell{background:#ffffff!important}
+#app .andos-main,#app .page-slider,#app .page-section{background-color:#ffffff!important}
+#app .home-hero-stage:before{background:linear-gradient(180deg,rgba(255,255,255,.9),transparent)!important}
+#app .page-section[data-sec=home]:before{background:#ffffff!important}
+/* ---- PV field (UID) : icon + counter ---- */
 #app .pv-field{
   display:flex!important;align-items:center!important;gap:9px!important;width:100%!important;
   height:52px!important;padding:0 12px!important;border-radius:14px!important;
@@ -573,6 +607,6 @@ nav.glass-nav, .xplore-head, .od-title, .wal-hero, .txn-bar, .sp-bar, .odd-bar, 
 .page-section[data-sec="wallet"] { background: #f4f2fb; }
 </style>
 
-<link rel="stylesheet" href="/assets/css/andos5.4e46dfa2.css">
+<link rel="stylesheet" href="/assets/css/assets/css/andos5.80b29c2a.css">
 </body>
 </html>
