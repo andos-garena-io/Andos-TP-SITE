@@ -1,9 +1,9 @@
 /* ANDOS Production Service Worker v3 — Cache Versioning, Legacy PWA Auto-Purge & Fresh HTML Guarantee */
-const CACHE_VERSION = 'v20';
+const CACHE_VERSION = 'v21';
 const STATIC_MEDIA_CACHE = 'andos-media-' + CACHE_VERSION;
 const HTML_CACHE = 'andos-html-' + CACHE_VERSION;
 const HTML_KEY = 'index.html';   /* single key: / or /index.html?source=pwa sab isi par */
-const APP_BUILD_ID = 'andos-v3-20261101hold404';
+const APP_BUILD_ID = 'andos-v3-20261101authgate';
 const PRECACHE_MEDIA = [
   './assets/videos/splash-loading.mp4',
   './assets/app-icon/splash-frame0-ed73c7df.webp',

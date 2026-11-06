@@ -13,18 +13,39 @@
     - koi session nahi        -> login (koi flash nahi, dashboard hai hi nahi)
   Lock sirf tab khulta hai jab user khud Logout dabaye (andos_auth_state='out'). */
 (function(){try{
-  var d=document.documentElement, LS=window.localStorage, has=!1, guest=!1;
+  var d=document.documentElement, LS=window.localStorage, has=!1;
   function g(k){try{return LS.getItem(k)}catch(e){return null}}
   function s(k,v){try{LS.setItem(k,v)}catch(e){}}
-  try{ guest = !!g("andos_guest_profile"); }catch(e){}
-  try{ var a=g("andos_last_account"); if(a){var o=JSON.parse(a); if(o&&(o.passToken||o.uid)) has=!0;} }catch(e){}
-  if(!has) try{ for(var i=0;i<LS.length;i++){var k=LS.key(i); if(k&&k.indexOf("firebase:authUser:")===0){has=!0;break;}} }catch(e){}
+  function fbAnon(raw){
+    try{
+      var o=JSON.parse(raw); if(!o) return true;
+      if(o.isAnonymous===true) return true;
+      if(o.value){ var v=typeof o.value==='string'?JSON.parse(o.value):o.value; if(v&&v.isAnonymous===true) return true; if(v&&(v.email||(v.providerData&&v.providerData.length))) return false; }
+      if(o.email || (o.providerData&&o.providerData.length&&o.isAnonymous!==true)) return false;
+    }catch(e){}
+    return true;
+  }
+  try{
+    var a=g("andos_last_account"); if(a){ var o=JSON.parse(a);
+      if(o && (o.passToken || o.email) && o.uid) has=!0;
+    }
+  }catch(e){}
+  if(!has) try{
+    for(var i=0;i<LS.length;i++){
+      var k=LS.key(i);
+      if(k && k.indexOf("firebase:authUser:")===0){
+        var raw=g(k);
+        if(raw && !fbAnon(raw)){ has=!0; break; }
+      }
+    }
+  }catch(e){}
   var state=g("andos_auth_state"), out=g("andos_logged_out")==="1";
-  if(out) state="out";                                  // Logout dabaya tha -> hamesha login screen
-  else if(state!=="in"&&state!=="out"){ state=(has||guest)?"in":"out"; }
+  if(out) state="out";
+  else if(!has) state="out";
+  else if(state!=="in"&&state!=="out") state="in";
   s("andos_auth_state",state);
   window.__ANDOS_HAS_PERSISTED_AUTH = (state==="in");
-  window.__ANDOS_IS_GUEST = guest;
+  window.__ANDOS_IS_GUEST = false;
   if(state!=="in"){
     window.__ANDOS_AUTH_LOCKED=false;
     d.setAttribute("data-auth","login"); d.classList.add("yg-lock");
@@ -611,6 +632,10 @@ document.addEventListener('error',function(e){var t=e.target;
     </script>
 
     <script src="/assets/js/andos6.15ddda7d.js"></script>
+    <script src="/assets/js/andos-auth-gate.js"></script>
+<style id="andos-no-guest">
+#guestBtn, #guestBtn + *, [data-andos-cta="guest"] { display: none !important; }
+</style>
 <script>/* LOGOUT MARKER: logoutUser() localStorage clear kar deta hai, isliye marker uske BAAD likhte hain.
    Bina iske logout ke baad reload par "saved account" ki wajah se dashboard wapas khul jata tha. */
 (function(){function hook(){ if(typeof window.logoutUser!=='function'||window.logoutUser.__wrapped)return false;
