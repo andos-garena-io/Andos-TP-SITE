@@ -101,16 +101,29 @@
     <meta name="theme-color" content="#000000">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#000000">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000">
-    <meta name="andos-build" content="andos-v3-20261107statusbar">
+    <meta name="andos-build" content="andos-v3-20261107statusexact">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <script id="andos-theme-sync">
-    /* R8F — Status bar (theme-color) ko page ke background se match karo.
-       Splash ke dauran bar PURE BLACK rehta hai (seamless, koi white patti nahi);
-       splash khatam hote hi bar #ffffff ho jata hai = login page ka white background.
-       Hook: splash controller ke andos:splash:done event + overlay-gone polling fallback. */
+    /* R8G — Status bar ka rang GUESS nahi, login screen ke background se EXACT liya jata hai.
+       Login screen ke background par yeh gradient laga hua hai:
+         #loginScreen::before { background-image: radial-gradient(95% 42% at 50% 0%, rgb(248,250,252), rgb(255,255,255) 72%) }
+       Yaani status bar ke theek neeche (top-center, y=0) ka exact rang = gradient ka start colour.
+       Isi liye runtime par wahi colour padha jata hai aur theme-color me set hota hai —
+       kal gradient badle to status bar bhi apne aap match karega (koi hardcode nahi).
+       Splash ke dauran bar #000000 hi rehta hai (seamless black splash). */
     (function () {
-        var BLACK = '#000000', WHITE = '#ffffff';
+        var BLACK = '#000000', FALLBACK = '#f8fafc';   /* fallback = aaj ka measured exact top colour */
+        function toHex(c) {
+            if (!c) return null;
+            c = String(c).trim();
+            if (c.charAt(0) === '#') return c.toLowerCase();
+            var m = c.match(/rgba?\(\s*([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)(?:[,\s/]+([\d.]+))?\s*\)/i);
+            if (!m) return null;
+            if (m[4] !== undefined && parseFloat(m[4]) === 0) return null;   /* transparent */
+            function h(n) { n = Math.max(0, Math.min(255, Math.round(parseFloat(n)))); return ('0' + n.toString(16)).slice(-2); }
+            return '#' + h(m[1]) + h(m[2]) + h(m[3]);
+        }
         function paint(c) {
             try {
                 var m = document.querySelectorAll('meta[name="theme-color"]');
@@ -118,29 +131,50 @@
             } catch (e) {}
             window.__andosCurrentTheme = c;
         }
-        /* splash controller isi ko call karta hai (#000000) — override mat karo */
+        /* splash controller isi function ko call karta hai (#000000) — isliye ise override nahi karte */
         window.__andosWriteMetaTheme = window.__andosWriteMetaTheme || paint;
-        function toWhite() {
-            if (window.__andosSplashActive === true) return;   /* splash chal raha hai */
-            paint(WHITE);
+
+        /* login screen ke background ka ACTUAL colour (::before gradient ka start, warna bg-color) */
+        function loginTopColor() {
+            var els = [document.getElementById('loginScreen'), document.getElementById('yuvaGate'), document.body];
+            for (var i = 0; i < els.length; i++) {
+                var el = els[i]; if (!el) continue;
+                try {
+                    var pb = getComputedStyle(el, '::before');
+                    if (pb && pb.backgroundImage && pb.backgroundImage.indexOf('gradient') !== -1) {
+                        var cols = pb.backgroundImage.match(/rgba?\([^)]*\)/g);
+                        if (cols && cols.length) { var hex = toHex(cols[0]); if (hex) return hex; }
+                    }
+                } catch (e) {}
+                try {
+                    var hx = toHex(getComputedStyle(el).backgroundColor);
+                    if (hx) return hx;
+                } catch (e) {}
+            }
+            return null;
         }
-        try { document.addEventListener('andos:splash:done', function () { paint(WHITE); }); } catch (e) {}
-        /* fallback: overlay hat gaya / kabhi tha hi nahi (session me splash skip) */
+        function syncStatusColor() {
+            if (window.__andosSplashActive === true) return;      /* splash chal raha hai -> black */
+            paint(loginTopColor() || FALLBACK);
+        }
+        window.__andosSyncStatusColor = syncStatusColor;
+
+        try { document.addEventListener('andos:splash:done', syncStatusColor); } catch (e) {}
+        try { document.addEventListener('andos:auth:resolved', syncStatusColor); } catch (e) {}
+
         var n = 0, t = setInterval(function () {
             n++;
             var ov = document.getElementById('appSplashOverlay');
             var gone = !ov || !document.body || !document.body.contains(ov) ||
                        (function () { try { return getComputedStyle(ov).display === 'none'; } catch (e) { return false; } })();
-            if (gone && window.__andosSplashActive !== true) { paint(WHITE); clearInterval(t); }
-            else if (n > 90) clearInterval(t);                 /* ~13.5s hard stop */
+            if (gone && window.__andosSplashActive !== true) { syncStatusColor(); clearInterval(t); }
+            else if (n > 90) clearInterval(t);
         }, 150);
-        document.addEventListener('DOMContentLoaded', function () {
-            if (!document.getElementById('appSplashOverlay') && window.__andosSplashActive !== true) paint(WHITE);
-        });
-        /* app page change par bhi bar white hi rahe (koi dark page nahi) */
-        document.addEventListener('visibilitychange', function () {
-            if (!document.hidden) toWhite();
-        });
+
+        document.addEventListener('DOMContentLoaded', function () { syncStatusColor(); });
+        document.addEventListener('visibilitychange', function () { if (!document.hidden) syncStatusColor(); });
+        /* login screen par wapas aane par bhi (logout) */
+        try { window.addEventListener('andos:page', syncStatusColor); } catch (e) {}
     })();
     </script>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
