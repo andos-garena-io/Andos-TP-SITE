@@ -98,12 +98,51 @@
     <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="apple-touch-icon" href="https://cdn.jsdelivr.net/gh/CIDHARIOM/ANDOS-VS-0.172.1919@main/assets/logo/logo.png">
-    <meta name="theme-color" content="#0b0f19">
-    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0b0f19">
-    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0f19">
-    <meta name="andos-build" content="andos-v3-20261030l58">
+    <meta name="theme-color" content="#000000">
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#000000">
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000">
+    <meta name="andos-build" content="andos-v3-20261107statusbar">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <script id="andos-theme-sync">
+    /* R8F — Status bar (theme-color) ko page ke background se match karo.
+       Splash ke dauran bar PURE BLACK rehta hai (seamless, koi white patti nahi);
+       splash khatam hote hi bar #ffffff ho jata hai = login page ka white background.
+       Hook: splash controller ke andos:splash:done event + overlay-gone polling fallback. */
+    (function () {
+        var BLACK = '#000000', WHITE = '#ffffff';
+        function paint(c) {
+            try {
+                var m = document.querySelectorAll('meta[name="theme-color"]');
+                for (var i = 0; i < m.length; i++) m[i].setAttribute('content', c);
+            } catch (e) {}
+            window.__andosCurrentTheme = c;
+        }
+        /* splash controller isi ko call karta hai (#000000) — override mat karo */
+        window.__andosWriteMetaTheme = window.__andosWriteMetaTheme || paint;
+        function toWhite() {
+            if (window.__andosSplashActive === true) return;   /* splash chal raha hai */
+            paint(WHITE);
+        }
+        try { document.addEventListener('andos:splash:done', function () { paint(WHITE); }); } catch (e) {}
+        /* fallback: overlay hat gaya / kabhi tha hi nahi (session me splash skip) */
+        var n = 0, t = setInterval(function () {
+            n++;
+            var ov = document.getElementById('appSplashOverlay');
+            var gone = !ov || !document.body || !document.body.contains(ov) ||
+                       (function () { try { return getComputedStyle(ov).display === 'none'; } catch (e) { return false; } })();
+            if (gone && window.__andosSplashActive !== true) { paint(WHITE); clearInterval(t); }
+            else if (n > 90) clearInterval(t);                 /* ~13.5s hard stop */
+        }, 150);
+        document.addEventListener('DOMContentLoaded', function () {
+            if (!document.getElementById('appSplashOverlay') && window.__andosSplashActive !== true) paint(WHITE);
+        });
+        /* app page change par bhi bar white hi rahe (koi dark page nahi) */
+        document.addEventListener('visibilitychange', function () {
+            if (!document.hidden) toWhite();
+        });
+    })();
+    </script>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
 
     <!-- ==================== WHATSAPP / SOCIAL PREVIEW (OPEN GRAPH + TWITTER CARDS) ==================== -->
