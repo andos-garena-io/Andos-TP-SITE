@@ -1,0 +1,1 @@
+[{"relation": ["delegate_permission/common.handle_all_urls"], "target": {"namespace": "android_app", "package_name": "io.andos.app", "sha256_cert_fingerprints": ["6C:3E:71:70:4B:CD:02:66:C3:4E:75:78:5D:D1:44:6A:88:CB:ED:C3:64:24:32:BD:EF:35:40:41:F6:59:F5:83"]}}]
