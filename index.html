@@ -101,7 +101,7 @@
     <meta name="theme-color" content="#000000">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#000000">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000">
-    <meta name="andos-build" content="andos-v3-20261110homevideo">
+    <meta name="andos-build" content="andos-v3-20261110pinklock">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <script id="andos-theme-sync">
@@ -147,16 +147,23 @@
         };
         /* app ke engine ko colour do; engine na ho to khud paint karo */
         window.__andosSyncStatusColor = function () {
-            var c = window.__andosLoginBgColor() || FALLBACK;
-            try {
-                if (typeof window.__andosWriteMetaTheme === 'function') { window.__andosWriteMetaTheme(c); }
-                else {
-                    var m = document.querySelectorAll('meta[name="theme-color"]');
-                    for (var i = 0; i < m.length; i++) m[i].setAttribute('content', c);
-                }
-            } catch (e) {}
-            window.__andosCurrentTheme = c;
-            return c;
+            /* gate khula ho tabhi login colour; warna engine (andos4) maalik hai */
+            var g = document.getElementById('yuvaGate');
+            if (g && !g.classList.contains('yg-out')) {
+                var c = window.__andosLoginBgColor() || FALLBACK;
+                try {
+                    if (typeof window.__andosWriteMetaTheme === 'function') { window.__andosWriteMetaTheme(c); }
+                    else {
+                        var m = document.querySelectorAll('meta[name="theme-color"]');
+                        for (var i = 0; i < m.length; i++) m[i].setAttribute('content', c);
+                    }
+                } catch (e) {}
+                window.__andosCurrentTheme = c;
+                return c;
+            }
+            try { if (typeof window.__andosApplyStatus === 'function') window.__andosApplyStatus(); } catch (e) {}
+            try { var cur = document.querySelector('meta[name="theme-color"]'); return cur ? cur.getAttribute('content') : null; }
+            catch (e) { return null; }
         };
         try { document.addEventListener('andos:splash:done', function () { window.__andosSyncStatusColor(); }); } catch (e) {}
         try { document.addEventListener('andos:auth:resolved', function () { window.__andosSyncStatusColor(); }); } catch (e) {}
@@ -220,7 +227,7 @@
          Normal (pink anniversary hero ke saath): browser bar + status bar = PINK
          Scroll / upar pull karne pe (white blur barrier): = WHITE
          (App install karne pe status bar area bhi isi ko follow karta hai) -->
-    <script src="/assets/js/andos4.b68983dc.js"></script>
+    <script src="/assets/js/andos4.8db5a261.js"></script>
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>ANDOS | Next-Gen Panel</title>
