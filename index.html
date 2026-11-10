@@ -101,7 +101,7 @@
     <meta name="theme-color" content="#000000">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#000000">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000">
-    <meta name="andos-build" content="andos-v3-20261110ffcard">
+    <meta name="andos-build" content="andos-v3-20261110fffeature">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <script id="andos-theme-sync">
@@ -295,7 +295,7 @@
 
 
 </style>
-<link rel="preload" as="style" href="/assets/css/andos1.f4a7f80d.css"><link rel="preload" as="script" href="/assets/js/andos6.45c3652e.js">
+<link rel="preload" as="style" href="/assets/css/andos1.f4a7f80d.css"><link rel="preload" as="script" href="/assets/js/andos6.03135f3c.js">
 <style id="andos-r7c">
 /* ================= Round 7D — outline kill + pink flash kill ================= */
 /* 1) UID verify card: koi outline / ring / scale nahi (tap par bhi) */
@@ -417,6 +417,11 @@ html,body{background-color:#ffffff!important;background-image:none!important}
 #app .plans-verify-card .pv-field .plans-verify-input:focus{border:0!important;box-shadow:none!important;background:transparent!important;outline:none!important}
 #app .plans-verify-card .pv-field .pv-count{flex:0 0 auto!important;font-size:10px!important;font-weight:900!important;letter-spacing:.03em!important;color:#8b93a8!important;background:#eef0f7!important;border-radius:8px!important;padding:3px 7px!important;font-variant-numeric:tabular-nums}
 #app .plans-verify-card.pv-loading .pv-field{display:none!important}
+</style>
+<style id="andos-ff-feature">
+/* R8M — Popular Services ka pehla card (Free Fire MAX) thoda bada + featured */
+.popx-grid .popx-card:first-child{position:relative;z-index:2;transform:scale(1.07);transform-origin:50% 0;filter:drop-shadow(0 6px 12px rgba(180,140,40,.35));}
+.popx-grid .popx-card:first-child:active{transform:scale(1);}
 </style>
 </head>
 <!--YG-->
@@ -653,7 +658,7 @@ html,body{background-color:#ffffff!important;background-image:none!important}
       })();
     </script>
 
-    <script src="/assets/js/andos6.45c3652e.js"></script>
+    <script src="/assets/js/andos6.03135f3c.js"></script>
 
 <style id="andos-fixr-glitch">
 /* FIX-R(1): PWA top-scroll white glitch — dark root bg + no rubber-band (last rule wins vs legacy white !important) */
