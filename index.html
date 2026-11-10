@@ -101,7 +101,7 @@
     <meta name="theme-color" content="#000000">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#000000">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000">
-    <meta name="andos-build" content="andos-v3-20261110ffcdn">
+    <meta name="andos-build" content="andos-v3-20261110w1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <script id="andos-theme-sync">
@@ -295,7 +295,7 @@
 
 
 </style>
-<link rel="preload" as="style" href="/assets/css/andos1.f4a7f80d.css"><link rel="preload" as="script" href="/assets/js/andos6.06c2621d.js">
+<link rel="preload" as="style" href="/assets/css/andos1.f4a7f80d.css"><link rel="preload" as="script" href="/assets/js/andos6.7f2a9c4e.js">
 <style id="andos-r7c">
 /* ================= Round 7D — outline kill + pink flash kill ================= */
 /* 1) UID verify card: koi outline / ring / scale nahi (tap par bhi) */
@@ -653,7 +653,7 @@ html,body{background-color:#ffffff!important;background-image:none!important}
       })();
     </script>
 
-    <script src="/assets/js/andos6.06c2621d.js"></script>
+    <script src="/assets/js/andos6.7f2a9c4e.js"></script>
 
 <style id="andos-fixr-glitch">
 /* FIX-R(1): PWA top-scroll white glitch — dark root bg + no rubber-band (last rule wins vs legacy white !important) */
@@ -749,6 +749,22 @@ nav.glass-nav, .xplore-head, .od-title, .wal-hero, .txn-bar, .sp-bar, .odd-bar, 
 html:has(#appSplashOverlay),html:has(#appSplashOverlay) body,html:has(#appSplashOverlay) #app{
   background:#000000!important;background-image:none!important}
 
+</style>
+<style id="andos-w1">
+/* APEX W1: stacked pages + wallet edge shield (gesture slide OFF, nav-click only). Layout/compositing only — page designs untouched. */
+#pageSlider{position:relative!important;display:block!important;width:100%!important;overflow-x:hidden!important;scrollbar-width:none!important;-ms-overflow-style:none}
+#pageSlider::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}
+#pageSlider .page-section{position:absolute!important;inset:0!important;left:0!important;right:0!important;top:0!important;bottom:0!important;width:100%!important;margin:0!important;z-index:0!important}
+.andos-shell[data-page=home] #pageSlider .page-section[data-sec=home],.andos-shell[data-page=categories] #pageSlider .page-section[data-sec=categories],.andos-shell[data-page=orders] #pageSlider .page-section[data-sec=orders],.andos-shell[data-page=wallet] #pageSlider .page-section[data-sec=wallet],.andos-shell[data-page=account] #pageSlider .page-section[data-sec=account]{visibility:visible!important;z-index:1!important}
+.page-enter{animation:none!important;transform:none!important}
+.wal-page,.wal-hero{transform:none!important;transform-style:flat!important;-webkit-transform-style:flat!important;will-change:auto!important}
+html[data-andos-page=wallet],html[data-andos-page=wallet] body{background:#2e1065!important;background-color:#2e1065!important}
+html[data-andos-page=wallet] #app .andos-shell{background:#2e1065!important;background-color:#2e1065!important}
+html[data-andos-page=wallet] #pageSlider{background:#2e1065!important;background-color:#2e1065!important}
+html[data-andos-page=wallet] #pageSlider .page-section[data-sec=wallet]{background:#2e1065!important;background-color:#2e1065!important}
+html[data-andos-page=wallet] .wal-page{background-color:#2e1065!important}
+.page-section{scrollbar-width:none!important;-ms-overflow-style:none!important}
+.page-section::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}
 </style>
 </body>
 </html>
