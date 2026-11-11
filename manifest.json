@@ -2,7 +2,7 @@
   "id": "andos-digital-space-pwa",
   "name": "ANDOS - Your Digital Space",
   "short_name": "ANDOS",
-  "description": "India's fastest gaming top-up & digital services panel — instant recharges, live deals, secure wallet, and 24/7 support, all in one high-performance app.",
+  "description": "India's fastest gaming top-up & digital services panel \u2014 instant recharges, live deals, secure wallet, and 24/7 support, all in one high-performance app.",
   "start_url": "./index.html?source=pwa",
   "scope": "./",
   "display": "standalone",
@@ -97,11 +97,11 @@
   ],
   "screenshots": [
     {
-      "src": "https://raw.githubusercontent.com/CIDHARIOM/TEST-FILE/main/assets/images/ff-deals-banner.jpg",
+      "src": "./assets/pwa/p2-home-1080x720.png",
       "sizes": "1080x720",
-      "type": "image/jpeg",
+      "type": "image/png",
       "form_factor": "narrow",
-      "label": "ANDOS Gaming Panel — Home & Live Events"
+      "label": "ANDOS Gaming Panel \u2014 Home"
     }
   ]
 }
