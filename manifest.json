@@ -63,7 +63,7 @@
       "icons": [
         {
           "src": "assets/app-icon/logo-512.png",
-          "sizes": "192x192",
+          "sizes": "512x512",
           "purpose": "any"
         }
       ]
@@ -76,7 +76,7 @@
       "icons": [
         {
           "src": "assets/app-icon/logo-512.png",
-          "sizes": "192x192",
+          "sizes": "512x512",
           "purpose": "any"
         }
       ]
@@ -89,7 +89,7 @@
       "icons": [
         {
           "src": "assets/app-icon/logo-512.png",
-          "sizes": "192x192",
+          "sizes": "512x512",
           "purpose": "any"
         }
       ]
