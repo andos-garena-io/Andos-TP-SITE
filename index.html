@@ -101,7 +101,7 @@
     <meta name="theme-color" content="#000000">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#000000">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000">
-    <meta name="andos-build" content="andos-v3-20261110w1">
+    <meta name="andos-build" content="andos-v3-20261110ff1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <script id="andos-theme-sync">
@@ -295,7 +295,7 @@
 
 
 </style>
-<link rel="preload" as="style" href="/assets/css/andos1.f4a7f80d.css"><link rel="preload" as="script" href="/assets/js/andos6.7f2a9c4e.js">
+<link rel="preload" as="style" href="/assets/css/andos1.f4a7f80d.css"><link rel="preload" as="script" href="/assets/js/andos6.3f8a1c9e.js">
 <style id="andos-r7c">
 /* ================= Round 7D — outline kill + pink flash kill ================= */
 /* 1) UID verify card: koi outline / ring / scale nahi (tap par bhi) */
@@ -653,7 +653,7 @@ html,body{background-color:#ffffff!important;background-image:none!important}
       })();
     </script>
 
-    <script src="/assets/js/andos6.7f2a9c4e.js"></script>
+    <script src="/assets/js/andos6.3f8a1c9e.js"></script>
 
 <style id="andos-fixr-glitch">
 /* FIX-R(1): PWA top-scroll white glitch — dark root bg + no rubber-band (last rule wins vs legacy white !important) */
@@ -766,5 +766,23 @@ html[data-andos-page=wallet] .wal-page{background-color:#2e1065!important}
 .page-section{scrollbar-width:none!important;-ms-overflow-style:none!important}
 .page-section::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}
 </style>
+<style id="andos-ff1">
+/* APEX FF1: FF Plans story rail — 6 storm cards, zero shadow, 6px radius, fade-in, sheen, tap viewer. */
+.ff-ps{display:flex!important;gap:12px!important;padding:4px 16px 6px!important;overflow-x:auto!important;overflow-y:hidden!important;scroll-snap-type:x mandatory!important}
+.ff-ps-card{flex:0 0 86%!important;scroll-snap-align:start!important;border-radius:6px!important;overflow:hidden!important;background:transparent!important;border:0!important;box-shadow:none!important;filter:none!important;transform:none!important;opacity:1;position:relative;animation:ffCardIn .45s ease both}
+.ff-ps-card:nth-child(2){animation-delay:.06s}
+.ff-ps-card:nth-child(3){animation-delay:.12s}
+.ff-ps-card:nth-child(4){animation-delay:.18s}
+.ff-ps-card:nth-child(5){animation-delay:.24s}
+.ff-ps-card:nth-child(6){animation-delay:.3s}
+@keyframes ffCardIn{from{opacity:0}to{opacity:1}}
+.ff-ps-card img{display:block!important;width:100%!important;height:auto!important;aspect-ratio:16/9!important;object-fit:cover!important;object-position:center!important;border-radius:6px!important}
+.ff-ps-dots{display:none!important}
+.ff-ps-card.is-active::after{content:"";position:absolute;inset:-25%;background:linear-gradient(115deg,transparent 42%,rgba(255,255,255,.5) 50%,transparent 58%);transform:translateX(-130%);animation:ffSheen 3.4s ease-in-out infinite;pointer-events:none}
+@keyframes ffSheen{0%{transform:translateX(-130%)}45%,100%{transform:translateX(130%)}}
+.ff-viewer{position:fixed!important;inset:0!important;z-index:9999!important;display:flex!important;align-items:center!important;justify-content:center!important;background:rgba(8,12,22,.56)!important;backdrop-filter:blur(20px)!important;-webkit-backdrop-filter:blur(20px)!important}
+.ff-viewer img{max-width:92vw!important;max-height:82vh!important;border-radius:6px!important;box-shadow:none!important;border:0!important;filter:none!important;background:transparent!important;touch-action:none;user-select:none;-webkit-user-select:none;will-change:transform;pointer-events:auto!important}
+</style>
+
 </body>
 </html>
