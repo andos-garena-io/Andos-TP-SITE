@@ -105,6 +105,36 @@ async function fsGet(token, path) {
   return Object.assign({ _id: path.split('/').pop() }, fromFs(d.fields));
 }
 
+async function fsQueryEqual(token, collection, field, value) {
+  const body = {
+    structuredQuery: {
+      from: [{ collectionId: collection }],
+      where: {
+        fieldFilter: {
+          field: { fieldPath: field },
+          op: 'EQUAL',
+          value: { stringValue: String(value) },
+        },
+      },
+      limit: 1,
+    },
+  };
+  const r = await fetch(FS + ':runQuery', {
+    method: 'POST',
+    headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  const arr = await r.json().catch(function () { return []; });
+  if (!Array.isArray(arr)) return null;
+  for (var i = 0; i < arr.length; i++) {
+    const doc = arr[i] && arr[i].document;
+    if (!doc || !doc.fields) continue;
+    const id = String(doc.name || '').split('/').pop();
+    return Object.assign({ _id: id }, fromFs(doc.fields));
+  }
+  return null;
+}
+
 async function fsPatch(token, path, data) {
   const fields = {};
   Object.keys(data).forEach(function (k) { fields[k] = fsVal(data[k]); });
@@ -128,7 +158,20 @@ async function findRequest(token, rawId) {
     const doc = await fsGet(token, 'requests/' + variants[i]);
     if (doc) return doc;
   }
+  const fields = ['reference', 'id', 'paymentCheckReference'];
+  for (var f = 0; f < fields.length; f++) {
+    for (var j = 0; j < variants.length; j++) {
+      const found = await fsQueryEqual(token, 'requests', fields[f], variants[j]);
+      if (found) return found;
+    }
+  }
   return null;
+}
+
+function orderDocId(req) {
+  const raw = String((req && (req.orderId || req.order_id)) || '').trim();
+  if (!raw) return '';
+  return raw.replace(/^#/, '');
 }
 
 async function creditWallet(token, uid, amount, note) {
@@ -298,6 +341,15 @@ async function handleFailReply(msg) {
     failReason: reason,
     adminNote: 'Failed via Telegram: ' + reason,
   });
+  const oid = orderDocId(req);
+  if (oid) {
+    await fsPatch(gtok, 'orders/' + oid, {
+      status: 'failed',
+      displayStatus: 'Failed',
+      failReason: reason,
+      updatedAt: now,
+    });
+  }
   let bal = null;
   if (req.uid && amt > 0) {
     bal = await creditWallet(gtok, req.uid, amt, 'fail-refund');
