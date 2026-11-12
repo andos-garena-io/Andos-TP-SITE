@@ -38,7 +38,10 @@ async function tg(method, body) {
 function sa() {
   const raw = process.env.FIREBASE_SERVICE_ACCOUNT;
   if (!raw) return null;
-  try { return JSON.parse(raw); } catch (e) { return null; }
+  if (typeof raw === 'object') return raw;
+  const s = String(raw).trim();
+  try { return JSON.parse(s); } catch (e) {}
+  try { return JSON.parse(Buffer.from(s, 'base64').toString('utf8')); } catch (e) { return null; }
 }
 
 function b64url(buf) {
