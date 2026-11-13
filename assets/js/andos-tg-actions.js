@@ -1,4 +1,4 @@
-/* Fail from Telegram: mark order/txn FAILED. Wallet refund is server-side (tracker). */
+/* Fail from Telegram: red failed spend + local refund row. Wallet number comes from server. */
 (function () {
   function markLocalTxnsFailed(e) {
     try {
@@ -9,6 +9,7 @@
         var keys = [l.reference, l.requestId, l.orderId].filter(Boolean).map(function (x) { return String(x); });
         var ok = refs.some(function (r) { return keys.indexOf(r) !== -1; });
         if (!ok) return;
+        if (String(l.source || '') === 'refund' || l.type === 'credit') return;
         hit = true;
         l.status = 'failed';
         l.failReason = e.failReason || e.note || 'Failed';
@@ -17,40 +18,44 @@
       if (hit) localStorage.setItem('andos_transactions', JSON.stringify(list.slice(0, 80)));
     } catch (err) {}
   }
-
+  function addLocalRefund(e) {
+    try {
+      if (!(e.refund || e.refunded)) return;
+      var amt = Number(e.refundAmount || e.amount || 0);
+      if (!(amt > 0)) return;
+      var list = JSON.parse(localStorage.getItem('andos_transactions') || '[]') || [];
+      var rr = String(e.refundRef || ('RFD-' + e.id));
+      var exists = list.some(function (l) {
+        return String(l.reference) === rr || (String(l.source || '') === 'refund' && String(l.orderId || '') === String(e.orderId || ''));
+      });
+      if (exists) return;
+      list.unshift({
+        type: 'credit',
+        amount: amt,
+        desc: 'Wallet add · order failed',
+        status: 'approved',
+        source: 'refund',
+        reference: rr,
+        orderId: e.orderId || '',
+        requestId: e.id,
+        date: new Date().toLocaleDateString('en-IN')
+      });
+      localStorage.setItem('andos_transactions', JSON.stringify(list.slice(0, 80)));
+    } catch (err) {}
+  }
   function wrap() {
     if (!window.ANDOS_FB || typeof ANDOS_FB.applyRequest !== 'function' || ANDOS_FB.applyRequest.__andosFailRefund) return false;
     var orig = ANDOS_FB.applyRequest.bind(ANDOS_FB);
     ANDOS_FB.applyRequest = function (e) {
+      var out = orig(e);
       try {
         if (e && (e.status === 'failed' || e.status === 'refunded')) {
-          var done = {};
-          try { done = JSON.parse(localStorage.getItem('andos_requests_done') || '{}'); } catch (err) {}
-          if (done[e.id] !== e.status) {
-            done[e.id] = e.status;
-            try { localStorage.setItem('andos_requests_done', JSON.stringify(done)); } catch (err) {}
-            if (e.type === 'order' && e.orderId && typeof orders !== 'undefined' && orders && orders.length) {
-              var ix = orders.findIndex(function (o) { return o.id === e.orderId; });
-              if (ix !== -1) {
-                orders[ix].status = 'failed';
-                orders[ix].displayStatus = 'Failed';
-                orders[ix].failReason = e.note || e.failReason || 'Failed';
-                try { localStorage.setItem('andos_orders', JSON.stringify(orders)); } catch (err) {}
-                try { ANDOS_FB.saveOrder(orders[ix]); } catch (err) {}
-              }
-            }
-            markLocalTxnsFailed(e);
-            var amt = Number(e.refundAmount || e.amount || 0);
-            if (e.refund && amt > 0) {
-              try { showToast('Order failed · ₹' + amt + ' wallet me refund ho raha hai.', 'success'); } catch (err) {}
-            } else {
-              try { showToast('Request ' + (e.id || '') + ' FAILED.', 'error'); } catch (err) {}
-            }
-            try { if (typeof render === 'function') render(); } catch (err) {}
-          }
+          markLocalTxnsFailed(e);
+          addLocalRefund(e);
+          try { if (typeof render === 'function') render(); } catch (err) {}
         }
       } catch (err) {}
-      return orig(e);
+      return out;
     };
     ANDOS_FB.applyRequest.__andosFailRefund = true;
     return true;
