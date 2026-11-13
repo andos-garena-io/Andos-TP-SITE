@@ -1,5 +1,23 @@
-/* Fail/refund from Telegram → Firestore requests.status=failed (refund:true). */
+/* Fail from Telegram: mark order/txn FAILED. Wallet refund is server-side (tracker). */
 (function () {
+  function markLocalTxnsFailed(e) {
+    try {
+      var list = JSON.parse(localStorage.getItem('andos_transactions') || '[]') || [];
+      var refs = [e.reference, e.id, e.orderId, e.requestId].filter(Boolean).map(function (x) { return String(x); });
+      var hit = false;
+      list.forEach(function (l) {
+        var keys = [l.reference, l.requestId, l.orderId].filter(Boolean).map(function (x) { return String(x); });
+        var ok = refs.some(function (r) { return keys.indexOf(r) !== -1; });
+        if (!ok) return;
+        hit = true;
+        l.status = 'failed';
+        l.failReason = e.failReason || e.note || 'Failed';
+        l.desc = String(l.desc || 'Payment').replace(/\s*·\s*FAILED$/i, '') + ' · FAILED';
+      });
+      if (hit) localStorage.setItem('andos_transactions', JSON.stringify(list.slice(0, 80)));
+    } catch (err) {}
+  }
+
   function wrap() {
     if (!window.ANDOS_FB || typeof ANDOS_FB.applyRequest !== 'function' || ANDOS_FB.applyRequest.__andosFailRefund) return false;
     var orig = ANDOS_FB.applyRequest.bind(ANDOS_FB);
@@ -21,13 +39,12 @@
                 try { ANDOS_FB.saveOrder(orders[ix]); } catch (err) {}
               }
             }
-            var amt = Number(e.amount || 0);
-            var doRefund = e.refund !== false && amt > 0;
-            if (doRefund && typeof saveWallet === 'function' && typeof wallet !== 'undefined') {
-              saveWallet((Number(wallet) || 0) + amt);
-              try { showToast('₹' + amt + ' wallet me refund ho gaya.', 'success'); } catch (err) {}
+            markLocalTxnsFailed(e);
+            var amt = Number(e.refundAmount || e.amount || 0);
+            if (e.refund && amt > 0) {
+              try { showToast('Order failed · ₹' + amt + ' wallet me refund ho raha hai.', 'success'); } catch (err) {}
             } else {
-              try { showToast('Request ' + (e.id || '') + ' failed.', 'error'); } catch (err) {}
+              try { showToast('Request ' + (e.id || '') + ' FAILED.', 'error'); } catch (err) {}
             }
             try { if (typeof render === 'function') render(); } catch (err) {}
           }
