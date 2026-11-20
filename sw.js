@@ -2,7 +2,7 @@
 const CACHE_VERSION = 'v39';
 const STATIC_MEDIA_CACHE = 'andos-media-' + CACHE_VERSION;
 const IMG_CACHE = 'andos-img-' + CACHE_VERSION;
-const APP_BUILD_ID = 'andos-v3-20261120g1';
+const APP_BUILD_ID = 'andos-v3-20261120g2';
 const PRECACHE_MEDIA = [
   './assets/videos/splash-loading.mp4',
   './assets/app-icon/logo-192.png',

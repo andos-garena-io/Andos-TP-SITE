@@ -752,3 +752,52 @@ p2log("boot-ok");
     setTimeout(sweep, 12000);
   } catch (_) {}
 })();
+
+/* ================= P-INPUT: typed text + focus survive render() =================
+   Har render() se pehle id-wale input/textarea ki values + focused element stash;
+   render ke baad wapas restore + refocus. Beech-rebuild me typing kabhi nahi mitegi. */
+(function () {
+  try {
+    if (W.__p2InputGuard) return; W.__p2InputGuard = 1;
+    var R = W.render;
+    if (typeof R !== "function") return;
+    W.render = function () {
+      var stash = null;
+      try {
+        var ae = document.activeElement;
+        stash = { id: (ae && ae.id) || null, sel: null, vals: {} };
+        try {
+          if (ae && typeof ae.selectionStart === "number") stash.sel = [ae.selectionStart, ae.selectionEnd];
+        } catch (_) {}
+        var els = document.querySelectorAll("input[id], textarea[id]");
+        for (var k = 0; k < els.length && k < 60; k++) {
+          try { stash.vals[els[k].id] = els[k].value; } catch (_) {}
+        }
+      } catch (_) {}
+      var r;
+      try { r = R.apply(this, arguments); }
+      finally {
+        try {
+          if (stash) {
+            for (var id in stash.vals) {
+              try {
+                var el = document.getElementById(id);
+                if (el && "value" in el && el.value !== stash.vals[id]) el.value = stash.vals[id];
+              } catch (_) {}
+            }
+            if (stash.id) {
+              try {
+                var f = document.getElementById(stash.id);
+                if (f && f.focus) {
+                  try { f.focus({ preventScroll: true }); } catch (_) { try { f.focus(); } catch (__) {} }
+                  if (stash.sel) { try { f.setSelectionRange(stash.sel[0], stash.sel[1]); } catch (_) {} }
+                }
+              } catch (_) {}
+            }
+          }
+        } catch (_) {}
+      }
+      return r;
+    };
+  } catch (_) {}
+})();

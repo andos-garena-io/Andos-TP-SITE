@@ -18,7 +18,7 @@ const liveHash = (p) => (basename(p).match(/\.([a-f0-9]{8})\.(js|css)$/) || [])[
 
 const TARGETS = [
   { name: 'morph-rt', kind: 'js', parts: ['src/morph/vendor-idiomorph.min.js', 'src/morph/helper.js'], join: '\n', live: 'assets/js/morph-rt.e94632e1.js' },
-  { name: 'p2-overrides', kind: 'js', parts: ['src/p2-overrides.js'], join: '', live: 'assets/js/p2-overrides.044eb381.js' },
+  { name: 'p2-overrides', kind: 'js', parts: ['src/p2-overrides.js'], join: '', live: 'assets/js/p2-overrides.6c3e621c.js' },
   { name: 'p2-overrides-css', kind: 'css', parts: ['src/p2-overrides.css'], join: '', live: 'assets/css/p2-overrides.fd243889.css' },
 ];
 
