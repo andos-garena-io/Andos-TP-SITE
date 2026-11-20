@@ -1,0 +1,11 @@
+{
+  "name": "andos-tp-site",
+  "private": true,
+  "scripts": {
+    "build": "node tools/build.mjs",
+    "scan": "node tools/ownership-scan.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2"
+  }
+}

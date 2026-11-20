@@ -24,3 +24,28 @@
 
 /* NAVHIDE-FIX: page sections end above fixed #bottomNav (65px exact + safe-area) */
 #pageSlider .page-section{padding-bottom:calc(65px + env(safe-area-inset-bottom))!important}
+
+/* NOTIF-REMOVE: profile top faltu notification card hatao (user order) */
+#notifToggleCard{display:none!important}
+
+/* TXNHIDE-FIX: bhari transactions list ka aakhri hissa nav ke upar rahe (latent navhide) */
+.txn-list{padding-bottom:calc(65px + env(safe-area-inset-bottom))!important}
+
+/* CRAWLHIDE-FIX: leaderboard/loyalty/trust-sheet bottoms nav ke upar rahen (exhaustive crawl v2) */
+.lb-table{padding-bottom:calc(65px + env(safe-area-inset-bottom))!important}
+.loyalty-market-page{padding-bottom:calc(65px + env(safe-area-inset-bottom))!important}
+.p2-sheet:has(#p2GoSupport2){padding-bottom:calc(85px + env(safe-area-inset-bottom))!important}
+
+/* Failed payments — obvious from the transaction list */
+.txn-item.is-fail{border:1.5px solid #fecaca!important;background:#fef2f2!important;box-shadow:inset 0 0 0 1px #fecaca80}
+.txn-item.is-fail .txn-mid b{color:#991b1b!important;text-decoration:line-through;text-decoration-thickness:2px}
+.txn-item.is-fail .txn-right b{color:#b91c1c!important}
+.txn-item.is-fail .txn-state.bad{background:#dc2626!important;color:#fff!important;letter-spacing:.08em;font-size:10px!important;padding:3px 8px!important}
+.txn-ico.fail{background:#fee2e2!important;color:#b91c1c!important}
+.txn-item.is-refund{border-color:#a7f3d0!important}
+.txn-filters button[data-f=failed].on,.txn-filters .on[data-filter=failed]{background:#dc2626;color:#fff}
+
+/* LANDGATE-FIX: gate khula ho to invisible signout kabhi tap na churaye (landscape stuck) */
+#yuvaGate:not(.yg-out) #signOutBtn{pointer-events:none!important}
+/* BUSY-TAP-FIX: invisible busy texts ko tap nahi chahiye */
+.txt-busy{pointer-events:none!important}

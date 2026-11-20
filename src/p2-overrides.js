@@ -65,6 +65,31 @@ try {
     try {
       var back = W.__p2LastWasBack; W.__p2LastWasBack = false;
       try { if (typeof W.__andosApplyStatus === "function") W.__andosApplyStatus(); } catch (_) {}
+      /* F1 (deepfix): app ke render() ka save (__andosRS) bhi restore karo — P2 ne app ke
+         __andosRestoreScroll ko shadow kar diya tha, isliye har snapshot-render par scroll 0 ho jata tha. */
+      try {
+        var rs = W.__andosRS; W.__andosRS = null;
+        if (rs && String(cur() || "") === String(rs.p) && (rs.y > 0 || rs.sc)) {
+          var navFresh = false;
+          try { navFresh = (Date.now() - (W.__andosNavTapT || 0)) < 1200; } catch (_) {}
+          if (!navFresh) {
+            var rsy = rs.y || 0, rssc = !!rs.sc, rsp = String(rs.p);
+            var applyRS = function () {
+              try {
+                var sec = document.querySelector('.page-section[data-sec="' + rsp + '"]');
+                var m = document.querySelector("main.andos-main");
+                if (sec && sec.scrollHeight > sec.clientHeight + 2) sec.scrollTop = rsy;
+                else if (m && m.scrollHeight > m.clientHeight + 2) m.scrollTop = rsy;
+                var n = document.querySelector("nav.glass-nav");
+                if (n && rssc) n.classList.add("is-scrolled");
+                if (typeof W.syncHomeHeroNav === "function") { try { W.syncHomeHeroNav(rsy); } catch (_) {} }
+              } catch (_) {}
+            };
+            applyRS(); requestAnimationFrame(applyRS); setTimeout(applyRS, 250);
+            return;
+          }
+        }
+      } catch (_) {}
       if (!back) return;
       var p = cur(), y = W.__p2Saved[p] || 0;
       if (!(y > 0)) return;
@@ -155,10 +180,35 @@ try {
   };
 } catch (e) { p2log("fill-wrap-fail"); }
 
-/* ================= P5: trailing render replay ================= */
+/* ================= P5: trailing render replay + F2 coalesce ================= */
 try {
   var __renderOrig = render, __p2Armed = false, __p2Pending = false;
   render = function () {
+    try {
+      /* F2 (deepfix): 1s coalesce — Firestore burst (orders+requests+users lagbhag ek saath aaye to)
+         ek hi rebuild me simte. Tab-switch render hamesha immediate (navigation me der nahi). */
+      if (!W.__andosTabSwitch) {
+        var __now = Date.now();
+        if (W.__p2LastRenderT && (__now - W.__p2LastRenderT) < 1000) {
+          __p2Pending = true; p2log("render-coalesce");
+          if (!__p2Armed) {
+            __p2Armed = true;
+            var __wait = 1000 - (__now - W.__p2LastRenderT); if (__wait < 80) __wait = 80;
+            setTimeout(function () {
+              try {
+                __p2Armed = false;
+                if (__p2Pending && !W.__andosRenderQueued) {
+                  __p2Pending = false; p2log("render-coalesced");
+                  __renderOrig(); W.__p2LastRenderT = Date.now();
+                  try { __p3MediaVideos(cur()); } catch (_) {}
+                } else if (__p2Pending) { try { render(); } catch (_) {} }
+              } catch (_) { __p2Armed = false; }
+            }, __wait);
+          }
+          return;
+        }
+      }
+    } catch (_) {}
     try {
       if (W.__andosRenderQueued) {
         __p2Pending = true; p2log("render-drop");
@@ -168,7 +218,7 @@ try {
             try {
               if (!W.__andosRenderQueued) {
                 __p2Armed = false;
-                if (__p2Pending) { __p2Pending = false; p2log("render-replay"); __renderOrig(); try { __p3MediaVideos(cur()); } catch (_) {} }
+                if (__p2Pending) { __p2Pending = false; p2log("render-replay"); __renderOrig(); W.__p2LastRenderT = Date.now(); try { __p3MediaVideos(cur()); } catch (_) {} }
               } else requestAnimationFrame(arm);
             } catch (_) { __p2Armed = false; }
           };
@@ -178,6 +228,7 @@ try {
       }
     } catch (_) {}
     var __p3rr = __renderOrig();
+    try { W.__p2LastRenderT = Date.now(); } catch (_) {}
     try { __p3MediaVideos(cur()); } catch (_) {}
     return __p3rr;
   };
@@ -494,4 +545,158 @@ W.__p3TabSync = function (prev, isBack) {
 };
 
 p2log("boot-ok");
+})();
+/* VIDFIX: slow net par home video sirf first frame; tez net par autoplay (user order).
+   + faststart mp4 rewrite (moov front) taaki first frame jaldi aaye.
+   Splash video ko kabhi nahi chhedta (LOCK) — sirf lv_0_ home video. */
+(function () {
+  if (window.__andosVidFix) return;
+  window.__andosVidFix = true;
+  var SRC_MATCH = "lv_0_";
+  var OLD_MP4 = "lv_0_20261110151827.mp4";
+  var FAST_MP4 = "lv_0_20261110151827-fast.mp4";
+  var __io = null;
+  function isSlow() {
+    try {
+      var c = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+      if (c) {
+        if (c.saveData) return true;
+        var et = c.effectiveType || "";
+        if (et === "slow-2g" || et === "2g" || et === "3g") return true;
+      }
+    } catch (_) {}
+    return false;
+  }
+  function curSrc(v) {
+    try { return v.getAttribute("src") || v.currentSrc || v.src || ""; }
+    catch (_) { return ""; }
+  }
+  function useFast(v) {
+    try {
+      var s = curSrc(v);
+      if (s.indexOf(OLD_MP4) !== -1 && s.indexOf("-fast.mp4") === -1) {
+        v.setAttribute("src", s.replace(OLD_MP4, FAST_MP4));
+      }
+    } catch (_) {}
+  }
+  function isHidden(v) {
+    try { var r = v.getBoundingClientRect(); return (r.width < 2 && r.height < 2); }
+    catch (_) { return false; }
+  }
+  function liteMode(v, why) {
+    try {
+      if (!v || v.__vidLite) return;
+      v.__vidLite = true;
+      try { v.removeAttribute("autoplay"); } catch (_) {}
+      try { v.pause(); } catch (_) {}
+      try {
+        var src = curSrc(v);
+        v.preload = "metadata";
+        try { v.setAttribute("preload", "metadata"); } catch (_) {}
+        if (src) { v.src = src; v.load(); }
+      } catch (_) {}
+      try { v.style.cursor = "pointer"; } catch (_) {}
+      try {
+        if (!v.__vidTap) {
+          v.__vidTap = true;
+          v.addEventListener("click", function () {
+            try {
+              v.__vidLite = false;
+              v.preload = "auto";
+              try { v.setAttribute("preload", "auto"); } catch (_) {}
+              var s2 = curSrc(v);
+              if (s2) { v.src = s2; v.load(); }
+              var pr = v.play();
+              if (pr && pr.catch) pr.catch(function () {});
+              try { v.setAttribute("data-vidfix", "tap-play"); } catch (_) {}
+            } catch (_) {}
+          });
+        }
+      } catch (_) {}
+      try { v.setAttribute("data-vidfix", why || "slow"); } catch (_) {}
+    } catch (_) {}
+  }
+  function fastMode(v) {
+    try {
+      if (!v || !v.__vidLite) return;
+      v.__vidLite = false;
+      v.preload = "auto";
+      try { v.setAttribute("preload", "auto"); } catch (_) {}
+      var s2 = curSrc(v);
+      if (s2) { v.src = s2; v.load(); }
+      try { v.setAttribute("autoplay", ""); } catch (_) {}
+      var pr = v.play();
+      if (pr && pr.catch) pr.catch(function () {});
+      try { v.setAttribute("data-vidfix", "fast"); } catch (_) {}
+    } catch (_) {}
+  }
+  function watchVisible(v) {
+    try {
+      if (!("IntersectionObserver" in window)) return;
+      if (!__io) {
+        __io = new IntersectionObserver(function (es) {
+          for (var i = 0; i < es.length; i++) {
+            (function (en) {
+              try {
+                var t = en.target;
+                if (en.isIntersecting && !isHidden(t)) {
+                  try { __io.unobserve(t); } catch (_) {}
+                  if (isSlow()) { if (!t.__vidLite) liteMode(t, "slow-vis"); }
+                  else fastMode(t);
+                }
+              } catch (_) {}
+            })(es[i]);
+          }
+        }, { threshold: 0.05 });
+      }
+      try { __io.observe(v); } catch (_) {}
+    } catch (_) {}
+  }
+  function check(v) {
+    try {
+      if (!v || v.__vidChecked) return;
+      var src = curSrc(v);
+      if (src.indexOf(SRC_MATCH) === -1) return;
+      if (v.closest) { try { if (v.closest("#appSplashOverlay")) return; } catch (_) {} }
+      v.__vidChecked = true;
+      useFast(v);
+      if (isHidden(v)) { liteMode(v, "hidden"); watchVisible(v); return; }
+      if (isSlow()) { liteMode(v, "slow-conn"); return; }
+      setTimeout(function () {
+        try {
+          if (v.__vidLite) return;
+          if (isSlow()) { liteMode(v, "slow-late"); return; }
+          var buf = 0;
+          try { if (v.buffered && v.buffered.length) buf = v.buffered.end(v.buffered.length - 1); } catch (_) {}
+          if (!v.paused && v.readyState < 2 && buf < 0.5) liteMode(v, "stalled");
+        } catch (_) {}
+      }, 6000);
+    } catch (_) {}
+  }
+  function scan() {
+    try {
+      var vs = document.querySelectorAll("video");
+      for (var i = 0; i < vs.length; i++) check(vs[i]);
+    } catch (_) {}
+  }
+  try {
+    var c0 = navigator.connection;
+    if (c0 && c0.addEventListener) {
+      c0.addEventListener("change", function () {
+        try {
+          if (isSlow()) return;
+          var vs = document.querySelectorAll("video");
+          for (var i = 0; i < vs.length; i++) fastMode(vs[i]);
+        } catch (_) {}
+      });
+    }
+  } catch (_) {}
+  try {
+    var mo = new MutationObserver(function () { scan(); });
+    mo.observe(document.documentElement, { childList: true, subtree: true });
+  } catch (_) {}
+  try {
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", scan);
+    else scan();
+  } catch (_) {}
 })();
