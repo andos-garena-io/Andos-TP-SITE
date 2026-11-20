@@ -1,7 +1,8 @@
 /* ANDOS Production Service Worker v3 — Cache Versioning, Legacy PWA Auto-Purge & Fresh HTML Guarantee */
-const CACHE_VERSION = 'v38';
+const CACHE_VERSION = 'v39';
 const STATIC_MEDIA_CACHE = 'andos-media-' + CACHE_VERSION;
-const APP_BUILD_ID = 'andos-v3-20261120f1';
+const IMG_CACHE = 'andos-img-' + CACHE_VERSION;
+const APP_BUILD_ID = 'andos-v3-20261120g1';
 const PRECACHE_MEDIA = [
   './assets/videos/splash-loading.mp4',
   './assets/app-icon/logo-192.png',
@@ -64,7 +65,7 @@ self.addEventListener('activate', (event) => {
       const keys = await caches.keys();
       await Promise.all(
         keys
-          .filter((key) => key !== STATIC_MEDIA_CACHE)
+          .filter((key) => key !== STATIC_MEDIA_CACHE && key !== IMG_CACHE)
           .map((key) => caches.delete(key))
       );
     } catch (e) {}
@@ -143,5 +144,22 @@ self.addEventListener('fetch', (event) => {
         return fresh;
       })
     );
+    return;
+  }
+
+  // 3. LOCAL-FIRST images (g1): phone-cache se turant; version-badli to activate purana cache mita deta hai.
+  if (req.destination === 'image') {
+    event.respondWith(
+      caches.open(IMG_CACHE).then(async (cache) => {
+        const hit = await cache.match(req);
+        if (hit) return hit;
+        const fresh = await fetch(req);
+        if (fresh && (fresh.ok || fresh.type === 'opaque')) {
+          cache.put(req, fresh.clone()).catch(() => {});
+        }
+        return fresh;
+      }).catch(() => fetch(req))
+    );
+    return;
   }
 });

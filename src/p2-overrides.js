@@ -700,3 +700,55 @@ p2log("boot-ok");
     else scan();
   } catch (_) {}
 })();
+
+/* __p2ImgGuard (local-first fix): tooti tasveer kabhi mat dikhao.
+   capture-phase me har IMG error pakdo -> 1 retry (cache-bust, 1.2s) ->
+   phir bhi fail -> SVG tile (broken-icon impossible). Namespace: __p2* only. */
+(function () {
+  var SVG_TILE = 'data:image/svg+xml;utf8,' + encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="800" height="240">' +
+    '<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">' +
+    '<stop offset="0" stop-color="#7c3aed"/><stop offset="1" stop-color="#4f46e5"/></linearGradient></defs>' +
+    '<rect width="800" height="240" rx="28" fill="url(#g)"/>' +
+    '<circle cx="400" cy="96" r="40" fill="#ffffff" opacity="0.25"/>' +
+    '<text x="400" y="112" font-size="44" text-anchor="middle" fill="#ffffff">A</text>' +
+    '<text x="400" y="170" font-size="26" text-anchor="middle" fill="#ffffff" opacity="0.9">ANDOS</text>' +
+    '</svg>');
+  function isData(u) { return !u || u.indexOf('data:') === 0; }
+  function heal(img, retried) {
+    try {
+      if (retried && !isData(img.src)) {
+        var s = img.src;
+        img.dataset.p2Ig = 'retried';
+        var sep = s.indexOf('?') >= 0 ? '&' : '?';
+        setTimeout(function () { try { if (img.naturalWidth > 0) return; img.src = s + sep + 'p2r=1'; } catch (_) {} }, 1200);
+        return;
+      }
+      img.dataset.p2Ig = 'done';
+      if (img.width <= 2 && img.height <= 2) { img.style.display = 'none'; return; }
+      img.src = SVG_TILE;
+      img.style.objectFit = 'cover';
+    } catch (_) {}
+  }
+  function onErr(e) {
+    try {
+      var t = e && e.target;
+      if (!t || t.tagName !== 'IMG' || t.dataset.p2Ig === 'done') return;
+      heal(t, t.dataset.p2Ig !== 'retried');
+    } catch (_) {}
+  }
+  function sweep() {
+    try {
+      var imgs = document.querySelectorAll('img');
+      for (var i = 0; i < imgs.length; i++) {
+        var im = imgs[i];
+        if (im.complete && im.naturalWidth === 0 && !isData(im.src) && !im.dataset.p2Ig) heal(im, true);
+      }
+    } catch (_) {}
+  }
+  try {
+    document.addEventListener('error', onErr, true);
+    setTimeout(sweep, 2500);
+    setTimeout(sweep, 12000);
+  } catch (_) {}
+})();
